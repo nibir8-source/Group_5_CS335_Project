@@ -6,3 +6,8 @@ Adit Khokar 190054</br>
 Nibir Baruah 190545</br>
 Manish 190477</br>
 Manish Mayank 190482</br>
+
+<br>
+<br>
+
+Language Manual: https://github.com/nibir8-source/CS335_Go_Compiler/blob/main/docs/LanguageManual.pdf
