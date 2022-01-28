@@ -6,7 +6,7 @@ keywords = {
     'break'        :    'BREAK',
     'default'      :    'DEFAULT',
     'select'       :    'SELECT',
-    'func'         :    'FUNC',
+    'func'         :    'FUNCTION',
     'case'         :    'CASE',
     'interface'    :    'INTERFACE',
     'defer'        :    'DEFER',
@@ -19,7 +19,7 @@ keywords = {
     'fallthrough'  :    'FALLTHROUGH',
     'package'      :    'PACKAGE',
     'switch'       :    'SWITCH',
-    'const'        :    'CONST',
+    'const'        :    'CONSTANT',
     'range'        :    'RANGE',
     'type'         :    'TYPE',
     'if'           :    'IF',
@@ -27,110 +27,110 @@ keywords = {
     'return'       :    'RETURN',
     'for'          :    'FOR',
     'import'       :    'IMPORT',
-    'var'          :    'VAR',
+    'var'          :    'VARIABLE',
 }
 
 tokens = list(keywords.values()) + [
     'IDENT',            # main
     'INT',              # 123
     'FLOAT',            # 123.4
-    'IMAG',             # 123.4i
+    'IMAGINARY',             # 123.4i
     'CHAR',             # 'a'
     'STRING',           # "abc"
     'ADD',              # +
-    'SUB',              # -
-    'MUL',              # *
-    'QUO',              # /
-    'REM',              # %
-    'ADD_ASSIGN',       # +=
-    'SUB_ASSIGN',       # -=
-    'MUL_ASSIGN',       # *=
-    'QUO_ASSIGN',       # %=
-    'REM_ASSIGN',       # %=
+    'SUBTRACT',              # -
+    'MULTIPLY',              # *
+    'QUOTIENT',              # /
+    'REMAINDER',              # %
+    'ADD_ASSIGNMENT',       # +=
+    'SUB_ASSIGNMENT',       # -=
+    'MUL_ASSIGNMENT',       # *=
+    'QUO_ASSIGNMENT',       # %=
+    'REM_ASSIGNMENT',       # %=
     'AND',              # &
     'OR',               # |
     'XOR',              # ^
-    'SHL',              # <<
-    'SHR',              # >>
+    'SHIFT_LEFT',              # <<
+    'SHIFT_RIGHT',              # >>
     'AND_NOT',          # &^
-    'AND_ASSIGN',       # &=
-    'OR_ASSIGN',        # |=
-    'XOR_ASSIGN',       # ^=
-    'SHL_ASSIGN',       # <<=
-    'SHR_ASSIGN',       # >>=
-    'AND_NOT_ASSIGN',   # &^=
-    'LAND',             # &&
-    'LOR',              # ||
+    'AND_ASSIGNMENT',       # &=
+    'OR_ASSIGNMENT',        # |=
+    'XOR_ASSIGNMENT',       # ^=
+    'SHIFT_LEFT_ASSIGNMENT',       # <<=
+    'SHIFT_RIGHT_ASSIGNMENT',       # >>=
+    'AND_NOT_ASSIGNMENT',   # &^=
+    'LOGICAL_AND',             # &&
+    'LOGICAL_OR',              # ||
     'ARROW',            # <-
-    'INC',              # ++
-    'DEC',              # --
-    'EQL',              # ==
-    'LSS',              # <
-    'GTR',              # >
-    'ASSIGN',           # =
+    'INCREMENT',              # ++
+    'DECREMENT',              # --
+    'EQUAL',              # ==
+    'LESS_THAN',              # <
+    'GREATER_THAN',              # >
+    'ASSIGNMENT',           # =
     'NOT',              # !
-    'NEQ',              # !=
-    'LEQ',              # <=
-    'GEQ',              # >=
+    'NOT_EQUAL',              # !=
+    'LESS_THAN_EQUAL',              # <=
+    'GREATER_THAN_EQUAL',              # >=
     'DEFINE',           # :=
     'ELLIPSIS',         # ...
-    'LPAREN',           # (
-    'LBRACK',           # [
-    'LBRACE',           # {
+    'LEFT_PARENTHESIS',           # (
+    'LEFT_BRACKET',           # [
+    'LEFT_BRACE',           # {
     'COMMA',            # ,
     'PERIOD',           # .
-    'RPAREN',           # )
-    'RBRACK',           # ]
-    'RBRACE',           # }
+    'RIGHT_PARENTHESIS',           # )
+    'RIGHT_BRACKET',           # ]
+    'RIGHT_BRACE',           # }
     'SEMICOLON',        # ;
     'COLON',            # :
 ]
 
 t_ADD   = r"\+"
-t_SUB   = r"-"
-t_MUL   = r"\*"
-t_QUO   = r"/"
-t_REM   = r"%"
-t_ADD_ASSIGN    = r"\+="
-t_SUB_ASSIGN    = r"-="
-t_MUL_ASSIGN    = r"\*="
-t_QUO_ASSIGN    = r"/="
-t_REM_ASSIGN    = r"%="
+t_SUBTRACT   = r"-"
+t_MULTIPLY   = r"\*"
+t_QUOTIENT   = r"/"
+t_REMAINDER   = r"%"
+t_ADD_ASSIGNMENT    = r"\+="
+t_SUB_ASSIGNMENT    = r"-="
+t_MUL_ASSIGNMENT    = r"\*="
+t_QUO_ASSIGNMENT    = r"/="
+t_REM_ASSIGNMENT    = r"%="
 t_AND   = r"&"
 t_OR    = r"\|"
 t_XOR   = r"\^"
-t_SHL   = r"<<"
-t_SHR   = r">>"
+t_SHIFT_LEFT   = r"<<"
+t_SHIFT_RIGHT   = r">>"
 t_AND_NOT   = r"&\^"
-AND_ASSIGN  = r"&="
-OR_ASSIGN   = r"!="
-XOR_ASSIGN  = r"\^="
-SHL_ASSIGN  = r"<<="
-SHR_ASSIGN  = r">>="
-AND_NOT_ASSIGN  = r"&\^="
-t_LAND  = r"&&"
-t_LOR   = r"\|\|"
+AND_ASSIGNMENT  = r"&="
+OR_ASSIGNMENT   = r"!="
+XOR_ASSIGNMENT  = r"\^="
+SHL_ASSIGNMENT  = r"<<="
+SHR_ASSIGNMENT  = r">>="
+AND_NOT_ASSIGNMENT  = r"&\^="
+t_LOGICAL_AND  = r"&&"
+t_LOGICAL_OR   = r"\|\|"
 t_ARROW = r"<-"
-t_INC   = r"\+\+"
-t_DEC   = r"--"
-t_EQL   = r"=="
-t_LSS   = r"<"
-t_GTR   = r">"
-t_ASSIGN    = r"="
+t_INCREMENT   = r"\+\+"
+t_DECREMENT   = r"--"
+t_EQUAL   = r"=="
+t_LESS_THAN   = r"<"
+t_GREATER_THAN   = r">"
+t_ASSIGNMENT    = r"="
 t_NOT   = "!"
-t_NEQ   = r"!="
-t_LEQ   = r"<="
-t_GEQ   = r">="
+t_NOT_EQUAL   = r"!="
+t_LESS_THAN_EQUAL   = r"<="
+t_GREATER_THAN_EQUAL   = r">="
 t_DEFINE    = r":="
 t_ELLIPSIS  = r"\.\.\."
-t_LPAREN    = r"\("
-t_LBRACK    = r"\["
-t_LBRACE    = r"\{"
+t_LEFT_PARENTHESIS    = r"\("
+t_LEFT_BRACKET    = r"\["
+t_LEFT_BRACE    = r"\{"
 t_COMMA     = r","
 t_PERIOD    = r"\."
-t_RPAREN    = r"\)"
-t_RBRACK    = r"\]"
-t_RBRACE    = r"\}"
+t_RIGHT_PARENTHESIS    = r"\)"
+t_RIGHT_BRACKET    = r"\]"
+t_RIGHT_BRACE    = r"\}"
 t_SEMICOLON = r";"
 t_COLON     = r":"
 
@@ -140,7 +140,7 @@ decimal_digit   = r"[0-9]"
 identifier = letter + r"(" + letter + r"|" + decimal_digit + r")*"
 
 decimal_literal = r"[1-9][0-9]*"
-t_INT           = decimal_literal 
+t_INT           = decimal_literal
 t_FLOAT         = r"[0-9]+\.[0-9]+"
 
 t_ignore = " \t"
@@ -176,13 +176,16 @@ func main() {
     fmt.Println("hello world")
 }
 '''
- 
+
  # Give the lexer some input
 lexer.input(data)
- 
+def find_column(input, token):
+     line_start = input.rfind('\n', 0, token.lexpos) + 1
+     return (token.lexpos - line_start) + 1
  # Tokenize
 while True:
     tok = lexer.token()
-    if not tok: 
-        break      # No more input
-    print(tok)
+    if not tok:
+        break
+          # No more input
+    print(tok.type,tok.value,tok.lineno,find_column(data,tok))
