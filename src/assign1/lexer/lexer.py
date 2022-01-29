@@ -1,6 +1,7 @@
 from ply import lex
 import ply.lex as lex
 from ply.lex import TOKEN
+import pandas as pd
 
 keywords = {
     'break'        :    'BREAK',
@@ -136,46 +137,45 @@ t_COLON     = r":"
 
 letter          = r"[_A-Za-z]"
 decimal_digit   = r"[0-9]"
+binary_digit    = r"[0-1]" 
+octal_digit     = r"[0-7]" 
+hex_digit       = r"[0-9A-Fa-f]"
+decimal_literal = r"[1-9][0-9]*"
+decimal         = decimal_digit + r"(" + decimal_digit + r")*"
+binary_literal  = r"0[bB]" + binary_digit + r"+"
+octal_literal   = r"0" + octal_digit + r"+"
+hex_literal     = r"0[xX]" + hex_digit + r"+" 
 
 identifier = letter + r"(" + letter + r"|" + decimal_digit + r")*"
+exponent   = r"(E|e)" + r"(\+|-)?" + decimal_digit + r"+"
 
-decimal_literal = r"[1-9][0-9]*"
-t_INT           = decimal_literal
-t_FLOAT         = r"[0-9]+\.[0-9]+"
-
+t_CHAR      = r"[a-zA-Z]"
+t_INT       = decimal_literal + r"|" + binary_literal + r"|" + octal_literal + r"|" + hex_literal + r"|0"
+t_FLOAT     = r"(" + r"(\+|-)?" + decimal + exponent + r")|(" + r"\." + decimal + exponent + r")|(" + r"(\+|-)?" + decimal + r"\." + decimal + exponent + r")"
+t_IMAGINARY = r"(" + decimal + r"|" + t_FLOAT + r")" + r"i"
+t_STRING    = r"\"[^\"\\]*(\\.[^\"\\]*)*\""
 t_ignore = " \t"
+
+def t_NEWLINE(t):
+    r"\n+"
+    t.lexer.lineno += len(t.value)
+
+def t_error(t):
+    print("[ERROR] Invalid token:",t.value[0])
+    t.lexer.skip(1)
 
 @TOKEN(identifier)
 def t_IDENT(t):
     t.type = keywords.get(t.value,"IDENT")
     return t
 
-def t_newline(t):
-    r'\n+'
-    t.lexer.lineno += len(t.value)
-
-
-def t_STRING(t):
-    r"(\"(.|\n)*?)\""
-    return t
-
-
-def t_error(t):
-    print("[ERROR] Invalid token:",t.value[0])
-    t.lexer.skip(1) #skip ahead 1 character
-
 
 lexer = lex.lex()
 
 # Test it out
-data = '''
-package main
-import "fmt"
-func main() {
-    int a = 23
-    fmt.Println("hello world")
-}
-'''
+file = open('test.go', 'r')
+data = file.read()
+file.close()
 
  # Give the lexer some input
 lexer.input(data)
@@ -183,9 +183,16 @@ def find_column(input, token):
      line_start = input.rfind('\n', 0, token.lexpos) + 1
      return (token.lexpos - line_start) + 1
  # Tokenize
+
+tokens = []
+
 while True:
     tok = lexer.token()
     if not tok:
         break
-          # No more input
-    print(tok.type,tok.value,tok.lineno,find_column(data,tok))
+    tokens.append(tok)
+
+df = pd.DataFrame([[tok.type,tok.value,tok.lineno,find_column(data,tok)] for tok in tokens])
+df = df.rename(columns={0:'Token',1:'Lexeme',2:'Line#',3:'Column#'})
+
+print(df)
