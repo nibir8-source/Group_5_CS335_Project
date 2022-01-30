@@ -103,12 +103,12 @@ t_XOR   = r"\^"
 t_SHIFT_LEFT   = r"<<"
 t_SHIFT_RIGHT   = r">>"
 t_AND_NOT   = r"&\^"
-AND_ASSIGNMENT  = r"&="
-OR_ASSIGNMENT   = r"!="
-XOR_ASSIGNMENT  = r"\^="
-SHL_ASSIGNMENT  = r"<<="
-SHR_ASSIGNMENT  = r">>="
-AND_NOT_ASSIGNMENT  = r"&\^="
+t_AND_ASSIGNMENT  = r"&="
+t_OR_ASSIGNMENT   = r"!="
+t_XOR_ASSIGNMENT  = r"\^="
+t_SHIFT_LEFT_ASSIGNMENT  = r"<<="
+t_SHIFT_RIGHT_ASSIGNMENT  = r">>="
+t_AND_NOT_ASSIGNMENT  = r"&\^="
 t_LOGICAL_AND  = r"&&"
 t_LOGICAL_OR   = r"\|\|"
 t_ARROW = r"<-"
@@ -140,7 +140,7 @@ decimal_digit   = r"[0-9]"
 binary_digit    = r"[0-1]" 
 octal_digit     = r"[0-7]" 
 hex_digit       = r"[0-9A-Fa-f]"
-decimal_literal = r"[1-9][0-9]*"
+decimal_literal = r"(\+|-)?[1-9][0-9]*"
 decimal         = decimal_digit + r"(" + decimal_digit + r")*"
 binary_literal  = r"0[bB]" + binary_digit + r"+"
 octal_literal   = r"0" + octal_digit + r"+"
@@ -150,9 +150,9 @@ identifier = letter + r"(" + letter + r"|" + decimal_digit + r")*"
 exponent   = r"(E|e)" + r"(\+|-)?" + decimal_digit + r"+"
 
 t_CHAR      = r"[a-zA-Z]"
-t_INT       = decimal_literal + r"|" + binary_literal + r"|" + octal_literal + r"|" + hex_literal + r"|0"
-t_FLOAT     = r"(" + r"(\+|-)?" + decimal + exponent + r")|(" + r"\." + decimal + exponent + r")|(" + r"(\+|-)?" + decimal + r"\." + decimal + exponent + r")"
+t_FLOAT     = r"(" + r"(\+|-)?" + decimal + exponent + r")|(" + r"\." + decimal + exponent + r")|(" + r"\." + decimal + r")|(" + r"(\+|-)?" + decimal + r"\." + decimal + exponent + r")|(" + r"(\+|-)?" + decimal + r"\." + decimal + r")"
 t_IMAGINARY = r"(" + decimal + r"|" + t_FLOAT + r")" + r"i"
+t_INT       = decimal_literal + r"|" + binary_literal + r"|" + octal_literal + r"|" + hex_literal + r"|0"
 t_STRING    = r"\"[^\"\\]*(\\.[^\"\\]*)*\""
 t_ignore = " \t"
 
@@ -168,6 +168,10 @@ def t_error(t):
 def t_IDENT(t):
     t.type = keywords.get(t.value,"IDENT")
     return t
+
+def t_COMMENT(t):
+    r"(//.*)|(/\*(.|\n)*?\*/)"
+    pass
 
 
 lexer = lex.lex()
@@ -190,6 +194,8 @@ while True:
     tok = lexer.token()
     if not tok:
         break
+    elif tok.type == 'COMMENT':
+        continue
     tokens.append(tok)
 
 df = pd.DataFrame([[tok.type,tok.value,tok.lineno,find_column(data,tok)] for tok in tokens])
