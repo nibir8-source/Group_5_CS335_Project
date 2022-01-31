@@ -10,5 +10,5 @@ func main() {
 	var b string = `gh clear
      bjbjnkn
      jvbnjdnvkndk \" \ `
-
+    != 
 }
