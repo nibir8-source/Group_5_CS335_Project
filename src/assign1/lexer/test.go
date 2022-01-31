@@ -19,10 +19,10 @@ func main() {
 	var i int = 0x_67_7a_2f_cc_40_c6
 	var j uint64 = 170141183460469231
 	var k int = 170_141183_460469_231
-    var _43 int = 56
-    var tr int = _42         // an identifier, not an integer literal
-    var er int = 42_         // invalid: _ must separate successive digits
-    var yu int = 4__2        // invalid: only one _ at a time
-    var gh int = 0_xBadFace  // invalid: _ must separate successive digits
+	var _43 int = 56
+	var tr int = _42         // an identifier, not an integer literal
+	var er int = 42_         // invalid: _ must separate successive digits
+	var yu int = 4__2        // invalid: only one _ at a time
+	var gh int = 0_xBadFace  // invalid: _ must separate successive digits
 
 }

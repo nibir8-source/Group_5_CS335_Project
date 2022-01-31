@@ -137,34 +137,36 @@ t_RIGHT_BRACE    = r"\}"
 t_SEMICOLON = r";"
 t_COLON     = r":"
 
-letter          = r"[_A-Za-z]"
-decimal_digit   = r"[0-9]"
-binary_digit    = r"[0-1]" 
-octal_digit     = r"[0-7]" 
-hex_digit       = r"[0-9A-Fa-f]"
+letter          = r"([_A-Za-z])"
+decimal_digit   = r"([0-9])"
+binary_digit    = r"([0-1])" 
+octal_digit     = r"([0-7])" 
+hex_digit       = r"([0-9A-Fa-f])"
 
-identifier = letter + r"(" + letter + r"|" + decimal_digit + r")*"
+identifier = r"(" + letter + r"(" + letter + r"|" + decimal_digit + r")*)"
 
-decimal_digits  = decimal_digit + r"(\_?" + decimal_digit + r")*"
-binary_digits   = binary_digit + r"(\_?" + binary_digit + r")*"
-octal_digits    = octal_digit + r"(\_?" + octal_digit + r")*"
-hex_digits      = hex_digit + r"(\_?" + hex_digit + r")*"
+decimal_digits  = r"(" + decimal_digit + r"(\_?" + decimal_digit + r")*)"
+binary_digits   = r"(" + binary_digit + r"(\_?" + binary_digit + r")*)"
+octal_digits    = r"(" + octal_digit + r"(\_?" + octal_digit + r")*)"
+hex_digits      = r"(" + hex_digit + r"(\_?" + hex_digit + r")*)"
 
-octal_literal   = r"0[oO]?\_?" + octal_digits
-decimal_literal = r"0|([1-9](\_?" + decimal_digits + r")?)"
-binary_literal  = r"0[bB]\_?" + binary_digits 
-hex_literal     = r"0[xX]\_?" + hex_digits 
+decimal_literal = r"(0|([1-9](\_?" + decimal_digits + r")?))"
+binary_literal  = r"(0[bB]\_?" + binary_digits + r")" 
+octal_literal   = r"(0[oO]?\_?" + octal_digits + r")" 
+hex_literal     = r"(0[xX]\_?" + hex_digits + r")"
 
-t_INT = binary_literal + r"|" + octal_literal + r"|" + hex_literal + r"|" + decimal_literal
+t_INT = r"(" + binary_literal + r"|" + octal_literal + r"|" + hex_literal + r"|" + decimal_literal + r")"
 
-hex_exponent    = r"[pP][\+-]?" + decimal_digits
-hex_mantissa    = r"(\_?" + hex_digits + r"\.(" + hex_digits + r")?)|(\_?" + hex_digits + r")|(\." + hex_digits + r")"
-hex_float_literal   = r"0[xX]" + hex_mantissa + hex_exponent 
+decimal_exponent  =  r"([eE][\+-]?" + decimal_digits + r")"
+decimal_float_literal = r"(((" + decimal_digits + r")\.(" + decimal_digits + r")?(" + decimal_exponent + r")?)|(" + decimal_digits + decimal_exponent + r")|(\." + decimal_digits + r"(" + decimal_exponent + r")?))"
 
-decimal_exponent  =  r"[eE][\+-]?" + decimal_digits
-decimal_float_literal = r"(" + decimal_digits + r"\.(" + decimal_digits + r")?(" + decimal_exponent + r")?)|(" + decimal_digits + decimal_exponent + r")|(\." + decimal_digits + r"(" + decimal_exponent + r")?)"
+hex_exponent    = r"([pP][\+-]?" + decimal_digits + r")"
+hex_mantissa    = r"(((\_?" + hex_digits + r"\." + hex_digits + r"?)|(\_?" + hex_digits + r")|(\." + hex_digits + r")))"
+hex_float_literal   = r"(0[xX]" + hex_mantissa + hex_exponent + r")"
 
-t_FLOAT = hex_float_literal + r"|" + decimal_float_literal
+t_FLOAT = r"((" + hex_float_literal + ")|(" + decimal_float_literal + r"))"
+
+t_IMAGINARY = r"(" + decimal_digits + "|" + t_INT + "|" + t_FLOAT + r")i" 
 
 t_CHAR        = r"[a-zA-Z]"
 t_STRING    = r"(\"[^\"\\\n]*(\\.[^\"\\\n]*)*\")|(\`[^\`]*\`)" 

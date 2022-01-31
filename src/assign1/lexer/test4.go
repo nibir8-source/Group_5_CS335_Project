@@ -5,7 +5,7 @@ func main() {
 
 	/* SNVJKIDNVNDVNLDNVN
 	   CSDVCJDNVJ&*&(*)*) */
-
+	   var dfv int = 67
 	   var a float64 = 0.
 	   var b float64 = 72.40
 	   var c float64 = 072.40       // == 72.40
@@ -13,6 +13,7 @@ func main() {
 	   var e float64 = 1.e+0
 	   var f float64 = 6.67428e-11
 	   var g float64 = 1E6
+	   var gh float64 = 34.456e-10
 	   var h float64 = .25
 	   var i float64 = .12345E+5
 	   var i float64 = 1_5.         // == 15.0
