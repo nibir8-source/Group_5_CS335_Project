@@ -149,11 +149,13 @@ hex_literal     = r"0[xX]" + hex_digit + r"+"
 identifier = letter + r"(" + letter + r"|" + decimal_digit + r")*"
 exponent   = r"(E|e)" + r"(\+|-)?" + decimal_digit + r"+"
 
-t_CHAR      = r"[a-zA-Z]"
-t_FLOAT     = r"(" + r"(\+|-)?" + decimal + exponent + r")|(" + r"\." + decimal + exponent + r")|(" + r"\." + decimal + r")|(" + r"(\+|-)?" + decimal + r"\." + decimal + exponent + r")|(" + r"(\+|-)?" + decimal + r"\." + decimal + r")"
+t_CHAR        = r"[a-zA-Z]"
+
+t_FLOAT       = r"(" + r"(\+|-)?" + decimal + exponent + r")|(" + r"\." + decimal + exponent + r")|(" + r"\." + decimal + r")|(" + r"(\+|-)?" + decimal + r"\." + decimal + exponent + r")|(" + r"(\+|-)?" + decimal + r"\." + decimal + r")"
+
 t_IMAGINARY = r"(" + decimal + r"|" + t_FLOAT + r")" + r"i"
 t_INT       = decimal_literal + r"|" + binary_literal + r"|" + octal_literal + r"|" + hex_literal + r"|0"
-t_STRING    = r"\"[^\"\\]*(\\.[^\"\\]*)*\""
+t_STRING    = r"(\"[^\"\\\n]*(\\.[^\"\\\n]*)*\")|(\`(.|\n)*\`)" 
 t_ignore = " \t"
 
 def t_NEWLINE(t):
