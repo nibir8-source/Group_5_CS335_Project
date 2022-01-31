@@ -2,6 +2,7 @@ from ply import lex
 import ply.lex as lex
 from ply.lex import TOKEN
 import pandas as pd
+import sys
 
 keywords = {
     'break'        :    'BREAK',
@@ -29,6 +30,7 @@ keywords = {
     'for'          :    'FOR',
     'import'       :    'IMPORT',
     'var'          :    'VARIABLE',
+    'const'        :    'CONST',
 }
 
 tokens = list(keywords.values()) + [
@@ -104,6 +106,7 @@ t_SHIFT_LEFT   = r"<<"
 t_SHIFT_RIGHT   = r">>"
 t_AND_NOT   = r"&\^"
 t_AND_ASSIGNMENT  = r"&="
+t_OR_ASSIGNMENT  = r"\|="
 t_XOR_ASSIGNMENT  = r"\^="
 t_SHIFT_LEFT_ASSIGNMENT  = r"<<="
 t_SHIFT_RIGHT_ASSIGNMENT  = r">>="
@@ -139,22 +142,32 @@ decimal_digit   = r"[0-9]"
 binary_digit    = r"[0-1]" 
 octal_digit     = r"[0-7]" 
 hex_digit       = r"[0-9A-Fa-f]"
-decimal_literal = r"(\+|-)?[1-9][0-9]*"
-decimal         = decimal_digit + r"(" + decimal_digit + r")*"
-binary_literal  = r"0[bB]" + binary_digit + r"+"
-octal_literal   = r"0" + octal_digit + r"+"
-hex_literal     = r"0[xX]" + hex_digit + r"+" 
 
 identifier = letter + r"(" + letter + r"|" + decimal_digit + r")*"
-exponent   = r"(E|e)" + r"(\+|-)?" + decimal_digit + r"+"
+
+decimal_digits  = decimal_digit + r"(\_?" + decimal_digit + r")*"
+binary_digits   = binary_digit + r"(\_?" + binary_digit + r")*"
+octal_digits    = octal_digit + r"(\_?" + octal_digit + r")*"
+hex_digits      = hex_digit + r"(\_?" + hex_digit + r")*"
+
+octal_literal   = r"0[oO]?\_?" + octal_digits
+decimal_literal = r"0|([1-9](\_?" + decimal_digits + r")?)"
+binary_literal  = r"0[bB]\_?" + binary_digits 
+hex_literal     = r"0[xX]\_?" + hex_digits 
+
+t_INT = binary_literal + r"|" + octal_literal + r"|" + hex_literal + r"|" + decimal_literal
+
+hex_exponent    = r"[pP][\+-]?" + decimal_digits
+hex_mantissa    = r"(\_?" + hex_digits + r"\.(" + hex_digits + r")?)|(\_?" + hex_digits + r")|(\." + hex_digits + r")"
+hex_float_literal   = r"0[xX]" + hex_mantissa + hex_exponent 
+
+decimal_exponent  =  r"[eE][\+-]?" + decimal_digits
+decimal_float_literal = r"(" + decimal_digits + r"\.(" + decimal_digits + r")?(" + decimal_exponent + r")?)|(" + decimal_digits + decimal_exponent + r")|(\." + decimal_digits + r"(" + decimal_exponent + r")?)"
+
+t_FLOAT = hex_float_literal + r"|" + decimal_float_literal
 
 t_CHAR        = r"[a-zA-Z]"
-
-t_FLOAT       = r"(" + r"(\+|-)?" + decimal + exponent + r")|(" + r"\." + decimal + exponent + r")|(" + r"\." + decimal + r")|(" + r"(\+|-)?" + decimal + r"\." + decimal + exponent + r")|(" + r"(\+|-)?" + decimal + r"\." + decimal + r")"
-
-t_IMAGINARY = r"(" + decimal + r"|" + t_FLOAT + r")" + r"i"
-t_INT       = decimal_literal + r"|" + binary_literal + r"|" + octal_literal + r"|" + hex_literal + r"|0"
-t_STRING    = r"(\"[^\"\\\n]*(\\.[^\"\\\n]*)*\")|(\`(.|\n)*\`)" 
+t_STRING    = r"(\"[^\"\\\n]*(\\.[^\"\\\n]*)*\")|(\`[^\`]*\`)" 
 t_ignore = " \t"
 
 def t_NEWLINE(t):
@@ -177,8 +190,12 @@ def t_COMMENT(t):
 
 lexer = lex.lex()
 
+if(len(sys.argv) == 1):
+    print("[ERROR!] Enter File Name")
+    sys.exit(1)
+
 # Test it out
-file = open('test.go', 'r')
+file = open(sys.argv[1], 'r')
 data = file.read()
 file.close()
 
@@ -198,6 +215,9 @@ while True:
     elif tok.type == 'COMMENT':
         continue
     tokens.append(tok)
+
+
+pd.set_option('display.max_rows', None)
 
 df = pd.DataFrame([[tok.type,tok.value,tok.lineno,find_column(data,tok)] for tok in tokens])
 df = df.rename(columns={0:'Token',1:'Lexeme',2:'Line#',3:'Column#'})
