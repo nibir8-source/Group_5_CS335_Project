@@ -2,3 +2,4 @@
 ./bin/lexer/output
 *.pyc
 __pycache__
+./output
