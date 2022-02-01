@@ -202,10 +202,8 @@ octal_byte_val = r"(\\" + octal_digit + octal_digit + octal_digit + r")"
 byte_val = r"(" + octal_byte_val + "|" + hex_byte_val + r")"
 unicode_char = r"([^\n\'\\])"
 unicode_val = r"(" + unicode_char + r"|" + little_u_val + r"|" + big_u_val + r"|" + escp_char + r")"
-# print(unicode_val)
 
 t_RUNE = r"(\'(" + unicode_val + r"|" + byte_val + r")\')"
-# print(t_RUNE)
 
 t_CHAR        = r"[a-zA-Z]"
 t_STRING    = r"(\"[^\"\\\n]*(\\.[^\"\\\n]*)*\")|(\`[^\`]*\`)" 
