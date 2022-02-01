@@ -1,8 +1,8 @@
 from ply import lex
 import ply.lex as lex
 from ply.lex import TOKEN
-import pandas as pd
-import sys
+# import pandas as pd
+# import sys
 
 keywords = {
     #Keywords
@@ -234,34 +234,48 @@ def find_column(input, token):
     return (token.lexpos - line_start) + 1
 
 
-lexer = lex.lex()
+# lexer = lex.lex()
 
-if(len(sys.argv) == 1):
-    print("[ERROR!] Enter File Name")
-    sys.exit(1)
+# if(len(sys.argv) == 1):
+#     print("[ERROR!] Enter File Name")
+#     sys.exit(1)
 
+def Process(data):
+    lexer = lex.lex()
+    lexer.input(data)
+
+    tokens = []
+
+    while True:
+        tok = lexer.token()
+        if not tok:
+            break
+        elif tok.type == 'COMMENT':
+            continue
+        tokens.append(tok)
+    return tokens
 
 # Giving the lexer some input
-file = open(sys.argv[1], 'r')
-data = file.read()
-file.close()
-lexer.input(data)
+# file = open(sys.argv[1], 'r')
+# data = file.read()
+# file.close()
+# lexer.input(data)
 
-tokens = []
+# tokens = []
 
-while True:
-    tok = lexer.token()
-    if not tok:
-        break
-    elif tok.type == 'COMMENT':
-        continue
-    tokens.append(tok)
+# while True:
+#     tok = lexer.token()
+#     if not tok:
+#         break
+#     elif tok.type == 'COMMENT':
+#         continue
+#     tokens.append(tok)
 
 
-pd.set_option('display.max_rows', None)
-pd.set_option('display.max_columns', None)
+# pd.set_option('display.max_rows', None)
+# pd.set_option('display.max_columns', None)
 
-df = pd.DataFrame([[tok.type,tok.value,tok.lineno,find_column(data,tok)] for tok in tokens])
-df = df.rename(columns={0:'Token',1:'Lexeme',2:'Line#',3:'Column#'})
+# df = pd.DataFrame([[tok.type,tok.value,tok.lineno,find_column(data,tok)] for tok in tokens])
+# df = df.rename(columns={0:'Token',1:'Lexeme',2:'Line#',3:'Column#'})
 
-print(df)
+# print(df)

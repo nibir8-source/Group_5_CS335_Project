@@ -2,109 +2,70 @@ package main
 
 import "fmt"
 
-func init() {
-	return 0
-}
-func mul(a1, a2 int) int {
-
-	res := a1 * a2
-	fmt.Println(res)
-	return 0
-}
-
-type simple_struct struct {
-	orange, apple float64
-}
-
 func main() {
-	var varvarelseIf = 1
-	var switch_1_const = "hello_world" //playing with different identifiers names
-	var _Hello234world = 2
+	//Different type of integer assignment
+	a := 42
+	b := 4_2
+	c := 0600
+	d := 0_600
+	e := 0o600
+	f := 0o600
+	g := 0xBadFace
+	h := 0xBad_Face
+	i := 0x_67_7a_2f_cc_40_c6
+	j := 170141183460469
+	k := 170_141183_46046
+	fmt.Println(a, b, c, d, e, f, g, h, i, j, k)
 
-	m := make(map[string]simple_struct)
+	//floating point assignment
+	l := 0.
+	m := 72.40
+	n := 072.40
+	o := 2.71828
+	p := 1.e+0
+	q := 6.67428e-11
+	r := 1e6
+	s := .25
+	t := .12345e+5
+	u := 1_5.
+	v := 0.15e+0_2
+	fmt.Println(l, m, n, o, p, q, r, s, t, u, v)
 
-	m["key1"] = simple_struct{
-		40, -74.399,
-	}
-	fmt.Println(m["key1"])
+	la := 0x1p-2
+	ma := 0x2.p10
+	na := 0x1.Fp+0
+	oa := 0x.8p-0
+	pa := 0x_1FFFp-16
+	fmt.Println(la, ma, na, oa, pa)
 
-	map_1 := make(map[string]int)
+	//Imaginary number assignment
+	qa := 0i
+	qb := 123i
+	qc := 0o123i
+	qd := 0xabci
+	qe := 0.i
+	qf := 2.71828i
+	qg := 1.e+0i
+	qh := 6.67428e-11i
+	qi := 1e6i
+	qj := .25i
+	qk := .12345e+5i
+	ql := 0x1p-2i
+	fmt.Println(qa, qb, qc, qd, qe, qf, qg, qh, qi, qj, qk, ql)
 
-	map_1["k1"] = 7
-	map_1["k2"] = 13
-
-	fmt.Println("map:", map_1)
-
-	v1 := map_1["k1"]
-	fmt.Println("v1: ", v1)
-
-	fmt.Println("len:", len(map_1))
-
-	delete(map_1, "k2")
-	fmt.Println("map:", map_1)
-
-	_, prs := map_1["k2"]
-	fmt.Println("prs:", prs)
-
-	n := map[string]int{"foo": 1, "bar": 2}
-	fmt.Println("map:", n)
-
-	a := 20.25           //float assignment condition
-	b := 10 + 20i        //complex variable initialisation
-	c := 314159e-5       //float assignment in diff way
-	const Correct = true //assgning bool to const
-	p, q, r := 80, 70, 60
-	Arithmatic_operators := (p + q - r + p*q + p/r) % q
-	Relational_logical_operator := (p == q) && (p != r) || (q < r) && (!(r <= q)) || (p > r) || (p >= r)
-	Bitwise_opeartor := p&q + p ^ q + p | q + p<<2 + q>>2 + p&^q
-
-	fmt.Println(switch_1_const, a, b, c, Arithmatic_operators, Relational_logical_operator, Bitwise_opeartor, Correct)
-	//Assignment operators
-	p += p
-	p -= p
-	p *= p
-	p /= p
-	p %= p
-	p &= p
-	p |= p
-	p ^= p
-
-LOOP:
-	for i := 0; i < 4; i++ {
-		if p < 100 {
-			if q == 100 {
-				fmt.Printf("Nibir")
-			} else if q > 100 {
-				break
-			} else if q < 300 {
-				q--
-			} else {
-				goto LOOP
-			}
-		}
-	}
-	var string = "GeeksforGeeks"
-	for i, item := range string {
-		fmt.Println(i, item)
-	}
-
-	switch day := 2; day {
-	case 1:
-		fallthrough
-	case 2:
-	default:
-	}
-
-	select {
-	// case 1 for portal 1
-	case p := <-q:
-		fmt.Println(p, q)
-	}
-	type tank interface {
-	}
-
-	fmt.Println(varvarelseIf)
-	fmt.Printf("The value of myvariable1 is : %d\n", _Hello234world)
-	defer mul(11, 11)
+	//string representation
+	s1 := `abc`
+	s2 := `\n
+	\n` //giving error
+	s4 := "\n"
+	s5 := "\""
+	s6 := "Hello, world!\n"
+	s7 := "日本語"
+	s8 := "\u65e5本\U00008a9e"
+	s9 := "\xff\u00FF"
+	str := `vjnfvnfvkfnvk
+	dvjbvdjnvjdnvjkdv
+	dvdnvndkvnkdv\"dvjbvjdbjvbd\n`
+	fmt.Println(s1, s2, s4, s5, s6, s7, s8, s9, str)
 
 }
