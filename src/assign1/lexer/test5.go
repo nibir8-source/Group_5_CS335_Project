@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 func main() {
 	//Different type of integer assignment
 	a := 42
@@ -13,41 +15,45 @@ func main() {
 	i := 0x_67_7a_2f_cc_40_c6
 	j := 170141183460469
 	k := 170_141183_46046
+	fmt.Println(a, b, c, d, e, f, g, h, i, j, k)
 
 	//floating point assignment
-	a := 0.
-	b := 72.40
-	c := 072.40
-	d := 2.71828
-	e := 1.e+0
-	f := 6.67428e-11
-	g := 1e6
-	h := .25
-	i := .12345e+5
-	j := 1_5.
-	k := 0.15e+0_2
+	l := 0.
+	m := 72.40
+	n := 072.40
+	o := 2.71828
+	p := 1.e+0
+	q := 6.67428e-11
+	r := 1e6
+	s := .25
+	t := .12345e+5
+	u := 1_5.
+	v := 0.15e+0_2
+	fmt.Println(l, m, n, o, p, q, r, s, t, u, v)
 
-	l := 0x1p-2
-	m := 0x2.p10
-	n := 0x1.Fp+0
-	o := 0x.8p-0
-	p := 0x_1FFFp-16
+	la := 0x1p-2
+	ma := 0x2.p10
+	na := 0x1.Fp+0
+	oa := 0x.8p-0
+	pa := 0x_1FFFp-16
+	fmt.Println(la, ma, na, oa, pa)
 
 	//Imaginary number assignment
-	a := 0i
-	b := 123i
-	c := 0o123i
-	d := 0xabci
-	e := 0.i
-	f := 2.71828i
-	g := 1.e+0i
-	h := 6.67428e-11i
-	i := 1e6i
-	j := .25i
-	k := .12345e+5i
-	l := 0x1p-2i
-	//string representation
+	qa := 0i
+	qb := 123i
+	qc := 0o123i
+	qd := 0xabci
+	qe := 0.i
+	qf := 2.71828i
+	qg := 1.e+0i
+	qh := 6.67428e-11i
+	qi := 1e6i
+	qj := .25i
+	qk := .12345e+5i
+	ql := 0x1p-2i
+	fmt.Println(qa, qb, qc, qd, qe, qf, qg, qh, qi, qj, qk, ql)
 
+	//string representation
 	s1 := `abc`
 	s2 := `\n
 	\n` //giving error
@@ -57,8 +63,9 @@ func main() {
 	s7 := "日本語"
 	s8 := "\u65e5本\U00008a9e"
 	s9 := "\xff\u00FF"
-	str = `vjnfvnfvkfnvk
+	str := `vjnfvnfvkfnvk
 	dvjbvdjnvjdnvjkdv
 	dvdnvndkvnkdv\"dvjbvjdbjvbd\n`
+	fmt.Println(s1, s2, s4, s5, s6, s7, s8, s9, str)
 
 }
