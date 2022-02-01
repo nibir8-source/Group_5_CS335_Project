@@ -214,7 +214,7 @@ def t_NEWLINE(t):
     t.lexer.lineno += len(t.value)
 
 def t_error(t):
-    print("[ERROR] Invalid token:",t.value[0])
+    print(f"[ERROR] Invalid token: {t.value[0]} in #Line: {t.lineno}")
     t.lexer.skip(1)
 
 @TOKEN(identifier)

@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"errors"
+	"fmt"
 )
 
 // Color provides a type for vertex color
@@ -42,13 +42,13 @@ func (g *Graph) AddEdge(one, two int) {
 
 func (g *Graph) ValidateColorsOfVertex(colors map[int]Color) error {
 	if g.vertices != len(colors) {
-		return errors.New("coloring: not all vertices of graph are colored")
+		return errors.New("Error 1")
 	}
 	// check colors
 	for vertex, neighbours := range g.edges {
 		for nb := range neighbours {
 			if colors[vertex] == colors[nb] {
-				return errors.New("coloring: same colors of neighbouring vertex")
+				return errors.New("Error 2")
 			}
 		}
 	}
