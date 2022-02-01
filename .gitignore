@@ -1,1 +1,2 @@
 *.exe
+./bin/lexer/output
