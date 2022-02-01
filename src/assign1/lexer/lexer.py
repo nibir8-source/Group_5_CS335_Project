@@ -39,6 +39,7 @@ tokens = list(keywords.values()) + [
     'FLOAT',            # 123.4
     'IMAGINARY',             # 123.4i
     'CHAR',             # 'a'
+    'RUNE',
     'STRING',           # "abc"
     'ADD',              # +
     'SUBTRACT',              # -
@@ -168,6 +169,17 @@ t_FLOAT = r"((" + hex_float_literal + ")|(" + decimal_float_literal + r"))"
 
 t_IMAGINARY = r"(" + decimal_digits + "|" + t_INT + "|" + t_FLOAT + r")i" 
 
+escp_char = r"(\\(a|b|f|n|r|t|v|\\|\'|\"))"
+big_u_val = r"(\\U" + hex_digit + hex_digit + hex_digit + hex_digit + hex_digit + hex_digit + hex_digit + hex_digit + r")"
+little_u_val = r"(\\u" + hex_digit + hex_digit + hex_digit + hex_digit + r")"
+hex_byte_val = r"(\\x" + hex_digit + hex_digit + r")"
+octal_byte_val = r"(\\" + octal_digit + octal_digit + octal_digit + r")"
+byte_val = r"(" + octal_byte_val + "|" + hex_byte_val + r")"
+unicode_char = r"([^\n])"
+unicode_val = r"(" + unicode_char + r"|" + little_u_val + r"|" + big_u_val + r"|" + escp_char + r")"
+
+t_RUNE = r"(\'(" + unicode_val + r"|" + byte_val + r")\')"
+
 t_CHAR        = r"[a-zA-Z]"
 t_STRING    = r"(\"[^\"\\\n]*(\\.[^\"\\\n]*)*\")|(\`[^\`]*\`)" 
 t_ignore = " \t"
@@ -220,6 +232,7 @@ while True:
 
 
 pd.set_option('display.max_rows', None)
+pd.set_option('display.max_columns', None)
 
 df = pd.DataFrame([[tok.type,tok.value,tok.lineno,find_column(data,tok)] for tok in tokens])
 df = df.rename(columns={0:'Token',1:'Lexeme',2:'Line#',3:'Column#'})

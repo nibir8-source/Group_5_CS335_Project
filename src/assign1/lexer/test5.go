@@ -52,7 +52,7 @@ func main() {
 
 	s1:=`abc`                
 	s2:=`\n
-	s3:=\n`        //giving error         
+	\n`        //giving error         
 	s4:="\n"
 	s5:="\""                
 	s6:="Hello, world!\n"

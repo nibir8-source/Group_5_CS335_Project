@@ -5,7 +5,8 @@ func main() {
 
 	/* SNVJKIDNVNDVNLDNVN
 	   CSDVCJDNVJ&*&(*)*) */
-
+	var tyu rune = 'F'
+	var try rune = 'T'
 	var a int = 42
 	var b int = 4_2
 	var z int = 0b10101011
