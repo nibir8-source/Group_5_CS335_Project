@@ -1,3 +1,4 @@
 *.exe
 ./bin/lexer/output
 *.pyc
+__pycache__
