@@ -5,6 +5,7 @@ import pandas as pd
 import sys
 
 keywords = {
+    #Keywords
     'break'        :    'BREAK',
     'default'      :    'DEFAULT',
     'select'       :    'SELECT',
@@ -34,6 +35,8 @@ keywords = {
 }
 
 tokens = list(keywords.values()) + [
+
+    # Identifiers and Basic Type Literals
     'IDENT',            # main
     'INT',              # 123
     'FLOAT',            # 123.4
@@ -41,97 +44,121 @@ tokens = list(keywords.values()) + [
     'CHAR',             # 'a'
     'RUNE',
     'STRING',           # "abc"
+
+    # Operators and Delimiters
     'ADD',              # +
     'SUBTRACT',              # -
     'MULTIPLY',              # *
     'QUOTIENT',              # /
     'REMAINDER',              # %
+
     'ADD_ASSIGNMENT',       # +=
     'SUB_ASSIGNMENT',       # -=
     'MUL_ASSIGNMENT',       # *=
     'QUO_ASSIGNMENT',       # %=
     'REM_ASSIGNMENT',       # %=
+
     'AND',              # &
     'OR',               # |
     'XOR',              # ^
     'SHIFT_LEFT',              # <<
     'SHIFT_RIGHT',              # >>
     'AND_NOT',          # &^
+
     'AND_ASSIGNMENT',       # &=
     'OR_ASSIGNMENT',        # |=
     'XOR_ASSIGNMENT',       # ^=
     'SHIFT_LEFT_ASSIGNMENT',       # <<=
     'SHIFT_RIGHT_ASSIGNMENT',       # >>=
     'AND_NOT_ASSIGNMENT',   # &^=
+
     'LOGICAL_AND',             # &&
     'LOGICAL_OR',              # ||
     'ARROW',            # <-
     'INCREMENT',              # ++
     'DECREMENT',              # --
+
     'EQUAL',              # ==
     'LESS_THAN',              # <
     'GREATER_THAN',              # >
     'ASSIGNMENT',           # =
     'NOT',              # !
+
     'NOT_EQUAL',              # !=
     'LESS_THAN_EQUAL',              # <=
     'GREATER_THAN_EQUAL',              # >=
     'DEFINE',           # :=
     'ELLIPSIS',         # ...
+
     'LEFT_PARENTHESIS',           # (
     'LEFT_BRACKET',           # [
     'LEFT_BRACE',           # {
     'COMMA',            # ,
     'PERIOD',           # .
+
     'RIGHT_PARENTHESIS',           # )
     'RIGHT_BRACKET',           # ]
     'RIGHT_BRACE',           # }
     'SEMICOLON',        # ;
     'COLON',            # :
+
+    #Special Tokens
+    'COMMENT',
+    'NEWLINE',
+    'EOF',
 ]
 
+# Regular expression rules for different tokens
 t_ADD   = r"\+"
 t_SUBTRACT   = r"-"
 t_MULTIPLY   = r"\*"
 t_QUOTIENT   = r"/"
 t_REMAINDER   = r"%"
+
 t_ADD_ASSIGNMENT    = r"\+="
 t_SUB_ASSIGNMENT    = r"-="
 t_MUL_ASSIGNMENT    = r"\*="
 t_QUO_ASSIGNMENT    = r"/="
 t_REM_ASSIGNMENT    = r"%="
+
 t_AND   = r"&"
 t_OR    = r"\|"
 t_XOR   = r"\^"
 t_SHIFT_LEFT   = r"<<"
 t_SHIFT_RIGHT   = r">>"
 t_AND_NOT   = r"&\^"
+
 t_AND_ASSIGNMENT  = r"&="
 t_OR_ASSIGNMENT  = r"\|="
 t_XOR_ASSIGNMENT  = r"\^="
 t_SHIFT_LEFT_ASSIGNMENT  = r"<<="
 t_SHIFT_RIGHT_ASSIGNMENT  = r">>="
 t_AND_NOT_ASSIGNMENT  = r"&\^="
+
 t_LOGICAL_AND  = r"&&"
 t_LOGICAL_OR   = r"\|\|"
 t_ARROW = r"<-"
 t_INCREMENT   = r"\+\+"
 t_DECREMENT   = r"--"
+
 t_EQUAL   = r"=="
 t_LESS_THAN   = r"<"
 t_GREATER_THAN   = r">"
 t_ASSIGNMENT    = r"="
 t_NOT   = "!"
+
 t_NOT_EQUAL   = r"!="
 t_LESS_THAN_EQUAL   = r"<="
 t_GREATER_THAN_EQUAL   = r">="
 t_DEFINE    = r":="
 t_ELLIPSIS  = r"\.\.\."
+
 t_LEFT_PARENTHESIS    = r"\("
 t_LEFT_BRACKET    = r"\["
 t_LEFT_BRACE    = r"\{"
 t_COMMA     = r","
 t_PERIOD    = r"\."
+
 t_RIGHT_PARENTHESIS    = r"\)"
 t_RIGHT_BRACKET    = r"\]"
 t_RIGHT_BRACE    = r"\}"
@@ -201,6 +228,11 @@ def t_COMMENT(t):
     r"(//.*)|(/\*(.|\n)*?\*/)"
     pass
 
+#Function to find #Column
+def find_column(input, token):
+    line_start = input.rfind('\n', 0, token.lexpos) + 1
+    return (token.lexpos - line_start) + 1
+
 
 lexer = lex.lex()
 
@@ -208,17 +240,12 @@ if(len(sys.argv) == 1):
     print("[ERROR!] Enter File Name")
     sys.exit(1)
 
-# Test it out
+
+# Giving the lexer some input
 file = open(sys.argv[1], 'r')
 data = file.read()
 file.close()
-
- # Give the lexer some input
 lexer.input(data)
-def find_column(input, token):
-     line_start = input.rfind('\n', 0, token.lexpos) + 1
-     return (token.lexpos - line_start) + 1
- # Tokenize
 
 tokens = []
 
