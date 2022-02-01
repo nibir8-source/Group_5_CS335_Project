@@ -87,9 +87,8 @@ func main() {
 	s7 := "日本語"
 	s8 := "\u65e5本\U00008a9e"
 	s9 := "\xff\u00FF"
-	str := `vjnfvnfvkfnvk
-	dvjbvdjnvjdnvjkdv
-	dvdnvndkvnkdv\"dvjbvjdbjvbd\n`
+	str := `vjn
+	dnv\"dvd\n`
 	fmt.Println(s1, s2, s4, s5, s6, s7, s8, s9, str)
 
 }

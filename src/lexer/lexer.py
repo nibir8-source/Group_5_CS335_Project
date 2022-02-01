@@ -231,7 +231,7 @@ def find_column(input, token):
     line_start = input.rfind('\n', 0, token.lexpos) + 1
     return (token.lexpos - line_start) + 1
 
-
+#Token Processing
 def Process(data):
     lexer = lex.lex()
     lexer.input(data)
