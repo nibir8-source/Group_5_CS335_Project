@@ -1,4 +1,3 @@
 *.exe
 ./bin/lexer/output
 *.pyc
-src/lexer/__pycache__/lexer.cpython-39.pyc

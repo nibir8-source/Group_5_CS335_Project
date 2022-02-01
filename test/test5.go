@@ -6,12 +6,12 @@ func main() {
 	//Different type of integer assignment
 	a := 42
 	b := 4_2
-	c := 0600
-	d := 0_600
-	e := 0o600
-	f := 0o600
-	g := 0xBadFace
-	h := 0xBad_Face
+	c := 0666
+	d := 0_666
+	e := 0o666
+	f := 0o65_4
+	g := 0xBabeFace
+	h := 0xBabe_Face
 	i := 0x_67_7a_2f_cc_40_c6
 	j := 170141183460469
 	k := 170_141183_46046
