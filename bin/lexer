@@ -1,0 +1,2 @@
+#!/bin/sh
+python3 ./src/lexer/lexer_driver.py $1
