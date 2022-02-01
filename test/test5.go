@@ -1,127 +1,95 @@
 package main
 
-import (
-	"errors"
-	"fmt"
-)
-
-// Color provides a type for vertex color
-type Color int
-
-// Graph provides a structure to store an undirected graph.
-// It is safe to use its empty object.
-type Graph struct {
-	vertices int
-	edges    map[int]map[int]struct{}
-}
-
-// AddVertex will add a new vertex in the graph, if the vertex already
-// exist it will do nothing
-func (g *Graph) AddVertex(v int) {
-	if g.edges == nil {
-		g.edges = make(map[int]map[int]struct{})
-	}
-
-	// Check if vertex is present or not
-	if _, ok := g.edges[v]; !ok {
-		g.vertices++
-		g.edges[v] = make(map[int]struct{})
-	}
-}
-
-// AddEdge will add a new edge between the provided vertices in the graph
-func (g *Graph) AddEdge(one, two int) {
-	// Add vertices: one and two to the graph if they are not present
-	g.AddVertex(one)
-	g.AddVertex(two)
-
-	// and finally add the edges: one->two and two->one for undirected graph
-	g.edges[one][two] = struct{}{}
-	g.edges[two][one] = struct{}{}
-}
-
-func (g *Graph) ValidateColorsOfVertex(colors map[int]Color) error {
-	if g.vertices != len(colors) {
-		return errors.New("coloring: not all vertices of graph are colored")
-	}
-	// check colors
-	for vertex, neighbours := range g.edges {
-		for nb := range neighbours {
-			if colors[vertex] == colors[nb] {
-				return errors.New("coloring: same colors of neighbouring vertex")
-			}
-		}
-	}
-	return nil
-}
-
-func (g *Graph) TryBipartiteColoring() map[int]Color {
-	// 0 is uncolored, 1/2 is colors
-	colors := make(map[int]Color)
-	visited := make(map[int]bool)
-
-	for i := range g.edges {
-		colors[i] = 0
-		visited[i] = false
-	}
-
-	var color_node func(int)
-	color_node = func(s int) {
-		visited[s] = true
-		coloring := []Color{0, 2, 1}
-
-		for n := range g.edges[s] {
-			if colors[n] == 0 {
-				colors[n] = coloring[colors[s]]
-			}
-			if !visited[n] {
-				color_node(n)
-			}
-		}
-	}
-
-	for i := range g.edges {
-		if colors[i] == 0 {
-			colors[i] = 1
-			color_node(i)
-		}
-	}
-
-	return colors
-}
-
-// basically tries to color the graph in two colors if each edge
-// connects 2 differently colored nodes the graph can be considered bipartite
-func BipartiteCheck(N int, edges [][]int) bool {
-	var graph Graph
-	for i := 0; i < N; i++ {
-		graph.AddVertex(i)
-	}
-	for _, e := range edges {
-		graph.AddEdge(e[0], e[1])
-	}
-	return graph.ValidateColorsOfVertex(graph.TryBipartiteColoring()) == nil
-}
-
-var testCases = []struct {
-	name        string
-	N           int
-	isBipartite bool
-	edges       [][]int
-}{
-	{
-		"basic true", 2, true,
-		[][]int{{1, 0}},
-	},
-	{
-		"basic false", 3, false,
-		[][]int{{0, 1}, {1, 2}, {2, 0}},
-	},
-}
+import "fmt"
 
 func main() {
-	for _, tc := range testCases {
-		actual := BipartiteCheck(tc.N, tc.edges)
-		fmt.Print(actual, "\n")
-	}
+	//Different type of integer assignment
+	a := 42
+	b := 4_2
+	c := 0600
+	d := 0_600
+	e := 0o600
+	f := 0o600
+	g := 0xBadFace
+	h := 0xBad_Face
+	i := 0x_67_7a_2f_cc_40_c6
+	j := 170141183460469
+	k := 170_141183_46046
+	fmt.Println(a, b, c, d, e, f, g, h, i, j, k)
+
+	//floating point assignment
+	l := 0.
+	m := 72.40
+	n := 072.40
+	o := 2.71828
+	p := 1.e+0
+	q := 6.67428e-11
+	r := 1e6
+	s := .25
+	t := .12345e+5
+	u := 1_5.
+	v := 0.15e+0_2
+	fmt.Println(l, m, n, o, p, q, r, s, t, u, v)
+
+	la := 0x1p-2
+	ma := 0x2.p10
+	na := 0x1.Fp+0
+	oa := 0x.8p-0
+	pa := 0x_1FFFp-16
+	fmt.Println(la, ma, na, oa, pa)
+
+	//Imaginary number assignment
+	qa := 0i
+	qb := 123i
+	qc := 0o123i
+	qd := 0xabci
+	qe := 0.i
+	qf := 2.71828i
+	qg := 1.e+0i
+	qh := 6.67428e-11i
+	qi := 1e6i
+	qj := .25i
+	qk := .12345e+5i
+	ql := 0x1p-2i
+	fmt.Println(qa, qb, qc, qd, qe, qf, qg, qh, qi, qj, qk, ql)
+
+	//Rune literals
+
+	r1 := '\a' // U+0007
+	r2 := '\b' // U+0008
+	r3 := '\f' //U+000C
+	r4 := '\n' //U+000A
+	r5 := '\r' //U+000D
+	r6 := '\t' //U+0009
+	r7 := '\v' //U+000B
+	r8 := '\\' //U+005C
+	r9 := '\'' //U+0027
+
+	r11 := 'a'
+	r12 := 'ä'
+	r13 := '本'
+	r14 := '\t'
+	r15 := '\002'
+	r16 := '\005'
+	r17 := '\372'
+	r18 := '\x02'
+	r19 := '\xf4'
+	r20 := '\u33e4'
+	r21 := '\U00101234'
+	fmt.Println(r1, r2, r3, r4, r5, r6, r7, r8, r9, r11, r12, r13, r14, r15, r16, r17, r18, r19, r20, r21)
+	//string representation
+	s1 := `abc`
+	s2 := `\n
+	\n`
+	s4 := "\n"
+	s5 := "\""
+	s6 := "CS335 amazing course!\n"
+	s7 := "日本語"
+	s8 := "\u65e5本\U00008a9e"
+	s9 := "\xff\u00FF"
+	str := `vjnfvnfvkfnvk
+	dvjbvdjnvjdnvjkdv
+	dvdnvndkvnkdv\"dvjbvjdbjvbd\n`
+	fmt.Println(s1, s2, s4, s5, s6, s7, s8, s9, str)
+
 }
