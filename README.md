@@ -17,10 +17,10 @@ Language Manual: https://github.com/nibir8-source/CS335_Go_Compiler/blob/main/do
 
 # Milestone 2
 
-The actual Scanner or Lexer is in the folder src/lexer named lexer.py; and lexer_driver.py in the same folder, is the program the prints the output given by the lexer.<br>
-The script lexer in bin folder runs the lexer against test cases.<br>
+The actual Scanner or Lexer is in the folder src/lexer named lexer.py, and lexer_driver.py in the same folder is the program that prints the output given by the lexer.<br>
+The script lexer in the bin folder runs the lexer against test cases.<br>
 
-For running first test case given in the tests folder run the following command:<br>
+For running the first test case given in the tests folder run the following command:<br>
  
 ./bin/lexer ./tests/test1.go<br>
 
