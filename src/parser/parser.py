@@ -29,10 +29,6 @@ def p_type_name(p):
     ''''TypeName : IDENT | QualifiedIdent'''
     p[0] = p[1]
 
-def p_qualified_ident(p):
-    '''QualifiedIdent : PackageName DOT IDENT'''
-    p[0] = p[1] + "." + p[3]
-
 def p_package_name(p):
     '''PackageName : IDENT'''
     p[0] = p[1]
@@ -297,4 +293,185 @@ def p_short_var_decl(p):
     '''ShortValDecl : IdentifierList DEFINE ExpressionList'''
     p[0] = p[1] + " " + p[2] + " " + p[3]
 
-def p_
+def p_function_decl(p):
+    '''FunctionDecl : FUNC FunctionName Signature FunctionBodyPlus'''
+    p[0] = p[1] + " " + p[2] + " " + p[3] + " " + p[4]
+
+def p_function_body_plus(p):
+    '''FunctionBodyPlus : FunctionBody | EmptyStmt'''
+    p[0] = p[1]
+
+def p_function_name(p):
+    '''FunctionName : IDENT'''
+    p[0] = p[1]
+
+def p_function_body(p):
+    '''FunctionBody : Block'''
+    p[0] = p[1]
+
+def p_method_decl(p):
+    '''MethodDecl : FUNC Receiver MethodName Signature FunctionBodyPlus'''
+    p[0] = p[1] + " " + p[2] + " " + p[3] + " " + p[4]
+
+def p_receiver(p):
+    '''Receiver : Parameters'''
+    p[0] = p[1]
+
+def p_operand(p):
+    '''Operand : Literal | OperandName | LEFT_PARENTHESIS Expression RIGHT_PARENTHESIS'''
+    p[0] = p[1]
+
+def p_literal(p):
+    '''Literal : BasicLit | CompositeLit | FunctionLit'''
+    p[0] = p[1]
+
+def p_basic_lit(p):
+    '''BasicLit : INT | FLOAT | IMAGINARY | FLOAT | RUNE | STRING'''
+    p[0] = p[1]
+
+def p_operand_name(p):
+    '''OperandName : IDENT | QualifiedIdent'''
+    p[0] = p[1]
+
+
+def p_qualified_ident(p):
+    '''QualifiedIdent : PackageName DOT IDENT'''
+    p[0] = p[1] + "." + p[3]
+
+def p_composite_lit(p):
+    '''CompositeLit : LiteralType LiteralValue'''
+    p[0] = p[1] + " " + p[2]
+
+def p_literal_type(p):
+    '''LiteralType : StructType | ArrayType | LEFT_BRACKET ELLIPSIS RIGHT_BRACKET ElementType |
+                    SliceType | MapType | TypeName'''
+    p[0] = p[1]
+
+def p_literal_value(p):
+    '''LiteralValue : LEFT_BRACKET ElementListPlus RIGHT BRACKET'''
+    p[0] = p[1] + " " + p[2] + " " + p[3]
+
+def p_element_list_plus(p):
+    '''ElementListPlus : ElementList CommaPlus | EmptyStmt'''
+    p[0] = p[1]
+
+def p_element_list(p):
+    '''ElementList : KeyedElement KeyedelementStar'''
+    p[0] = p[1] + " " + p[2]
+
+def KeyedElementStar(p):
+    '''KeyedElementPlus : KeyedElementStar KeyedElement | EmptyStmt'''
+    p[0] = p[1]
+
+def KeyedElement(p):
+    '''KeyedElement : KeyPlus Element'''
+    p[0] = p[1] + " " + p[1]
+
+def p_key_plus(p):
+    '''KeyPlus : Key | EmptyStmt'''
+    p[0] = p[1]
+
+def p_key(p):
+    '''Key : FieldName | Expression | LiteralValue'''
+    p[0] = p[1]
+
+def p_field_name(p):
+    '''FieldName : IDENT'''
+    p[0] = p[1]
+
+def p_element(p):
+    '''Element : Expression | LiteralVal'''
+    p[0] = p[1]
+
+def p_function_lit(p):
+    '''FunctionLit : FUNC Signature FunctionBody'''
+    p[0] = p[1]
+
+def p_primary_expr(p):
+    '''PrimaryExpr : Operand |
+	Conversion |
+	MethodExpr |
+	PrimaryExpr Selector |
+	PrimaryExpr Index |
+	PrimaryExpr Slice |
+	PrimaryExpr TypeAssertion |
+	PrimaryExpr Arguments'''
+    p[0] = p[1]
+
+def p_selector(p):
+    '''Selector : DOT IDENT'''
+    p[0] = p[1] + " " + p[2]
+
+def p_index(p):
+    '''Index : LEFT_BRACKET Expression RIGHT_BRACKET'''
+    p[0] = p[1] + " " + p[2] + " " + p[3]
+
+def p_slice(p):
+    '''Slice : LEFT_BRACKET ExpressionPlus COLON ExpressionPlus RIGHT_BRACKET | LEFT_BRACKET ExpressionPlus COLON Expression COLON Expression RIGHT_BRACKET'''
+    p[0] = p[1]
+
+def p_expression_plus(p):
+    '''ExpressionPlus : Expression | EmptyStmt'''
+    p[0] = p[1]
+
+def p_type_assertion(p):
+    '''TypeAssertion : DOT LEFT_PARENTHESIS Type RIGHT_PARENTHESIS'''
+    p[0] = p[1] + " " + p[2] + " " + p[3] + " " + p[4]
+
+def p_arguments(p):
+    '''Arguments: LEFT_PARENTHESIS ArgumentsPlus RIGHT_PARENTHESIS'''
+    p[0] = p[1] + " " + p[2] + " " + p[3]
+
+def p_arguments_plus(p):
+    '''ArgumentsPlus : ArgumentsInOr | EmptyStmt'''
+    p[0] = p[1]
+
+def p_arguments_in_or(p):
+    '''ArgumentsInOr : ExpressionList | Type CommaExpressionListPlus'''
+    p[0] = p[1]
+
+def p_comma_expression_list_plus(p):
+    '''CommaExpressionListPlus : CommaPlus ExpressionList | EmptyStmt'''
+    p[0] = p[1]
+
+def p_method_expr(p):
+    '''MethodExpr : ReceiverType DOT MethodName'''
+    p[0] = p[1] + " " + p[2] + " " + p[3]
+
+def p_receiver_type(p):
+    '''ReceiverType : Type'''
+    p[0] = p[1]
+
+def p_expression(p):
+    '''Expression : UnaryExpr | Expression binary_op Expression'''
+    p[0] = p[1]
+
+def p_unary_expr(p):
+    '''UnaryEpr : PrimaryExpr | unary_op UnaryExpr'''
+    p[0] = p[1]
+
+def p_binary_op(p):
+    '''binary_op : LOGICAL_OR | LOGICAL_AND | rel_op | add_op | mul_op'''
+    p[0] = p[1]
+
+def p_rel_op(p):
+    '''rel_op : EQUAL | NOT_EQUAL | LESS_THAN | LESS_THAN_EQUAL | GREATER_THAN | GREATER_THAN_EQUAL'''
+    p[0] = p[1]
+
+def p_add_op(p):
+    '''add_op : ADD | SUBTRACT | OR | XOR'''
+    p[0] = p[1]
+
+def p_mul_op(p):
+    '''mul_op : MULTIPLY | QUOTIENT | REMAINDER | SHIFT_LEFT | SHIFT_RIGHT | AND | AND_NOT'''
+    p[0] = p[1]
+
+def p_unary_op(p):
+    '''unary_op : ADD | SUBTRACT | NOT | XOR | MULTIPLY | AND | ARROW'''
+    p[0] = p[1]
+
+def p_conversion(p):
+    '''Conversion : Type LEFT_PARENTHESIS Expression CommaPlus RIGHT_PARENTHESIS'''
+    p[0] = p[1] + " " + p[1] + " " + p[2] + " " + p[3] + " " + p[4] + " " + p[5]
+
+
