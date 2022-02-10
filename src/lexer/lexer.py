@@ -206,6 +206,7 @@ unicode_val = r"(" + unicode_char + r"|" + little_u_val + r"|" + big_u_val + r"|
 t_RUNE = r"(\'(" + unicode_val + r"|" + byte_val + r")\')"
 
 t_CHAR        = r"[a-zA-Z]"
+
 t_STRING    = r"(\"[^\"\\\n]*(\\.[^\"\\\n]*)*\")|(\`[^\`]*\`)" 
 t_ignore = " \t"
 
