@@ -475,7 +475,7 @@ def p_conversion(p):
     p[0] = p[1] + " " + p[1] + " " + p[2] + " " + p[3] + " " + p[4] + " " + p[5]
 
 
-
+#STATEMENT
 def p_statement(p):
     '''Statement : Declaration | LabeledStmt | SimpleStmt | GoStmt | ReturnStmt | BreakStmt | ContinueStmt | GotoStmt | FallthroughStmt | Block | IfStmt | SwitchStmt | SelectStmt | ForStmt | DeferStmt '''
     p[0]=p[1]
@@ -486,7 +486,9 @@ def p_simplestmt(p):
 
 def p_emptystmt(p):
     '''EmptyStmt :'''
-    p[0] = ""
+    # p[0] = ""
+    pass
+
 
 def p_labeledstmt(p):
     '''LabeledStmt : Label COLON Statement '''
@@ -537,11 +539,20 @@ def p_ifstmt(p):
 
 def p_simplestmt_semicolon_or_emptystmt(p):
     '''Simplestmt_semicolon_or_emptystmt : SimpleStmt SEMICOLON | EmptyStmt '''
+
+    if(len(p)==2):
+        p[0]=p[1]
+    else:
+        p[0]=p[1]+" "+p[2]
     #some error
 
 def else_present_or_not(p):
     '''Else_present_or_not : ELSE Nested_if_block | EmptyStmt'''
-    p[0]=p[1] + " " + p[2]
+
+    if(len(p)==2):
+        p[0]=p[1]
+    else:
+        p[0]=p[1]+" "+p[2]
     #some error
 
 def p_nested_if_block(p):
@@ -562,7 +573,11 @@ def p_expression_or_empty(p):
 
 def p_exprcaseclause_zero_or_more_time(p):
     '''Exprcaseclause_zero_or_more_time : Exprcaseclause_zero_or_more_time ExprCaseClause | EmptyStmt'''
-    p[0]=p[1]  #error
+    if(len(p)==2):
+        p[0]=p[1]
+    else:
+        p[0]=p[1]+" "+p[2]
+     #error
 
 def p_exprcaseclause(p):
     '''ExprCaseClause : ExprSwitchCase COLON StatementList'''
@@ -570,7 +585,11 @@ def p_exprcaseclause(p):
 
 def p_exprswitchcase(p):
     '''ExprSwitchCase : CASE ExpressionList | DEFAULT '''
-    p[0]=p[1]
+    if(len(p)==2):
+        p[0]=p[1]
+    else:
+        p[0]=p[1]+" "+p[2]
+    # p[0]=p[1]
     #some error
 
 
@@ -586,7 +605,11 @@ def p_typeswitchstmt(p):
 
 def p_typecaseclause_zero_or_more(p):
     '''Typecaseclause_zero_or_more : Typecaseclause_zero_or_more TypeCaseClause | EmptyStmt'''
-    p[0]=p[1] #some error
+    if(len(p)==2):
+        p[0]=p[1]
+    else:
+        p[0]=p[1]+" "+p[2]
+     #some error
 
 def p_typeswitchguard(p):
     '''TypeSwitchGuard : Identifier_define_zero_or_one PrimaryExpr PERIOD LEFT_PARANTHESIS TYPE RIGHT_PARANTHESIS '''
@@ -594,7 +617,11 @@ def p_typeswitchguard(p):
 
 def p_identifier_define_zero_or_one(p):
     '''Identifier_define_zero_or_one : IDENT DEFINE | EmptyStmt'''
-    p[0]=p[1] #some error
+    if(len(p)==2):
+        p[0]=p[1]
+    else:
+        p[0]=p[1]+" "+p[2]
+    #some error
 
 def p_typecaseclause(p):
     '''TypeCaseClause  : TypeSwitchCase COLON StatementList '''
@@ -602,7 +629,11 @@ def p_typecaseclause(p):
 
 def p_typeswitchcase(p):
     '''TypeSwitchCase : CASE TypeList | DEFAULT'''
-    p[0]=p[1] #some error
+    if(len(p)==2):
+        p[0]=p[1]
+    else:
+        p[0]=p[1]+" "+p[2]
+    #some error
 
 def p_typelist(p):
     '''TypeList : Type Comma_type_zero_or_more '''
@@ -610,7 +641,11 @@ def p_typelist(p):
    
 def p_comma_type_zero_or_more(p):
     '''Comma_type_zero_or_more : Comma_type_zero_or_more COMMA TYPE | EmptyStmt '''
-    p[0]=p[1] #some error
+    if(len(p)==2):
+        p[0]=p[1]
+    else:
+        p[0]=p[1]+" "+p[2]
+    #some error
 
 # ForStmt = "for" [ Condition | ForClause | RangeClause ] Block .
 # Condition = Expression 
@@ -661,7 +696,11 @@ def p_rangeclause(p):
     
 def p_above_exp_zero_or_one(p):
     '''Above_exp_zero_or_one : ExpressionList ASSIGNMENT | IdentifierList DEFINE | EmptyStmt'''
-    p[0]=p[1]#some error
+    if(len(p)==2):
+        p[0]=p[1]
+    else:
+        p[0]=p[1]+" "+p[2]
+    #some error
 
 # GoStmt = "go" Expression 
 def p_gostmt(p):
@@ -681,7 +720,11 @@ def p_selectstmt(p):
 
 def p_commclause_zero_or_one(p):
     '''Commclause_zero_or_one : commclause_zero_or_one CommClause | EmptyStmt'''
-    p[0]=p[1]
+    if(len(p)==2):
+        p[0]=p[1]
+    else:
+        p[0]=p[1]+" "+p[2]
+    
     #some error
 
 def p_commclause(p):
@@ -690,7 +733,12 @@ def p_commclause(p):
 
 def p_commcase(p):
     '''CommCase : CASE Sentstmt_recvstmt | DEFAULT'''
-    p[0]=p[1] #some error
+    if(len(p)==2):
+        p[0]=p[1]
+    else:
+        p[0]=p[1]+" "+p[2]
+    
+     #some error
 
 def p_sentstmt_recvstmt(p):
     '''Sentstmt_recvstmt : SendStmt | RecvStmt'''
@@ -750,11 +798,19 @@ def p_sourcefile(p):
 
 def p_importdecl_zero_or_more(p):
     '''Importdecl_zero_or_more : Importdecl_zero_or_more ImportDecl SEMICOLON | EmptyStmt'''
-    p[0]=p[1] #some error
+    if(len(p)==2):
+        p[0]=p[1]
+    else:
+        p[0]=p[1]+" "+p[2]+" "+p[3]
+     #some error
 
 def p_topleveldecl_zero_or_more(p):
     '''Topleveldecl_zero_or_more : topleveldecl_zero_or_more TopLevelDecl SEMICOLON | EmptyStmt'''
-    p[0]=p[1] #some error
+    if(len(p)==2):
+        p[0]=p[1]
+    else:
+        p[0]=p[1]+" "+p[2]+" "+p[3]
+    #some error
 
 # PackageClause  = "package" PackageName .
 # PackageName    = identifier .
@@ -776,12 +832,19 @@ def p_importdecl(p):
 
 def p_import_spec_or(p):
     '''ImportSpecOr : ImportSpec | LEFT_PARENTHESIS ImportSpecColonStar RIGHT_PARENTHESIS'''
-    p[0] = p[1]
+    if(len(p)==2):
+        p[0]=p[1]
+    else:
+        p[0]=p[1]+" "+p[2]+" "+p[3]
+    #SOME ERROR
 
 def p_import_spec_star(p):
     '''ImportSpecStar : ImportSpecStar ImportSpec COLON | EmptyStmt'''
-    p[0] = p[1]
-
+    if(len(p)==2):
+        p[0]=p[1]
+    else:
+        p[0]=p[1]+" "+p[2]+" "+p[3]
+    #some error
 def p_import_spec(p):
     '''ImportSpec : PeriodPackageNamePlus ImportPath'''
     p[0] = p[1] + " " + p[2]
