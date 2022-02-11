@@ -335,7 +335,7 @@ def p_operand_name(p):
 
 
 def p_qualified_ident(p):
-    '''QualifiedIdent : PackageName DOT IDENT'''
+    '''QualifiedIdent : PackageName PERIOD IDENT'''
     p[0] = p[1] + "." + p[3]
 
 def p_composite_lit(p):
@@ -399,7 +399,7 @@ def p_primary_expr(p):
     p[0] = p[1]
 
 def p_selector(p):
-    '''Selector : DOT IDENT'''
+    '''Selector : PERIOD IDENT'''
     p[0] = p[1] + " " + p[2]
 
 def p_index(p):
@@ -415,7 +415,7 @@ def p_expression_plus(p):
     p[0] = p[1]
 
 def p_type_assertion(p):
-    '''TypeAssertion : DOT LEFT_PARENTHESIS Type RIGHT_PARENTHESIS'''
+    '''TypeAssertion : PERIOD LEFT_PARENTHESIS Type RIGHT_PARENTHESIS'''
     p[0] = p[1] + " " + p[2] + " " + p[3] + " " + p[4]
 
 def p_arguments(p):
@@ -435,7 +435,7 @@ def p_comma_expression_list_plus(p):
     p[0] = p[1]
 
 def p_method_expr(p):
-    '''MethodExpr : ReceiverType DOT MethodName'''
+    '''MethodExpr : ReceiverType PERIOD MethodName'''
     p[0] = p[1] + " " + p[2] + " " + p[3]
 
 def p_receiver_type(p):
@@ -474,4 +474,327 @@ def p_conversion(p):
     '''Conversion : Type LEFT_PARENTHESIS Expression CommaPlus RIGHT_PARENTHESIS'''
     p[0] = p[1] + " " + p[1] + " " + p[2] + " " + p[3] + " " + p[4] + " " + p[5]
 
+
+
+def p_statement(p):
+    '''Statement : Declaration | LabeledStmt | SimpleStmt | GoStmt | ReturnStmt | BreakStmt | ContinueStmt | GotoStmt | FallthroughStmt | Block | IfStmt | SwitchStmt | SelectStmt | ForStmt | DeferStmt '''
+    p[0]=p[1]
+
+def p_simplestmt(p):
+    '''SimpleStmt : EmptyStmt | ExpressionStmt | SendStmt | IncDecStmt | Assignment | ShortVarDecl '''
+    p[0]=p[1]
+
+def p_emptystmt(p):
+    '''EmptyStmt :'''
+    p[0] = ""
+
+def p_labeledstmt(p):
+    '''LabeledStmt : Label COLON Statement '''
+    p[0]=p[1] + " " + p[2] + " " +p[3]
+
+def p_label(p):
+    '''Label : IDENT'''
+    p[0]=p[1]
+
+def p_expressionstmt(p):
+    '''ExpressionStmt : Expression'''
+    p[0]=p[1]
+
+def p_sendstmt(p):
+    '''SendStmt : Channel ARROW Expression'''
+    p[0]=p[1]+" "+p[2] + " " + p[3]
+
+def p_channel(p):
+    '''Channel : Expression'''
+    p[0]=p[1]
+
+def p_incdecstmt(p):
+    '''IncDecStmt : Expression Incordec'''
+    p[0]=p[1]+" " + p[2]
+
+def p_incordec(p):
+    '''Incordec : INCREMENT | DECREMENT '''
+    p[0]=p[1]
+
+def p_assignment(p):
+    '''Assignment : ExpressionList assign_op ExpressionList'''
+    p[0]=p[1] + " " + p[2] + " " + p[3]
+
+def p_assign_op(p):
+    '''assign_op : add_op_or_mul_op_plus ASSIGNMENT'''
+    p[0]=p[1]+" "+p[2]
+
+def p_add_op_or_mul_op_plus(p):
+    '''add_op_or_mul_op_plus : add_op_or_mul_op | EmptyStmt'''
+    p[0]=p[1]
+
+def p_add_op_or_mul_op(p):
+    '''add_op_or_mul_op : add_op | mul_op'''
+    p[0]=p[1]
+
+def p_ifstmt(p):
+    '''IfStmt : IF Simplestmt_semicolon_or_emptystmt  Expression Block Else_present_or_not'''
+
+def p_simplestmt_semicolon_or_emptystmt(p):
+    '''Simplestmt_semicolon_or_emptystmt : SimpleStmt SEMICOLON | EmptyStmt '''
+    #some error
+
+def else_present_or_not(p):
+    '''Else_present_or_not : ELSE Nested_if_block | EmptyStmt'''
+    p[0]=p[1] + " " + p[2]
+    #some error
+
+def p_nested_if_block(p):
+    '''Nested_if_block : IfStmt | Block '''
+    p[0]=p[1]
+
+def p_switchstmt(p):
+    '''SwitchStmt : ExprSwitchStmt | TypeSwitchStmt'''
+    p[0]=p[1]
+
+def p_exprswitchstmt(p):
+    '''ExprSwitchStmt : SWITCH Simplestmt_semicolon_or_emptystmt Expression_or_empty LEFT_BRACE Exprcaseclause_zero_or_more_time RIGHT_BRACE '''
+    p[0]= p[1]+" "+p[2] + " " + p[3] + " " + p[4] + " "+ p[5] +" "+ p[6]
+
+def p_expression_or_empty(p):
+    '''Expression_or_empty : Expression | EmptyStmt'''
+    p[0]=p[1]
+
+def p_exprcaseclause_zero_or_more_time(p):
+    '''Exprcaseclause_zero_or_more_time : Exprcaseclause_zero_or_more_time ExprCaseClause | EmptyStmt'''
+    p[0]=p[1]  #error
+
+def p_exprcaseclause(p):
+    '''ExprCaseClause : ExprSwitchCase COLON StatementList'''
+    p[0]=p[1]+" "+p[2]+" "+p[3]
+
+def p_exprswitchcase(p):
+    '''ExprSwitchCase : CASE ExpressionList | DEFAULT '''
+    p[0]=p[1]
+    #some error
+
+
+# TypeSwitchStmt  = "switch" [ SimpleStmt ";" ] TypeSwitchGuard "{" { TypeCaseClause } "}" .
+# TypeSwitchGuard = [ identifier ":=" ] PrimaryExpr "." "(" "type" ")" .
+# TypeCaseClause  = TypeSwitchCase ":" StatementList .
+# TypeSwitchCase  = "case" TypeList | "default" .
+# TypeList        = Type { "," Type } .
+
+def p_typeswitchstmt(p):
+    '''TypeSwitchStmt  : SWITCH Simplestmt_semicolon_or_emptystmt TypeSwitchGuard LEFT_BRACE Typecaseclause_zero_or_more RIGHT_BRACE '''
+    p[0]=p[1]+ " " + p[2] + " " +p[3] + " " + p[4] +" " + p[5] +" "+p[6]
+
+def p_typecaseclause_zero_or_more(p):
+    '''Typecaseclause_zero_or_more : Typecaseclause_zero_or_more TypeCaseClause | EmptyStmt'''
+    p[0]=p[1] #some error
+
+def p_typeswitchguard(p):
+    '''TypeSwitchGuard : Identifier_define_zero_or_one PrimaryExpr PERIOD LEFT_PARANTHESIS TYPE RIGHT_PARANTHESIS '''
+    p[0]=p[1]+" "+p[2]+" "+p[3]+" "+p[4]+" "+p[5]+" "+p[6]
+
+def p_identifier_define_zero_or_one(p):
+    '''Identifier_define_zero_or_one : IDENT DEFINE | EmptyStmt'''
+    p[0]=p[1] #some error
+
+def p_typecaseclause(p):
+    '''TypeCaseClause  : TypeSwitchCase COLON StatementList '''
+    p[0]=p[1]+" "+p[2]+" "+p[3]
+
+def p_typeswitchcase(p):
+    '''TypeSwitchCase : CASE TypeList | DEFAULT'''
+    p[0]=p[1] #some error
+
+def p_typelist(p):
+    '''TypeList : Type Comma_type_zero_or_more '''
+    p[0]=p[1]+" "+p[2]
+   
+def p_comma_type_zero_or_more(p):
+    '''Comma_type_zero_or_more : Comma_type_zero_or_more COMMA TYPE | EmptyStmt '''
+    p[0]=p[1] #some error
+
+# ForStmt = "for" [ Condition | ForClause | RangeClause ] Block .
+# Condition = Expression 
+
+def p_forstmt(p):
+    '''ForStmt : FOR For_internal Block'''
+    p[0]=p[1]+" "+p[2]+" "+p[3]
+
+def p_for_internal(p):
+    '''For_internal : Condition | ForClause | RangeClause | EmptyStmt'''
+    p[0]=p[1]
+
+def p_condition(p):
+    '''Condition : Expression'''
+    p[0]=p[1]
+
+# ForClause = [ InitStmt ] ";" [ Condition ] ";" [ PostStmt ] .
+# InitStmt = SimpleStmt .
+# PostStmt = SimpleStmt .
+def p_forclause(p):
+    '''ForClause : Initstmt_zero_or_one SEMICOLON Condition_zero_or_one SEMICOLON Poststmt_zero_or_one'''
+    p[0]=p[1]+" "+p[2]+" "+p[3]+" "+p[4]+" "+p[5]
+
+def p_initstmt_zero_or_one(p):
+    '''Initstmt_zero_or_one : InitStmt | EmptyStmt'''
+    p[0]=p[1]
+
+def p_condition_zero_or_one(p):
+    '''Condition_zero_or_one : Condition | EmptyStmt'''
+    p[0]=p[1]
+
+def p_poststmt_zero_or_one(p):
+    '''Poststmt_zero_or_one : PostStmt | EmptyStmt'''
+    p[0]=p[1]
+
+def p_initstmt(p):
+    '''InitStmt : SimpleStmt'''
+    p[0]=p[1]
+
+def p_poststmt(p):
+    '''PostStmt : SimpleStmt'''
+    p[0]=p[1]
+
+#RangeClause = [ ExpressionList "=" | IdentifierList ":=" ] "range" Expression 
+def p_rangeclause(p):
+    '''RangeClause :  Above_exp_zero_or_one RANGE Expression '''
+    p[0]=p[1]+" "+p[2]+" "+p[3]
+    
+def p_above_exp_zero_or_one(p):
+    '''Above_exp_zero_or_one : ExpressionList ASSIGNMENT | IdentifierList DEFINE | EmptyStmt'''
+    p[0]=p[1]#some error
+
+# GoStmt = "go" Expression 
+def p_gostmt(p):
+    '''GoStmt : GO Expression '''
+    p[0]=p[1]+" "+p[2]
+
+# SelectStmt = "select" "{" { CommClause } "}" .
+# CommClause = CommCase ":" StatementList .
+# CommCase   = "case" ( SendStmt | RecvStmt ) | "default" .
+# RecvStmt   = [ ExpressionList "=" | IdentifierList ":=" ] RecvExpr .
+# RecvExpr   = Expression .
+
+def p_selectstmt(p):
+    '''SelectStmt : SELECT LEFT_BRACE Commclause_zero_or_one RIGHT_BRACE '''
+    p[0]=p[1]+" "+p[2]+" "+p[3]+" "+p[4]
+
+
+def p_commclause_zero_or_one(p):
+    '''Commclause_zero_or_one : commclause_zero_or_one CommClause | EmptyStmt'''
+    p[0]=p[1]
+    #some error
+
+def p_commclause(p):
+    '''CommClause : CommCase COLON StatementList'''
+    p[0]=p[1]+" "+p[2]+" "+p[3]
+
+def p_commcase(p):
+    '''CommCase : CASE Sentstmt_recvstmt | DEFAULT'''
+    p[0]=p[1] #some error
+
+def p_sentstmt_recvstmt(p):
+    '''Sentstmt_recvstmt : SendStmt | RecvStmt'''
+    p[0]=p[1]
+
+def p_recvstmt(p):
+    '''RecvStmt : Above_exp_zero_or_one RecvExpr'''
+    p[0]=p[1]+" "+p[2]
+
+def p_recvexpr(p):
+    '''RecvExpr : Expression'''
+    p[0]=p[1]
+
+# ReturnStmt = "return" [ ExpressionList ] 
+def p_returnstmt(p):
+    '''ReturnStmt : RETURN Expression_list_zero_or_one'''
+    p[0]=p[1]+" "+p[2]
+
+def p_expression_list_zero_or_one(p):
+    '''Expression_list_zero_or_one : ExpressionList | EmptyStmt'''
+    p[0]=p[1]
+
+# BreakStmt = "break" [ Label ]
+def p_breakstmt(p):
+    '''BreakStmt : BREAK Label_zero_or_one'''
+    p[0]=p[1]+" "+p[2]
+    
+
+def p_label_zero_or_one(p):
+    '''Label_zero_or_one : Label | EmptyStmt'''
+    p[0]=p[1]
+
+# ContinueStmt = "continue" [ Label ] 
+def p_continuestmt(p):
+    '''ContinueStmt : CONTINUE Label_zero_or_one'''
+    p[0]=p[1]+" "+p[2]
+
+# GotoStmt = "goto" Label
+def p_gotostmt(p):
+    '''GotoStmt : GOTO Label'''
+    p[0]=p[1]+" "+p[2]
+
+# FallthroughStmt = "fallthrough"
+def p_fallthroughstmt(p):
+    '''FallthroughStmt : FALLTHROUGH'''
+    p[0]=p[1]
+
+# DeferStmt = "defer" Expression 
+def p_deferstmt(p):
+    '''DeferStmt : DEFER Expression'''
+    p[0]=p[1]
+
+# SourceFile       = PackageClause ";" { ImportDecl ";" } { TopLevelDecl ";" } 
+def p_sourcefile(p):
+    '''SourceFile  : PackageClause SEMICOLON Importdecl_zero_or_more Topleveldecl_zero_or_more'''
+    p[0]=p[1]+" "+p[2]+" "+p[3]+" "+p[4]
+
+def p_importdecl_zero_or_more(p):
+    '''Importdecl_zero_or_more : Importdecl_zero_or_more ImportDecl SEMICOLON | EmptyStmt'''
+    p[0]=p[1] #some error
+
+def p_topleveldecl_zero_or_more(p):
+    '''Topleveldecl_zero_or_more : topleveldecl_zero_or_more TopLevelDecl SEMICOLON | EmptyStmt'''
+    p[0]=p[1] #some error
+
+# PackageClause  = "package" PackageName .
+# PackageName    = identifier .
+def p_packageclause(p):
+    '''PackageClause : "package" PackageName'''
+    p[0]=p[1]+" "+p[2]
+
+def p_packagename(p):
+    '''PackageName : IDENT'''
+    p[0]=p[1]
+
+# ImportDecl       = "import" ( ImportSpec | "(" { ImportSpec ";" } ")" ) .
+# ImportSpec       = [ "." | PackageName ] ImportPath .
+# ImportPath       = string_lit .
+
+def p_importdecl(p):
+    '''ImportDecl = IMPORT ImportSpecOr'''
+    p[0] = p[1] + " " + p[2]
+
+def p_import_spec_or(p):
+    '''ImportSpecOr : ImportSpec | LEFT_PARENTHESIS ImportSpecColonStar RIGHT_PARENTHESIS'''
+    p[0] = p[1]
+
+def p_import_spec_star(p):
+    '''ImportSpecStar : ImportSpecStar ImportSpec COLON | EmptyStmt'''
+    p[0] = p[1]
+
+def p_import_spec(p):
+    '''ImportSpec : PeriodPackageNamePlus ImportPath'''
+    p[0] = p[1] + " " + p[2]
+
+def p_period_package_name_plus(p):
+    '''PeriodPackageNamePlus : PeriodOrPackageName | EmptyStmt'''
+    p[0] = p[1]
+
+def p_period_or_package_name(p):
+    '''PeriodPackageName : PERIOD PackageName'''
+    p[0] = p[1] + " " + p[2]
+
+def p_import_path(p):
+    '''ImportPath : STRING'''
+    p[0] = p[1]
 
