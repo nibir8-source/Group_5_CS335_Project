@@ -207,7 +207,11 @@ t_RUNE = r"(\'(" + unicode_val + r"|" + byte_val + r")\')"
 
 t_CHAR        = r"[a-zA-Z]"
 
-t_STRING    = r"(\"[^\"\\\n]*(\\.[^\"\\\n]*)*\")|(\`[^\`]*\`)" 
+uni_char = r"(([^\n\`]))"
+raw_string_lit= r"(\`(" + uni_char + r"|" +  r"(\n))*\`)"
+interpreted_string_lit =r"(\"(" + unicode_val + r"|" + byte_val+  r")*\")"
+
+t_STRING = r"(" + raw_string_lit + r"|" + interpreted_string_lit + r")"
 t_ignore = " \t"
 
 def t_NEWLINE(t):
