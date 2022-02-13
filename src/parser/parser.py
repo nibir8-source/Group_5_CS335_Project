@@ -5,10 +5,7 @@ import sys
 sys.path.insert(0, '/home/nibir/nibir/cs335/project/Group_5_CS335_Project/src/lexer')
 import lexer
 
-file = open(sys.argv[1], 'r')
-data = file.read()
 
-tokens = lexer.Process(data)
 
 precedence = (
     ('right', 'ASSIGNMENT'),
@@ -20,42 +17,66 @@ precedence = (
     ('right', 'NOT'),
 )
 
+# --------------------- TYPES -------------------------------------
 
 def p_type(p):
-    '''Type : TypeName | TypeLit | LEFT_PARENTHESIS Type RIGHT_PARENTHESIS'''
-    p[0] = p[1]
+    '''Type : TypeName 
+    | TypeLit 
+    | LEFT_PARENTHESIS Type RIGHT_PARENTHESIS'''
+    if len(p) == 2:
+        p[0] = p[1]
+    else:
+        p[0] = p[2]
 
 def p_type_name(p):
-    ''''TypeName : IDENT | QualifiedIdent'''
+    ''''TypeName : IDENT 
+    | QualifiedIdent'''
     p[0] = p[1]
+    p[0].name = "TypeName"
 
 def p_package_name(p):
     '''PackageName : IDENT'''
     p[0] = p[1]
+    p[0].name = "PackageName"
 
 def p_type_lit(p):
-    '''TypeLit : ArrayType | StructType | PointerType | FunctionType | InterfaceType | SliceType | MapType | ChannelType'''
+    '''TypeLit : ArrayType 
+    | StructType 
+    | PointerType 
+    | FunctionType 
+    | InterfaceType 
+    | SliceType 
+    | MapType 
+    | ChannelType'''
     p[0] = p[1]
+    p[0].name = "TypeLit"
 
 def p_array_type(p):
     '''ArrayType : LEFT_BRACKET ArrayLength RIGHT_BRACKET ElementType'''
-    p[0] = p[3] + "[" + p[2] + "]"
+    p[0].name = "ArrayType"
 
 def p_array_length(p):
     '''ArrayLength : Expression'''
     p[0] = p[1]
+    p[0].name = "ArrayLength"
 
 def p_element_type(p):
     '''ElementType : Type'''
     p[0] = p[1]
+    p[0].name = "ElementType"
 
 def p_slice_type(p):
     '''SliceType : LEFT_BRACKET RIGHT_BRACKET ElementType'''
-    p[0] = p[3] + "[]"
+    p[0].name = "SliceType"
 
 def p_struct_type(p):
     '''StructType : STRUCT LEFT_BRACE ManyFieldDecl RIGHT_BRACE'''
     p[0] = "struct"
+    p[0].name = "StructType"
+
+# --------------------------------------------------------------------
+
+
 
 def p_many_field_decl(p):
     '''ManyFieldDecl : ManyFieldDecl FieldDecl SEMICOLON
@@ -188,8 +209,10 @@ def p_statement_list(p):
                      | empty'''
     p[0] = p[1] + p[2]
 
-def p_decalration(p):
-    '''Decalration : ConstDecl | TypeDecl | VarDecl'''
+#-----------------------------------------------------------------------------
+
+def p_declaration(p):
+    '''Declaration : ConstDecl | TypeDecl | VarDecl'''
     p[0] = p[1]
 
 def p_top_level_decl(p):
@@ -198,60 +221,85 @@ def p_top_level_decl(p):
 
 def p_const_decl(p):
     '''ConstDecl : CONST ConstSpecOr'''
-    p[0] = "const"
+    p[0] = p[2]
 
 def p_const_spec_or(p):
     '''ConstSpecOr : ConstSpec | LEFT_PARENTHESIS ConstSpecStar RIGHT_PARENTHESIS'''
-    p[0] = p[1]
+    if len(p) == 2:
+        p[0] = p[1]
+    else:
+        p[0] = p[2]
 
 def p_const_spec_star(p):
     '''ConstSpecStar : ConstSpecStar ConstSpec SEMICOLON
-                     | empty'''
-    p[0] = p[1]
+                     |'''
+    if len(p) == 1:
+        p[0] = []
+    else:
+        p[0] = ['ConstSpecStar', p[1], p[2]]
 
 def p_const_spec(p):
-    '''ConstSpec : IdentifierList ExpressionListPlus'''
-    p[0] = p[1] + " " + p[2]
+    '''ConstSpec : IdentifierList TypeAssignmentExpressionListPlus'''
+    p[0] = ['ConstSpec', p[1], p[2]]
 
-def p_expression_list_plus(p):
-    '''ExpressionListPlus : TypePlus ASSIGNMENT ExpressionList 
-                          | EmptyStmt'''
-    p[0] = p[1]
+def p_type_assignment_expression_list_plus(p):
+    '''TypeAssignmentExpressionListPlus : TypePlus ASSIGNMENT ExpressionList 
+                          |'''
+    if len(p) == 1:
+        p[0] = []
+    else:
+        p[0] = ['TypeAssignmentExpressionListPlus', p[1], [p[2]], p[3]]
 
 def p_type_plus(p):
-    '''TypePlus : Type | EmptyStmt'''
-    p[0] = p[1]
+    '''TypePlus : Type 
+                |'''
+    if len(p) == 1:
+        p[0] = []
+    else:
+        p[0] = p[1]
 
 def p_expression_list(p):
     '''ExpressionList : IDENT IdentStar'''
-    p[0] = p[1] + p[2]
+    p[0] = ['ExpressionList', [p[1]], p[2]]
 
 def p_indent_star(p):
     '''IdentStar : COMMA IDENT IdentStar
-                 | empty'''
-    p[0] = p[1]
+                 |'''
+    if len(p) == 1:
+        p[0] = []
+    else:
+        p[0] = ['IdentStar', [p[2]], p[3]]
 
 def p_expression_list(p):
     '''ExpressionList : Expression ExpressionStar'''
-    p[0] = p[1] + p[2]
+    p[0] = ['ExpressionList', p[1], p[2]]
 
 def p_expression_star(p):
     '''ExpressionStar : COMMA Expression ExpressionStar
-                      | empty'''
-    p[0] = p[1]
+                      |'''
+    if len(p) == 1:
+        p[0] = []
+    else:
+        p[0] = ['ExpressionStar', p[2], p[3]]
 
 def p_type_decl(p):
     '''TypeDecl : TYPE TypeSpecOr'''
-    p[0] = "type"
+    p[0] = p[2]
 
 def p_type_spec_or(p):
     '''TypeSpecOr : TypeSpec | LEFT_PARENTHESIS TypeSpecStar RIGHT_PARENTHESIS'''
-    p[0] = p[1]
+    if len(p) == 2:
+        p[0] = p[1]
+    else:
+        p[0] = p[2]
 
 def p_type_spec_star(p):
     '''TypeSpecStar : TypeSpecStar TypeSpec SEMICOLON
-                    | empty'''
-    p[0] = p[1]
+                    |'''
+    if len(p) == 1:
+        p[0] = []
+    else:
+        p[0] = ['TypeSpecStar', p[1], p[2]]
 
 def p_type_spec(p):
     '''TypeSpec : AliasDecl | TypeDef'''
@@ -259,51 +307,68 @@ def p_type_spec(p):
 
 def p_alias_decl(p):
     '''AliasDecl : IDENT ASSIGNMENT Type'''
-    p[0] = p[1] + " " + p[2] + " " + p[3]
+    p[0] = ['AliasDecl', [p[1]], [p[2]], p[3]]
 
 def p_type_def(p):
     '''TypeDef : IDENT Type'''
-    p[0] = p[1] + " " + p[2]
+    p[0] = ['TypeDef', [p[1]], p[2]]
     
 def p_var_decl(p):
-    '''VarDecl : VAR VarSpecOr'''
-    p[0] = p[1] + " " + p[2]
-
-def p_var_spec_or(p):
-    '''VarSpecOr : VarSpec | LEFT_PARENTHESIS VarSpecStar RIGHT_PARENTHESIS'''
-    p[0] = p[1]
+    '''VarDecl : VAR VarSpec
+               | VAR LEFT_PARENTHESIS VarSpecStar RIGHT_PARENTHESIS'''   
+    if len(p) == 3:
+        p[0] = ['VarDecl', [p[1]], p[2]]
+    else:
+        p[0] = ['VarDecl', [p[1]], p[3]]
 
 def p_var_spec_star(p):
-    '''VarSpecStar : VarSpecStar VarSpec SEMICOLON | Empty'''
-    p[0] = p[1]
+    '''VarSpecStar : VarSpecStar VarSpec SEMICOLON 
+                    |'''
+    if len(p) == 1:
+        p[0] = []
+    else:
+        p[0] = ['VarSpecStar', p[1], p[2]]
 
 def p_var_spec(p):
     '''VarSpec : IdentifierList TypeExpressionListOr'''
-    p[0] = p[1] + " " + p[2]
+    p[0] = ['VarSpec', p[1], p[2]]
 
 def p_type_expression_list_plus(p):
     '''TypeExpressionListOr : Type AssignmentExpressionListPlus | ASSIGNMENT ExpressionList'''
-    p[0] = p[1]
+    p[0] = ['TypeExpressionListOr']
+    for idx in range(1,len(p)):
+      if(isinstance(p[idx],str)):
+        p[0].append([p[idx]])
+      else:
+        p[0].append(p[idx])
 
 def p_assignment_expression_list_plus(p):
-    '''AssignementExpressionListPlus : ASSIGNMENT Expression | EmptyStmt'''
-    p[0] = p[1]
+    '''AssignementExpressionListPlus : ASSIGNMENT Expression 
+                                        |'''
+    if len(p) == 1:
+        p[0] = []
+    else:
+        p[0] = ['AssignmentExpressionListPlus', [p[1]], p[2]]
 
 def p_short_var_decl(p):
     '''ShortValDecl : IdentifierList DEFINE ExpressionList'''
-    p[0] = p[1] + " " + p[2] + " " + p[3]
+    p[0] = ['ShortValDecl', [p[1]], p[3]]
 
 def p_function_decl(p):
     '''FunctionDecl : FUNC FunctionName Signature FunctionBodyPlus'''
-    p[0] = p[1] + " " + p[2] + " " + p[3] + " " + p[4]
+    p[0] = ['FunctionDecl', p[2], p[3], p[4]]
 
 def p_function_body_plus(p):
-    '''FunctionBodyPlus : FunctionBody | EmptyStmt'''
-    p[0] = p[1]
+    '''FunctionBodyPlus : FunctionBody 
+                        |'''
+    if len(p) == 1:
+        p[0] = []
+    else:
+        p[0] = p[1]
 
 def p_function_name(p):
     '''FunctionName : IDENT'''
-    p[0] = p[1]
+    p[0] = [p[1]]
 
 def p_function_body(p):
     '''FunctionBody : Block'''
@@ -311,7 +376,7 @@ def p_function_body(p):
 
 def p_method_decl(p):
     '''MethodDecl : FUNC Receiver MethodName Signature FunctionBodyPlus'''
-    p[0] = p[1] + " " + p[2] + " " + p[3] + " " + p[4]
+    p[0] = ['MethodDecl', p[2], p[3], p[4], p[5]]
 
 def p_receiver(p):
     '''Receiver : Parameters'''
@@ -319,7 +384,10 @@ def p_receiver(p):
 
 def p_operand(p):
     '''Operand : Literal | OperandName | LEFT_PARENTHESIS Expression RIGHT_PARENTHESIS'''
-    p[0] = p[1]
+    if len(p) == 1:
+        p[0] = p[1]
+    else:
+        p[0] = p[2]
 
 def p_literal(p):
     '''Literal : BasicLit | CompositeLit | FunctionLit'''
@@ -327,49 +395,67 @@ def p_literal(p):
 
 def p_basic_lit(p):
     '''BasicLit : INT | FLOAT | IMAGINARY | FLOAT | RUNE | STRING'''
-    p[0] = p[1]
+    p[0] = [p[1]]
 
 def p_operand_name(p):
     '''OperandName : IDENT | QualifiedIdent'''
-    p[0] = p[1]
+    if(isinstance(p[1],str)):
+        p[0] = [p[1]]
+    else:
+        p[0] = p[1]    
 
 
 def p_qualified_ident(p):
     '''QualifiedIdent : PackageName PERIOD IDENT'''
-    p[0] = p[1] + "." + p[3]
+    p[0] = ['QualifiedIdent', p[1], [p[2]], p[p[3]]]
 
 def p_composite_lit(p):
     '''CompositeLit : LiteralType LiteralValue'''
-    p[0] = p[1] + " " + p[2]
+    p[0] = ['CompositeLit', p[1], p[2]]
 
 def p_literal_type(p):
     '''LiteralType : StructType | ArrayType | LEFT_BRACKET ELLIPSIS RIGHT_BRACKET ElementType |
                     SliceType | MapType | TypeName'''
-    p[0] = p[1]
+    if len(p) == 2:
+        p[0] = p[1]
+    else:
+        p[0] = ['LiteralType', p[2], p[4]]
 
 def p_literal_value(p):
     '''LiteralValue : LEFT_BRACKET ElementListPlus RIGHT BRACKET'''
-    p[0] = p[1] + " " + p[2] + " " + p[3]
+    p[0] = p[2]
 
 def p_element_list_plus(p):
-    '''ElementListPlus : ElementList CommaPlus | EmptyStmt'''
-    p[0] = p[1]
+    '''ElementListPlus : ElementList CommaPlus 
+                        |'''
+    if len(p) == 1:
+        p[0] = []
+    else:
+        p[0] = ['ElementListPlus', p[1], p[2]]
 
 def p_element_list(p):
     '''ElementList : KeyedElement KeyedelementStar'''
-    p[0] = p[1] + " " + p[2]
+    p[0] = ['ElementList', p[1], p[2]]
 
 def KeyedElementStar(p):
-    '''KeyedElementPlus : KeyedElementStar KeyedElement | EmptyStmt'''
-    p[0] = p[1]
+    '''KeyedElementPlus : KeyedElementStar KeyedElement 
+                        |'''
+    if len(p) == 1:
+        p[0] = []
+    else:
+        p[0] = ['KeyedElementPlus', p[1], p[2]]
 
 def KeyedElement(p):
     '''KeyedElement : KeyPlus Element'''
-    p[0] = p[1] + " " + p[1]
+    p[0] = ['KeyedElement', p[1], p[2]]
 
 def p_key_plus(p):
-    '''KeyPlus : Key | EmptyStmt'''
-    p[0] = p[1]
+    '''KeyPlus : Key 
+                |'''
+    if len(p) == 1:
+        p[0] = []
+    else:
+        p[0] = p[1]
 
 def p_key(p):
     '''Key : FieldName | Expression | LiteralValue'''
@@ -377,7 +463,7 @@ def p_key(p):
 
 def p_field_name(p):
     '''FieldName : IDENT'''
-    p[0] = p[1]
+    p[0] = [p[1]]
 
 def p_element(p):
     '''Element : Expression | LiteralVal'''
@@ -385,7 +471,7 @@ def p_element(p):
 
 def p_function_lit(p):
     '''FunctionLit : FUNC Signature FunctionBody'''
-    p[0] = p[1]
+    p[0] = ['FunctionLit', p[2], p[3]]
 
 def p_primary_expr(p):
     '''PrimaryExpr : Operand |
@@ -396,11 +482,14 @@ def p_primary_expr(p):
 	PrimaryExpr Slice |
 	PrimaryExpr TypeAssertion |
 	PrimaryExpr Arguments'''
-    p[0] = p[1]
+    if len(p) == 1:
+        p[0] = p[1]
+    else:
+        p[0] = ['PrimaryExpr', p[1], p[2]]
 
 def p_selector(p):
     '''Selector : PERIOD IDENT'''
-    p[0] = p[1] + " " + p[2]
+    p[0] = ['Selector', [p[1]], [p[2]]]
 
 def p_index(p):
     '''Index : LEFT_BRACKET Expression RIGHT_BRACKET'''
@@ -791,73 +880,82 @@ def p_deferstmt(p):
     '''DeferStmt : DEFER Expression'''
     p[0]=p[1]
 
-# SourceFile       = PackageClause ";" { ImportDecl ";" } { TopLevelDecl ";" } 
-def p_sourcefile(p):
-    '''SourceFile  : PackageClause SEMICOLON Importdecl_zero_or_more Topleveldecl_zero_or_more'''
-    p[0]=p[1]+" "+p[2]+" "+p[3]+" "+p[4]
 
-def p_importdecl_zero_or_more(p):
-    '''Importdecl_zero_or_more : Importdecl_zero_or_more ImportDecl SEMICOLON | EmptyStmt'''
-    if(len(p)==2):
-        p[0]=p[1]
+
+#----------------------------------------------------------------------------------------
+
+def p_source_file(p):
+    '''SourceFile  : PackageClause SEMICOLON ImportDeclStar TopleveldeclStar'''
+    p[0] = ['SourceFile', p[1], p[3], p[4]]
+
+def p_import_decl_star(p):
+    '''ImportDeclStar : ImportDeclStar ImportDecl SEMICOLON 
+                        |'''
+    if len(p) == 1:
+        p[0] = []
     else:
-        p[0]=p[1]+" "+p[2]+" "+p[3]
-     #some error
+        p[0] = ['ImportDeclStar', p[1], p[2]]
 
-def p_topleveldecl_zero_or_more(p):
-    '''Topleveldecl_zero_or_more : topleveldecl_zero_or_more TopLevelDecl SEMICOLON | EmptyStmt'''
-    if(len(p)==2):
-        p[0]=p[1]
+def p_top_level_decl_star(p):
+    '''TopLevelDeclStar : TopLevelDeclStar TopLevelDecl SEMICOLON 
+                        |'''
+    if len(p) == 1:
+        p[0] = []
     else:
-        p[0]=p[1]+" "+p[2]+" "+p[3]
-    #some error
+        p[0] = ['TopLevelDeclStar', p[1], p[2]]
 
-# PackageClause  = "package" PackageName .
-# PackageName    = identifier .
 def p_packageclause(p):
-    '''PackageClause : "package" PackageName'''
-    p[0]=p[1]+" "+p[2]
+    '''PackageClause : PACKAGE PackageName'''
+    p[0] = ['PackageClause', p[2]]
 
 def p_packagename(p):
     '''PackageName : IDENT'''
-    p[0]=p[1]
-
-# ImportDecl       = "import" ( ImportSpec | "(" { ImportSpec ";" } ")" ) .
-# ImportSpec       = [ "." | PackageName ] ImportPath .
-# ImportPath       = string_lit .
-
-def p_importdecl(p):
-    '''ImportDecl = IMPORT ImportSpecOr'''
-    p[0] = p[1] + " " + p[2]
-
-def p_import_spec_or(p):
-    '''ImportSpecOr : ImportSpec | LEFT_PARENTHESIS ImportSpecColonStar RIGHT_PARENTHESIS'''
-    if(len(p)==2):
-        p[0]=p[1]
-    else:
-        p[0]=p[1]+" "+p[2]+" "+p[3]
-    #SOME ERROR
-
-def p_import_spec_star(p):
-    '''ImportSpecStar : ImportSpecStar ImportSpec COLON | EmptyStmt'''
-    if(len(p)==2):
-        p[0]=p[1]
-    else:
-        p[0]=p[1]+" "+p[2]+" "+p[3]
-    #some error
-def p_import_spec(p):
-    '''ImportSpec : PeriodPackageNamePlus ImportPath'''
-    p[0] = p[1] + " " + p[2]
-
-def p_period_package_name_plus(p):
-    '''PeriodPackageNamePlus : PeriodOrPackageName | EmptyStmt'''
     p[0] = p[1]
 
-def p_period_or_package_name(p):
-    '''PeriodPackageName : PERIOD PackageName'''
-    p[0] = p[1] + " " + p[2]
+def p_importdecl(p):
+    '''ImportDecl : IMPORT ImportSpecOr'''
+    p[0] = ['ImportDecl', p[2]]
+
+def p_import_spec_or(p):
+    '''ImportSpecOr : ImportSpec | LEFT_PARENTHESIS ImportSpecSemicolonStar RIGHT_PARENTHESIS'''
+    if len(p) == 2:
+        p[0] = p[1]
+    else:
+        p[0] = p[2]
+
+def p_import_spec_semicolon_star(p):
+    '''ImportSpecSemicolonStar : ImportSpecSemicolonStar ImportSpec SEMICOLON 
+                                |'''
+    if len(p) == 1:
+        p[0] = []
+    else:
+        p[0] = ['ImportSpecSemicolonStar', p[1], p[2]]
+
+def p_import_spec(p):
+    '''ImportSpec : PeriodPackageNamePlus ImportPath'''
+    p[0] = ['ImportSpec', p[1], p[2]]
+
+def p_period_package_name_plus(p):
+    '''PeriodPackageNamePlus : PeriodPackageNameOr 
+                            |'''
+    if len(p) == 1:
+        p[0] = []
+    else:
+        p[0] = ['PeriodPackageNamePlus', p[1]]
+
+def p_period_package_name_or(p):
+    '''PeriodPackageNameOr : PERIOD | PackageName'''
+    p[0] = p[1]
 
 def p_import_path(p):
     '''ImportPath : STRING'''
     p[0] = p[1]
+#-------------------------------------------------------------------------------------
 
+file = open(sys.argv[1], 'r')
+data = file.read()
+
+tokens = lexer.Process(data)
+
+parser = yacc.yacc()
+res = parser.parse(data)
