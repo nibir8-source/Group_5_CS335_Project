@@ -21,8 +21,8 @@ precedence = (
 
 def p_type(p):
     '''Type : TypeName 
-    | TypeLit 
-    | LEFT_PARENTHESIS Type RIGHT_PARENTHESIS'''
+            | TypeLit 
+            | LEFT_PARENTHESIS Type RIGHT_PARENTHESIS'''
     if len(p) == 2:
         p[0] = p[1]
     else:
@@ -30,85 +30,87 @@ def p_type(p):
 
 def p_type_name(p):
     ''''TypeName : IDENT 
-    | QualifiedIdent'''
-    p[0] = p[1]
-    p[0].name = "TypeName"
+                | QualifiedIdent'''
+    if isinstance(p[1], str):
+        p[0] = [p[1]]
+    else:
+        p[0] = p[1]
 
 def p_package_name(p):
     '''PackageName : IDENT'''
-    p[0] = p[1]
-    p[0].name = "PackageName"
+    p[0] = [p[1]]
 
 def p_type_lit(p):
     '''TypeLit : ArrayType 
-    | StructType 
-    | PointerType 
-    | FunctionType 
-    | InterfaceType 
-    | SliceType 
-    | MapType 
-    | ChannelType'''
+                | StructType 
+                | PointerType 
+                | FunctionType 
+                | InterfaceType 
+                | SliceType 
+                | MapType 
+                | ChannelType'''
     p[0] = p[1]
-    p[0].name = "TypeLit"
 
 def p_array_type(p):
     '''ArrayType : LEFT_BRACKET ArrayLength RIGHT_BRACKET ElementType'''
-    p[0].name = "ArrayType"
+    p[0] = ['ArrayType', p[2], p[4]]
 
 def p_array_length(p):
     '''ArrayLength : Expression'''
     p[0] = p[1]
-    p[0].name = "ArrayLength"
 
 def p_element_type(p):
     '''ElementType : Type'''
     p[0] = p[1]
-    p[0].name = "ElementType"
 
 def p_slice_type(p):
     '''SliceType : LEFT_BRACKET RIGHT_BRACKET ElementType'''
-    p[0].name = "SliceType"
+    p[0] = ['SliceType', p[3]]
 
 def p_struct_type(p):
     '''StructType : STRUCT LEFT_BRACE ManyFieldDecl RIGHT_BRACE'''
-    p[0] = "struct"
-    p[0].name = "StructType"
+    p[0] = ['StructType', [p[1]], p[3]]
 
 # --------------------------------------------------------------------
 
-
-
 def p_many_field_decl(p):
     '''ManyFieldDecl : ManyFieldDecl FieldDecl SEMICOLON
-                     | empty'''
-    p[0] = p[1] + p[2]
+                     |'''
+    if len(p) == 1:
+        p[0] = []
+    else:
+        p[0] = ['ManyFieldDecl', p[1], p[2]]
 
 def p_field_decl(p):
-    '''FieldDecl : IdentifierList Type ZeroOneTag 
-                 | EmbeddedField ZeroOneTag'''
-    p[0] = p[1] + " " + p[2]
+    '''FieldDecl : IdentifierList Type TagPlus 
+                 | EmbeddedField TagPlus'''
+    if len(p) == 3:
+        p[0] = ['FieldDecl', p[1], p[2], p[3]]
+    else:
+        p[0] = ['FieldDecl', p[1], p[2]]
 
-def p_zero_one_tag(p):
-    '''ZeroOneTag : Tag
-                  | EmptyStmt'''
-    p[0] = p[1]
+def p_tag_plus(p):
+    '''TagPlus : Tag
+                  |'''
+    if len(p) == 1:
+        p[0] = []
+    else:
+        p[0] = p[1]
 
 def p_embedded_field(p):
-    '''EmbeddedField : ZeroOneStar TypeName'''
-    p[0] = p[1] + p[2]
-
-def p_zero_one_star(p):
-    '''ZeroOneStar : STAR
-                   | EmptyStmt'''
-    p[0] = p[1]
+    '''EmbeddedField : STAR TypeName | TypeName'''
+    if len(p) == 2:
+        p[0] = p[1]
+    else:
+        p[0] = ['EmbeddedField', [p[1]], p[2]]
 
 def p_tag(p):
     '''Tag : STRING'''
-    p[0] = p[1]
+    p[0] = [p[1]]
 
 def p_pointer_type(p):
     '''PointerType : STAR BaseType'''
-    p[0] = "*" + p[3] 
+    p[0] = ['PointerType', [p[1]], p[2]]
 
 def p_base_type(p):
     '''BaseType : Type'''
@@ -116,16 +118,19 @@ def p_base_type(p):
 
 def p_function_type(p):
     '''FunctionType : FUNC Signature'''
-    p[0] = "func"
+    p[0] = ['FunctionType', [p[0]], p[1]]
 
 def p_signature(p):
-    '''Signature : Parameters ZeroOneResult'''
-    p[0] = p[1] + " " + p[2]
+    '''Signature : Parameters ResultPlus'''
+    p[0] = ['Signature', p[1], p[2]]
 
-def p_zero_one_result(p):
-    '''ZeroOneResult : Result
-                     | EmptyStmt'''
-    p[0] = p[1]
+def p_result_plus(p):
+    '''ResultPlus : Result
+                     |'''
+    if len(p) == 1:
+        p[0] = []
+    else:
+        p[0] = p[1]
 
 def p_result(p):
     '''Result : Parameters | Type'''
@@ -133,22 +138,26 @@ def p_result(p):
 
 def p_parameters(p):
     '''Parameters : LEFT_PARENTHESIS ParameterListPlus RIGHT_PARENTHESIS'''
-    p[0] = "(" + p[2] + ")"
+    p[0] = ['Parameters', p[2]]
 
 def p_parameters_list_plus(p):
-    '''ParameterListPlus : ParameterList CommaPlus
-                         | empty'''
-    p[0] = p[1]
-
-def p_comma_plus(p):
-    '''CommaPlus : COMMA
-                 | EmptyStmt'''
-    p[0] = p[1]
+    '''ParameterListPlus : ParameterList COMMA 
+                         | ParameterList 
+                         |'''
+    if len(p) == 1:
+        p[0] = []
+    else:
+        p[0] = p[1]
 
 def p_parameter_list(p):
     '''ParameterList : ParameterDecl
                      | ParameterDecl COMMA ParameterList'''
-    p[0] = p[1] + p[2]
+    if len(p) == 1:
+        p[0] = p[1]
+    else:
+        p[0] = ['ParamterList', p[1], p[3]]
+
+#------------------- DO FROM HERE ----------------------------------
 
 def p_parameter_decl(p):
     '''IdentifierListPlus EllipsisPlus Type'''
@@ -426,12 +435,13 @@ def p_literal_value(p):
     p[0] = p[2]
 
 def p_element_list_plus(p):
-    '''ElementListPlus : ElementList CommaPlus 
+    '''ElementListPlus : ElementList 
+                        | ElementList COMMA
                         |'''
     if len(p) == 1:
         p[0] = []
     else:
-        p[0] = ['ElementListPlus', p[1], p[2]]
+        p[0] = p[1]
 
 def p_element_list(p):
     '''ElementList : KeyedElement KeyedelementStar'''
@@ -493,39 +503,61 @@ def p_selector(p):
 
 def p_index(p):
     '''Index : LEFT_BRACKET Expression RIGHT_BRACKET'''
-    p[0] = p[1] + " " + p[2] + " " + p[3]
+    p[0] = p[2]
 
 def p_slice(p):
-    '''Slice : LEFT_BRACKET ExpressionPlus COLON ExpressionPlus RIGHT_BRACKET | LEFT_BRACKET ExpressionPlus COLON Expression COLON Expression RIGHT_BRACKET'''
-    p[0] = p[1]
+    '''Slice : LEFT_BRACKET ExpressionPlus COLON ExpressionPlus RIGHT_BRACKET 
+            | LEFT_BRACKET ExpressionPlus COLON Expression COLON Expression RIGHT_BRACKET'''
+    if len(p) == 6:
+        p[0] = ['Slice', p[2], [p[3]], p[4]]
+    else:
+        p[0] = ['Slice', p[2], [p[3]], p[4], [p[5]], p[6]]
 
 def p_expression_plus(p):
-    '''ExpressionPlus : Expression | EmptyStmt'''
-    p[0] = p[1]
+    '''ExpressionPlus : Expression 
+    |'''
+    if len(p) == 1:
+        p[0] = []
+    else:
+        p[0] = p[1]
 
 def p_type_assertion(p):
     '''TypeAssertion : PERIOD LEFT_PARENTHESIS Type RIGHT_PARENTHESIS'''
-    p[0] = p[1] + " " + p[2] + " " + p[3] + " " + p[4]
+    p[0] = ['TypeAssertion', [p[1]], p[3]]
 
 def p_arguments(p):
     '''Arguments: LEFT_PARENTHESIS ArgumentsPlus RIGHT_PARENTHESIS'''
-    p[0] = p[1] + " " + p[2] + " " + p[3]
+    p[0] = ['Arguments', p[2]]
 
 def p_arguments_plus(p):
-    '''ArgumentsPlus : ArgumentsInOr | EmptyStmt'''
-    p[0] = p[1]
+    '''ArgumentsPlus : ArgumentsInOr 
+    |'''
+    if len(p) == 1:
+        p[0] = []
+    else:
+        p[0] = p[1]
 
 def p_arguments_in_or(p):
     '''ArgumentsInOr : ExpressionList | Type CommaExpressionListPlus'''
-    p[0] = p[1]
+    if len(p) == 2:
+        p[0] = p[1]
+    else:
+        p[0] = ['ArgumentsInOr', p[1], p[2]]
 
 def p_comma_expression_list_plus(p):
-    '''CommaExpressionListPlus : CommaPlus ExpressionList | EmptyStmt'''
-    p[0] = p[1]
+    '''CommaExpressionListPlus : COMMA ExpressionList
+                                | ExpressionList 
+                                |'''
+    if len(p) == 1:
+        p[0] = []
+    elif len(p) == 2:
+        p[0] = p[1]
+    else:
+        p[0] = p[2]
 
 def p_method_expr(p):
     '''MethodExpr : ReceiverType PERIOD MethodName'''
-    p[0] = p[1] + " " + p[2] + " " + p[3]
+    p[0] = ['MethodExpr', p[1], [p[2]], p[3]]
 
 def p_receiver_type(p):
     '''ReceiverType : Type'''
@@ -533,352 +565,393 @@ def p_receiver_type(p):
 
 def p_expression(p):
     '''Expression : UnaryExpr | Expression binary_op Expression'''
-    p[0] = p[1]
+    if len(p) == 2:
+        p[0] = p[1]
+    else:
+        p[0] = ['Expression', p[1], p[2], p[3]]
 
 def p_unary_expr(p):
     '''UnaryEpr : PrimaryExpr | unary_op UnaryExpr'''
-    p[0] = p[1]
+    if len(p) == 2:
+        p[0] = p[1]
+    else:
+        p[0] = ['UnaryExpr', p[1], p[2]]
 
 def p_binary_op(p):
     '''binary_op : LOGICAL_OR | LOGICAL_AND | rel_op | add_op | mul_op'''
-    p[0] = p[1]
+    if(isinstance(p[1],str)):
+        p[0].append([p[1]])
+    else:
+        p[0].append(p[1])
 
 def p_rel_op(p):
     '''rel_op : EQUAL | NOT_EQUAL | LESS_THAN | LESS_THAN_EQUAL | GREATER_THAN | GREATER_THAN_EQUAL'''
-    p[0] = p[1]
+    p[0] = [p[1]]
 
 def p_add_op(p):
     '''add_op : ADD | SUBTRACT | OR | XOR'''
-    p[0] = p[1]
+    p[0] = [p[1]]
 
 def p_mul_op(p):
     '''mul_op : MULTIPLY | QUOTIENT | REMAINDER | SHIFT_LEFT | SHIFT_RIGHT | AND | AND_NOT'''
-    p[0] = p[1]
+    p[0] = [p[1]]
 
 def p_unary_op(p):
     '''unary_op : ADD | SUBTRACT | NOT | XOR | MULTIPLY | AND | ARROW'''
-    p[0] = p[1]
+    p[0] = [p[1]]
 
 def p_conversion(p):
-    '''Conversion : Type LEFT_PARENTHESIS Expression CommaPlus RIGHT_PARENTHESIS'''
-    p[0] = p[1] + " " + p[1] + " " + p[2] + " " + p[3] + " " + p[4] + " " + p[5]
+    '''Conversion : Type LEFT_PARENTHESIS Expression COMMA RIGHT_PARENTHESIS
+                    | Type LEFT_PARENTHESIS Expression RIGHT_PARENTHESIS'''
+    p[0] = ['Conversion', p[1], p[3]]
 
 
-#STATEMENT
+#----------------------------------------------------------
+
 def p_statement(p):
-    '''Statement : Declaration | LabeledStmt | SimpleStmt | GoStmt | ReturnStmt | BreakStmt | ContinueStmt | GotoStmt | FallthroughStmt | Block | IfStmt | SwitchStmt | SelectStmt | ForStmt | DeferStmt '''
-    p[0]=p[1]
+    '''Statement : Declaration 
+                | LabeledStmt 
+                | SimpleStmt 
+                | GoStmt 
+                | ReturnStmt 
+                | BreakStmt 
+                | ContinueStmt 
+                | GotoStmt 
+                | FallthroughStmt 
+                | Block 
+                | IfStmt 
+                | SwitchStmt 
+                | SelectStmt 
+                | ForStmt 
+                | DeferStmt '''
+    p[0] = p[1]
 
-def p_simplestmt(p):
-    '''SimpleStmt : EmptyStmt | ExpressionStmt | SendStmt | IncDecStmt | Assignment | ShortVarDecl '''
-    p[0]=p[1]
+def p_simple_stmt(p):
+    '''SimpleStmt : ExpressionStmt 
+                    | SendStmt 
+                    | IncDecStmt 
+                    | Assignment 
+                    | ShortVarDecl 
+                    |'''
+    if len(p) == 1:
+        p[0] = []
+    else:
+        p[0]=p[1]
 
-def p_emptystmt(p):
-    '''EmptyStmt :'''
-    # p[0] = ""
-    pass
 
-
-def p_labeledstmt(p):
+def p_labeled_stmt(p):
     '''LabeledStmt : Label COLON Statement '''
-    p[0]=p[1] + " " + p[2] + " " +p[3]
+    p[0] = ['LabeledStmt', p[1], [p[2]], p[3]]
 
 def p_label(p):
     '''Label : IDENT'''
-    p[0]=p[1]
+    p[0] = p[1]
 
-def p_expressionstmt(p):
+def p_expression_stmt(p):
     '''ExpressionStmt : Expression'''
-    p[0]=p[1]
+    p[0] = p[1]
 
-def p_sendstmt(p):
+def p_send_stmt(p):
     '''SendStmt : Channel ARROW Expression'''
-    p[0]=p[1]+" "+p[2] + " " + p[3]
+    p[0] = ['SendStmt', p[1], [p[2]], p[3]]
 
 def p_channel(p):
     '''Channel : Expression'''
-    p[0]=p[1]
+    p[0] = p[1]
 
-def p_incdecstmt(p):
-    '''IncDecStmt : Expression Incordec'''
-    p[0]=p[1]+" " + p[2]
+def p_inc_dec_stmt(p):
+    '''IncDecStmt : Expression IncDecOr'''
+    p[0] = ['InDecStmt', p[1], p[2]]
 
-def p_incordec(p):
-    '''Incordec : INCREMENT | DECREMENT '''
-    p[0]=p[1]
+def p_inc_dec_or(p):
+    '''IncDecOr : INCREMENT 
+                | DECREMENT'''
+    p[0] = [p[1]]
 
 def p_assignment(p):
     '''Assignment : ExpressionList assign_op ExpressionList'''
-    p[0]=p[1] + " " + p[2] + " " + p[3]
+    p[0] = ['Assignment', p[1], p[2], p[3]]
 
 def p_assign_op(p):
-    '''assign_op : add_op_or_mul_op_plus ASSIGNMENT'''
-    p[0]=p[1]+" "+p[2]
+    '''assign_op : add_op_mul_op_or_plus ASSIGNMENT'''
+    p[0] = ['assign_op', p[1], [p[2]]]
 
 def p_add_op_or_mul_op_plus(p):
-    '''add_op_or_mul_op_plus : add_op_or_mul_op | EmptyStmt'''
-    p[0]=p[1]
+    '''add_op_mul_op_or_plus : add_op_mul_op_or 
+                            |'''
+    if len(p) == 1:
+        p[0] = []
+    else:
+        p[0] = p[1]
 
-def p_add_op_or_mul_op(p):
+def p_add_op_mul_op_or(p):
     '''add_op_or_mul_op : add_op | mul_op'''
-    p[0]=p[1]
+    p[0] = p[1]
 
-def p_ifstmt(p):
-    '''IfStmt : IF Simplestmt_semicolon_or_emptystmt  Expression Block Else_present_or_not'''
+def p_if_stmt(p):
+    '''IfStmt : IF SimpleStmtSemicolonPlus Expression Block ElsePlus'''
 
-def p_simplestmt_semicolon_or_emptystmt(p):
-    '''Simplestmt_semicolon_or_emptystmt : SimpleStmt SEMICOLON | EmptyStmt '''
-
-    if(len(p)==2):
-        p[0]=p[1]
+def p_simple_stmt_semicolon_plus(p):
+    '''SimpleStmtSemicolonPlus : SimpleStmt SEMICOLON 
+                            |'''
+    if len(p) == 1:
+        p[0] = []
     else:
-        p[0]=p[1]+" "+p[2]
-    #some error
+        p[0] = p[1]
 
-def else_present_or_not(p):
-    '''Else_present_or_not : ELSE Nested_if_block | EmptyStmt'''
-
-    if(len(p)==2):
-        p[0]=p[1]
+def else_plus(p):
+    '''ElsePlus : ELSE Nested_if_block 
+                            |'''
+    if len(p) == 1:
+        p[0] = []
     else:
-        p[0]=p[1]+" "+p[2]
-    #some error
+        p[0] = ['ElsePlus', [p[1]], p[2]]
 
 def p_nested_if_block(p):
-    '''Nested_if_block : IfStmt | Block '''
-    p[0]=p[1]
+    '''Nested_if_block : IfStmt 
+                        | Block '''
+    p[0] = p[1]
 
-def p_switchstmt(p):
+def p_switch_stmt(p):
     '''SwitchStmt : ExprSwitchStmt | TypeSwitchStmt'''
-    p[0]=p[1]
+    p[0] = p[1]
 
-def p_exprswitchstmt(p):
-    '''ExprSwitchStmt : SWITCH Simplestmt_semicolon_or_emptystmt Expression_or_empty LEFT_BRACE Exprcaseclause_zero_or_more_time RIGHT_BRACE '''
-    p[0]= p[1]+" "+p[2] + " " + p[3] + " " + p[4] + " "+ p[5] +" "+ p[6]
+def p_expr_switch_stmt(p):
+    '''ExprSwitchStmt : SWITCH SimpleStmtSemicolonPlus ExpressionPlus LEFT_BRACE ExprCaseClauseStar RIGHT_BRACE '''
+    p[0]= ['ExprSwitchStmt', [p[1]], p[2], p[3], p[5]]
 
-def p_expression_or_empty(p):
-    '''Expression_or_empty : Expression | EmptyStmt'''
-    p[0]=p[1]
-
-def p_exprcaseclause_zero_or_more_time(p):
-    '''Exprcaseclause_zero_or_more_time : Exprcaseclause_zero_or_more_time ExprCaseClause | EmptyStmt'''
-    if(len(p)==2):
-        p[0]=p[1]
+def p_expression_plus(p):
+    '''ExpressionPlus : Expression 
+                        |'''
+    if len(p) == 1:
+        p[0] = []
     else:
-        p[0]=p[1]+" "+p[2]
-     #error
+        p[0]=p[1]
 
-def p_exprcaseclause(p):
+def p_expr_case_clause_plus(p):
+    '''ExprCaseClauseStar : ExprCaseClauseStar ExprCaseClause 
+                            |'''
+    if len(p) == 1:
+        p[0] = []
+    else:
+        p[0] = ['ExprCaseClausePlus', p[1], p[2]]
+
+def p_expr_case_clause(p):
     '''ExprCaseClause : ExprSwitchCase COLON StatementList'''
-    p[0]=p[1]+" "+p[2]+" "+p[3]
+    p[0] = ['ExprCaseClause', p[1], [p[2]], p[3]]
 
-def p_exprswitchcase(p):
-    '''ExprSwitchCase : CASE ExpressionList | DEFAULT '''
-    if(len(p)==2):
-        p[0]=p[1]
+def p_expr_switch_case(p):
+    '''ExprSwitchCase : CASE ExpressionList | DEFAULT'''
+    if len(p) == 2:
+        p[0] = [p[1]]
     else:
-        p[0]=p[1]+" "+p[2]
-    # p[0]=p[1]
-    #some error
+        p[0] = ['ExprSwitchCase', [p[1]], p[2]]
 
+def p_type_switch_stmt(p):
+    '''TypeSwitchStmt  : SWITCH SimpleStmtSemicolonPlus TypeSwitchGuard LEFT_BRACE TypeCaseClauseStar RIGHT_BRACE '''
+    p[0] = ['TypeSwitchstmt', [p[1]], ]
 
-# TypeSwitchStmt  = "switch" [ SimpleStmt ";" ] TypeSwitchGuard "{" { TypeCaseClause } "}" .
-# TypeSwitchGuard = [ identifier ":=" ] PrimaryExpr "." "(" "type" ")" .
-# TypeCaseClause  = TypeSwitchCase ":" StatementList .
-# TypeSwitchCase  = "case" TypeList | "default" .
-# TypeList        = Type { "," Type } .
-
-def p_typeswitchstmt(p):
-    '''TypeSwitchStmt  : SWITCH Simplestmt_semicolon_or_emptystmt TypeSwitchGuard LEFT_BRACE Typecaseclause_zero_or_more RIGHT_BRACE '''
-    p[0]=p[1]+ " " + p[2] + " " +p[3] + " " + p[4] +" " + p[5] +" "+p[6]
-
-def p_typecaseclause_zero_or_more(p):
-    '''Typecaseclause_zero_or_more : Typecaseclause_zero_or_more TypeCaseClause | EmptyStmt'''
-    if(len(p)==2):
-        p[0]=p[1]
+def p_type_case_clause_star(p):
+    '''TypeCaseClauseStar : TypeCaseClauseStar TypeCaseClause 
+                            |'''
+    if len(p) == 1:
+        p[0] = []
     else:
-        p[0]=p[1]+" "+p[2]
-     #some error
+        p[0] = ['TypeCaseClauseStar', p[1], p[2]]
 
 def p_typeswitchguard(p):
-    '''TypeSwitchGuard : Identifier_define_zero_or_one PrimaryExpr PERIOD LEFT_PARANTHESIS TYPE RIGHT_PARANTHESIS '''
+    '''TypeSwitchGuard : IdentDefinePlus PrimaryExpr PERIOD LEFT_PARANTHESIS TYPE RIGHT_PARANTHESIS '''
     p[0]=p[1]+" "+p[2]+" "+p[3]+" "+p[4]+" "+p[5]+" "+p[6]
 
-def p_identifier_define_zero_or_one(p):
-    '''Identifier_define_zero_or_one : IDENT DEFINE | EmptyStmt'''
-    if(len(p)==2):
-        p[0]=p[1]
+def p_ident_define_plus(p):
+    '''IdentDefinePlus : IDENT DEFINE 
+                        |'''
+    if len(p) == 1:
+        p[0] = []
     else:
-        p[0]=p[1]+" "+p[2]
-    #some error
+        p[0] = ['IdentDefinePlus', [p[1]], [p[2]]]
 
-def p_typecaseclause(p):
+def p_type_case_clause(p):
     '''TypeCaseClause  : TypeSwitchCase COLON StatementList '''
-    p[0]=p[1]+" "+p[2]+" "+p[3]
+    p[0] = ['TypeCaseClause', p[1], [p[2]], p[3]]
 
-def p_typeswitchcase(p):
+def p_type_switch_case(p):
     '''TypeSwitchCase : CASE TypeList | DEFAULT'''
-    if(len(p)==2):
-        p[0]=p[1]
+    if len(p) == 2:
+        p[0] = [p[1]]
     else:
-        p[0]=p[1]+" "+p[2]
-    #some error
+        p[0] = ['TypeSwitchCase', [p[1]], p[2]]
 
-def p_typelist(p):
-    '''TypeList : Type Comma_type_zero_or_more '''
+def p_type_list(p):
+    '''TypeList : Type CommaTypePlus '''
     p[0]=p[1]+" "+p[2]
    
-def p_comma_type_zero_or_more(p):
-    '''Comma_type_zero_or_more : Comma_type_zero_or_more COMMA TYPE | EmptyStmt '''
-    if(len(p)==2):
-        p[0]=p[1]
+def p_comma_type_plus(p):
+    '''CommaTypePlus : CommaTypePlus COMMA TYPE 
+                    |'''
+    if len(p) == 1:
+        p[0] = []
     else:
-        p[0]=p[1]+" "+p[2]
-    #some error
+        p[0] = ['CommaTypePlus', p[1], p[3]]
 
-# ForStmt = "for" [ Condition | ForClause | RangeClause ] Block .
-# Condition = Expression 
-
-def p_forstmt(p):
-    '''ForStmt : FOR For_internal Block'''
-    p[0]=p[1]+" "+p[2]+" "+p[3]
+def p_for_stmt(p):
+    '''ForStmt : FOR ForInternal Block'''
+    p[0] = ['ForStmt', [p[1]], p[2], p[3]]
 
 def p_for_internal(p):
-    '''For_internal : Condition | ForClause | RangeClause | EmptyStmt'''
-    p[0]=p[1]
+    '''ForInternal : Condition 
+                    | ForClause 
+                    | RangeClause 
+                    |'''
+    if len(p) == 1:
+        p[0] = []
+    else:
+        p[0] = p[1]
 
 def p_condition(p):
     '''Condition : Expression'''
-    p[0]=p[1]
+    p[0] = p[1]
 
-# ForClause = [ InitStmt ] ";" [ Condition ] ";" [ PostStmt ] .
-# InitStmt = SimpleStmt .
-# PostStmt = SimpleStmt .
-def p_forclause(p):
-    '''ForClause : Initstmt_zero_or_one SEMICOLON Condition_zero_or_one SEMICOLON Poststmt_zero_or_one'''
-    p[0]=p[1]+" "+p[2]+" "+p[3]+" "+p[4]+" "+p[5]
+#----------------------------------------------------------------
 
-def p_initstmt_zero_or_one(p):
-    '''Initstmt_zero_or_one : InitStmt | EmptyStmt'''
-    p[0]=p[1]
+def p_for_clause(p):
+    '''ForClause : InitStmtPlus SEMICOLON ConditionPlus SEMICOLON PostStmtPlus'''
+    p[0] = ['ForClause', p[1], p[3], p[5]]
 
-def p_condition_zero_or_one(p):
-    '''Condition_zero_or_one : Condition | EmptyStmt'''
-    p[0]=p[1]
-
-def p_poststmt_zero_or_one(p):
-    '''Poststmt_zero_or_one : PostStmt | EmptyStmt'''
-    p[0]=p[1]
-
-def p_initstmt(p):
-    '''InitStmt : SimpleStmt'''
-    p[0]=p[1]
-
-def p_poststmt(p):
-    '''PostStmt : SimpleStmt'''
-    p[0]=p[1]
-
-#RangeClause = [ ExpressionList "=" | IdentifierList ":=" ] "range" Expression 
-def p_rangeclause(p):
-    '''RangeClause :  Above_exp_zero_or_one RANGE Expression '''
-    p[0]=p[1]+" "+p[2]+" "+p[3]
-    
-def p_above_exp_zero_or_one(p):
-    '''Above_exp_zero_or_one : ExpressionList ASSIGNMENT | IdentifierList DEFINE | EmptyStmt'''
-    if(len(p)==2):
-        p[0]=p[1]
+def p_init_stmt_plus(p):
+    '''InitStmtPlus : InitStmt 
+                    |'''
+    if len(p) == 1:
+        p[0] = []
     else:
-        p[0]=p[1]+" "+p[2]
-    #some error
+        p[0] = p[1]
 
-# GoStmt = "go" Expression 
-def p_gostmt(p):
+def p_condition_plus(p):
+    '''ConditionPlus : Condition 
+                    |'''
+    if len(p) == 1:
+        p[0] = []
+    else:
+        p[0] = p[1]
+
+def p_post_stmt_plus(p):
+    '''PostStmtPlus : PostStmt 
+                    |'''
+    if len(p) == 1:
+        p[0] = []
+    else:
+        p[0] = p[1]
+
+def p_init_stmt(p):
+    '''InitStmt : SimpleStmt'''
+    p[0] = p[1]
+
+def p_post_stmt(p):
+    '''PostStmt : SimpleStmt'''
+    p[0] = p[1]
+
+#---------------------------------------------------------------
+
+def p_range_clause(p):
+    '''RangeClause :  ExpListAssignIdListDefOrPlus RANGE Expression'''
+    p[0] = ['RangeClause', p[1], [p[2]], p[3]]
+    
+def p_exp_list_assign_id_list_def_or_plus(p):
+    '''ExpListAssignIdListDefOrPlus : ExpressionList ASSIGNMENT 
+                                | IdentifierList DEFINE 
+                                |'''
+    if len(p) == 1:
+        p[0] = []
+    else:
+        p[0] = ['ExpListAssignIdListDefOrPlus', p[1], [p[2]]]
+
+def p_go_stmt(p):
     '''GoStmt : GO Expression '''
-    p[0]=p[1]+" "+p[2]
+    p[0] = ['GoStmt', [p[1]], p[2]]
 
-# SelectStmt = "select" "{" { CommClause } "}" .
-# CommClause = CommCase ":" StatementList .
-# CommCase   = "case" ( SendStmt | RecvStmt ) | "default" .
-# RecvStmt   = [ ExpressionList "=" | IdentifierList ":=" ] RecvExpr .
-# RecvExpr   = Expression .
+#------------------------------------------------------------------
 
 def p_selectstmt(p):
-    '''SelectStmt : SELECT LEFT_BRACE Commclause_zero_or_one RIGHT_BRACE '''
-    p[0]=p[1]+" "+p[2]+" "+p[3]+" "+p[4]
+    '''SelectStmt : SELECT LEFT_BRACE CommClausePlus RIGHT_BRACE '''
+    p[0] = ['SelectStmt', p[3]]
 
 
-def p_commclause_zero_or_one(p):
-    '''Commclause_zero_or_one : commclause_zero_or_one CommClause | EmptyStmt'''
-    if(len(p)==2):
-        p[0]=p[1]
+def p_comm_clause_plus(p):
+    '''CommClausePlus : CommClausePlus CommClause 
+                        |'''
+    if len(p) == 1:
+        p[0] = p[1]
     else:
-        p[0]=p[1]+" "+p[2]
-    
-    #some error
+        p[0] = ['CommClausePlus', p[1], p[2]]
 
-def p_commclause(p):
+def p_comm_clause(p):
     '''CommClause : CommCase COLON StatementList'''
-    p[0]=p[1]+" "+p[2]+" "+p[3]
+    p[0] = ['CommClause', p[1], [p[2]], p[3]]
 
-def p_commcase(p):
-    '''CommCase : CASE Sentstmt_recvstmt | DEFAULT'''
-    if(len(p)==2):
-        p[0]=p[1]
+def p_comm_case(p):
+    '''CommCase : CASE SentStmtRecvStmtOr | DEFAULT'''
+    if len(p) == 2:
+        p[0] = p[1]
     else:
-        p[0]=p[1]+" "+p[2]
-    
-     #some error
+        p[0] = ['CommCase', [p[1]], p[2]]
 
-def p_sentstmt_recvstmt(p):
-    '''Sentstmt_recvstmt : SendStmt | RecvStmt'''
-    p[0]=p[1]
+def p_sent_stmt_recv_stmt_or(p):
+    '''SentStmtRecvStmtOr : SendStmt | RecvStmt'''
+    p[0] = p[1]
 
-def p_recvstmt(p):
-    '''RecvStmt : Above_exp_zero_or_one RecvExpr'''
-    p[0]=p[1]+" "+p[2]
+def p_recv_stmt(p):
+    '''RecvStmt : ExpListAssignIdListDefOrPlus RecvExpr'''
+    p[0] = ['RecvStmt', p[1], p[2]]
 
-def p_recvexpr(p):
+def p_recv_expr(p):
     '''RecvExpr : Expression'''
-    p[0]=p[1]
-
-# ReturnStmt = "return" [ ExpressionList ] 
+    p[0] = p[1]
+ 
 def p_returnstmt(p):
-    '''ReturnStmt : RETURN Expression_list_zero_or_one'''
-    p[0]=p[1]+" "+p[2]
+    '''ReturnStmt : RETURN ExpressionListPlus'''
+    p[0] = ['ReturnStmt', [p[1]], p[2]]
 
-def p_expression_list_zero_or_one(p):
-    '''Expression_list_zero_or_one : ExpressionList | EmptyStmt'''
-    p[0]=p[1]
+def p_expression_list_plus(p):
+    '''ExpressionListPlus : ExpressionList 
+                            |'''
+    if len(p) == 1:
+        p[0] = []
+    else:
+        p[0] = p[1]
 
-# BreakStmt = "break" [ Label ]
-def p_breakstmt(p):
-    '''BreakStmt : BREAK Label_zero_or_one'''
+#---------------------------------
+
+def p_break_stmt(p):
+    '''BreakStmt : BREAK LabelPlus'''
     p[0]=p[1]+" "+p[2]
     
+#------------------------------------
 
-def p_label_zero_or_one(p):
-    '''Label_zero_or_one : Label | EmptyStmt'''
-    p[0]=p[1]
+def p_label_plus(p):
+    '''LabelPlus : Label 
+                |'''
+    if len(p) == 1:
+        p[0] = []
+    else:
+        p[0] = p[1]
 
-# ContinueStmt = "continue" [ Label ] 
-def p_continuestmt(p):
-    '''ContinueStmt : CONTINUE Label_zero_or_one'''
-    p[0]=p[1]+" "+p[2]
+#-------------------------------------
 
-# GotoStmt = "goto" Label
-def p_gotostmt(p):
+def p_continue_stmt(p):
+    '''ContinueStmt : CONTINUE LabelPlus'''
+    p[0] = ['ContinueStmt', [p[1]], p[2]]
+
+def p_goto_stmt(p):
     '''GotoStmt : GOTO Label'''
-    p[0]=p[1]+" "+p[2]
+    p[0] = ['GotoStmt', [p[1]], p[2]]
 
-# FallthroughStmt = "fallthrough"
-def p_fallthroughstmt(p):
+def p_fallthrough_stmt(p):
     '''FallthroughStmt : FALLTHROUGH'''
-    p[0]=p[1]
+    p[0] = [p[1]]
 
-# DeferStmt = "defer" Expression 
-def p_deferstmt(p):
+def p_defer_stmt(p):
     '''DeferStmt : DEFER Expression'''
-    p[0]=p[1]
+    p[0] = ['DeferStmt', [p[1]], p[2]]
 
 
 
