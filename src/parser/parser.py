@@ -157,25 +157,31 @@ def p_parameter_list(p):
     else:
         p[0] = ['ParamterList', p[1], p[3]]
 
-#------------------- DO FROM HERE ----------------------------------
-
 def p_parameter_decl(p):
-    '''IdentifierListPlus EllipsisPlus Type'''
-    p[0] = p[1] + p[2] + p[3]
+    '''ParamterDecl : IdentifierListPlus EllipsisPlus Type'''
+    p[0] = ['ParameterDecl', p[1], p[2], p[3]]
 
 def p_ellipsis_plus(p):
     '''EllipsisPlus : ELLIPSIS
-                    | EmptyStmt'''
-    p[0] = p[1]
+                    |'''
+    if len(p) == 1:
+        p[0] = []
+    else:
+        p[0] = [p[1]]
+
+#--------------------------------------------------------------------
 
 def p_interface_type(p):
     '''InterfaceType : INTERFACE LEFT_BRACE InterfaceTypePlus RIGHT_BRACE'''
-    p[0] = "interface"
+    p[0] = ['InterfaceType', [p[1]], p[3]]
 
 def p_interface_type_plus(p):
     '''InterfaceTypePlus : InterfaceTypePlus InterfaceTypeMethod SEMICOLON
-                         | empty'''
-    p[0] = p[1] + p[2]
+                         |'''
+    if len(p) == 1:
+        p[0] = []
+    else:
+        p[0] = ['InterfaceTypePlus', p[1], p[2]]
 
 def p_interface_type_method(p):
     '''InterfaceTypeMethod : MethodSpec | InterfaceTypeName'''
@@ -183,11 +189,11 @@ def p_interface_type_method(p):
 
 def p_method_spec(p):
     '''MethodSpec : MethodName Signature'''
-    p[0] = p[1] + " " + p[2]
+    p[0] = ['MetodSpec', p[1], p[2]]
 
 def p_method_name(p):
     '''MethodName : IDENT'''
-    p[0] = p[1]
+    p[0] = [p[1]]
 
 def p_interface_type_name(p):
     '''InterfaceTypeName : TypeName'''
@@ -195,7 +201,7 @@ def p_interface_type_name(p):
 
 def p_map_type(p):
     '''MapType : MAP LEFT_BRACKET KeyType RIGHT_BRACKET ElementType'''
-    p[0] = "map"
+    p[0] = ['MapType', p[1], p[3], p[5]]
 
 def p_key_type(p):
     '''KeyType : Type'''
@@ -203,20 +209,26 @@ def p_key_type(p):
 
 def p_channel_type(p):
     '''ChannelType : ChannelTypeOr ElementType'''
-    p[0] = "chan"
+    p[0] = ['ChannelType', p[1], p[2]]
 
 def p_channel_type_or(p):
     '''ChannelTypeOr : CHAN | CHAN ARROW | ARROW CHAN'''
-    p[0] = p[1]
+    if len(p) == 2:
+        p[0] = [p[1]]
+    else:
+        p[0] = ['ChannelTypeOr', [p[1]], [p[2]]]
 
 def p_block(p):
     '''Block : LEFT_BRACE StatementList RIGHT_BRACE'''
-    p[0] = "{" + p[2] + "}"
+    p[0] = p[2]
 
 def p_statement_list(p):
     '''StatementList : StatementList Statement SEMICOLON
-                     | empty'''
-    p[0] = p[1] + p[2]
+                     |'''
+    if len(p) == 1:
+        p[0] = []
+    else:
+        p[0] = ['StatementList', p[1], p[2]]
 
 #-----------------------------------------------------------------------------
 
