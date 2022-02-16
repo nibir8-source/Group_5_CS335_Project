@@ -39,7 +39,6 @@ tokens = list(keywords.values()) + [
     'INT',              # 123
     'FLOAT',            # 123.4
     'IMAGINARY',             # 123.4i
-    'CHAR',             # 'a'
     'RUNE',
     'STRING',           # "abc"
 
@@ -204,8 +203,6 @@ unicode_char = r"([^\n\'\\])"
 unicode_val = r"(" + unicode_char + r"|" + little_u_val + r"|" + big_u_val + r"|" + escp_char + r")"
 
 t_RUNE = r"(\'(" + unicode_val + r"|" + byte_val + r")\')"
-
-t_CHAR        = r"[a-zA-Z]"
 
 uni_char = r"(([^\n\`]))"
 raw_string_lit= r"(\`(" + uni_char + r"|" +  r"(\n))*\`)"
