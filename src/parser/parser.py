@@ -574,6 +574,7 @@ def p_binary_op(p):
     | rel_op 
     | add_op 
     | mul_op'''
+    p[0] = ['binary_op']
     if(isinstance(p[1],str)):
         p[0].append([p[1]])
     else:

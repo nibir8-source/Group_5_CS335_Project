@@ -8,5 +8,9 @@ type xyz struct {
 
 func main() {
 
-	fmt.Println(34);
+	var a int = 5;
+	var b int = 7;
+	var c int;
+	c = a + b;
+	fmt.Println(c);
 };
