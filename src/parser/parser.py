@@ -14,6 +14,63 @@ precedence = (
     ('left', 'MULTIPLY', 'QUOTIENT', 'REMAINDER', 'SHIFT_LEFT', 'SHIFT_RIGHT', 'AND', 'AND_NOT'),
     ('right', 'NOT'),
 )
+
+#----------------------------------------------------------------------------------------
+def p_source_file(p):
+    '''SourceFile  : PackageClause SEMICOLON ImportDeclStar TopLevelDeclStar'''
+    p[0] = ['SourceFile', p[1], p[3], p[4]]
+def p_import_decl_star(p):
+    '''ImportDeclStar : ImportDeclStar ImportDecl SEMICOLON 
+    |'''
+    if len(p) == 1:
+        p[0] = []
+    else:
+        p[0] = ['ImportDeclStar', p[1], p[2]]
+def p_top_level_decl_star(p):
+    '''TopLevelDeclStar : TopLevelDeclStar TopLevelDecl SEMICOLON 
+    |'''
+    if len(p) == 1:
+        p[0] = []
+    else:
+        p[0] = ['TopLevelDeclStar', p[1], p[2]]
+def p_packageclause(p):
+    '''PackageClause : PACKAGE IDENT'''
+    p[0] = ['PackageClause', [p[2]]]
+def p_importdecl(p):
+    '''ImportDecl : IMPORT ImportSpecOr'''
+    p[0] = ['ImportDecl', p[2]]
+def p_import_spec_or(p):
+    '''ImportSpecOr : ImportSpec 
+    | LEFT_PARENTHESIS ImportSpecSemicolonStar RIGHT_PARENTHESIS'''
+    if len(p) == 2:
+        p[0] = p[1]
+    else:
+        p[0] = p[2]
+def p_import_spec_semicolon_star(p):
+    '''ImportSpecSemicolonStar : ImportSpecSemicolonStar ImportSpec SEMICOLON 
+    |'''
+    if len(p) == 1:
+        p[0] = []
+    else:
+        p[0] = ['ImportSpecSemicolonStar', p[1], p[2]]
+def p_import_spec(p):
+    '''ImportSpec : PeriodPackageNamePlus ImportPath'''
+    p[0] = ['ImportSpec', p[1], p[2]]
+def p_period_package_name_plus(p):
+    '''PeriodPackageNamePlus : PeriodPackageNameOr 
+    |'''
+    if len(p) == 1:
+        p[0] = []
+    else:
+        p[0] = ['PeriodPackageNamePlus', p[1]]
+def p_period_package_name_or(p):
+    '''PeriodPackageNameOr : PERIOD 
+    | IDENT'''
+    p[0] = [p[1]]
+def p_import_path(p):
+    '''ImportPath : STRING'''
+    p[0] = p[1]
+
 # --------------------- TYPES -------------------------------------
 def p_type(p):
     '''Type : TypeName 
@@ -41,28 +98,25 @@ def p_type_lit(p):
     | ChannelType'''
     p[0] = p[1]
 def p_array_type(p):
-    '''ArrayType : LEFT_BRACKET ArrayLength RIGHT_BRACKET ElementType'''
+    '''ArrayType : LEFT_BRACKET ArrayLength RIGHT_BRACKET Type'''
     p[0] = ['ArrayType', p[2], p[4]]
 def p_array_length(p):
     '''ArrayLength : Expression'''
     p[0] = p[1]
-def p_element_type(p):
-    '''ElementType : Type'''
-    p[0] = p[1]
 def p_slice_type(p):
-    '''SliceType : LEFT_BRACKET RIGHT_BRACKET ElementType'''
+    '''SliceType : LEFT_BRACKET RIGHT_BRACKET Type'''
     p[0] = ['SliceType', p[3]]
 def p_struct_type(p):
-    '''StructType : STRUCT LEFT_BRACE ManyFieldDecl RIGHT_BRACE'''
+    '''StructType : STRUCT LEFT_BRACE FieldDeclStar RIGHT_BRACE'''
     p[0] = ['StructType', [p[1]], p[3]]
 # --------------------------------------------------------------------
-def p_many_field_decl(p):
-    '''ManyFieldDecl : ManyFieldDecl FieldDecl SEMICOLON
+def p_field_decl_star(p):
+    '''FieldDeclStar : FieldDeclStar FieldDecl SEMICOLON
     |'''
     if len(p) == 1:
         p[0] = []
     else:
-        p[0] = ['ManyFieldDecl', p[1], p[2]]
+        p[0] = ['FieldDeclStar', p[1], p[2]]
 def p_field_decl(p):
     '''FieldDecl : IdentifierList Type TagPlus 
     | EmbeddedField TagPlus'''
@@ -170,13 +224,13 @@ def p_interface_type_name(p):
     '''InterfaceTypeName : TypeName'''
     p[0] = p[1]
 def p_map_type(p):
-    '''MapType : MAP LEFT_BRACKET KeyType RIGHT_BRACKET ElementType'''
+    '''MapType : MAP LEFT_BRACKET KeyType RIGHT_BRACKET Type'''
     p[0] = ['MapType', p[1], p[3], p[5]]
 def p_key_type(p):
     '''KeyType : Type'''
     p[0] = p[1]
 def p_channel_type(p):
-    '''ChannelType : ChannelTypeOr ElementType'''
+    '''ChannelType : ChannelTypeOr Type'''
     p[0] = ['ChannelType', p[1], p[2]]
 def p_channel_type_or(p):
     '''ChannelTypeOr : CHAN 
@@ -351,7 +405,7 @@ def p_operand(p):
     '''Operand : Literal 
     | OperandName 
     | LEFT_PARENTHESIS Expression RIGHT_PARENTHESIS'''
-    if len(p) == 1:
+    if len(p) == 2:
         p[0] = p[1]
     else:
         p[0] = p[2]
@@ -376,15 +430,15 @@ def p_operand_name(p):
         p[0] = p[1]    
 
 def p_qualified_ident(p):
-    '''QualifiedIdent : PackageName PERIOD IDENT'''
-    p[0] = ['QualifiedIdent', p[1], [p[2]], p[p[3]]]
+    '''QualifiedIdent : IDENT PERIOD IDENT'''
+    p[0] = ['QualifiedIdent', [p[1]], [p[2]], [p[3]]]
 def p_composite_lit(p):
     '''CompositeLit : LiteralType LiteralValue'''
     p[0] = ['CompositeLit', p[1], p[2]]
 def p_literal_type(p):
     '''LiteralType : StructType 
     | ArrayType 
-    | LEFT_BRACKET ELLIPSIS RIGHT_BRACKET ElementType 
+    | LEFT_BRACKET ELLIPSIS RIGHT_BRACKET Type 
     | SliceType 
     | MapType 
     | TypeName'''
@@ -447,7 +501,7 @@ def p_primary_expr(p):
     | PrimaryExpr Slice 
     | PrimaryExpr TypeAssertion 
     | PrimaryExpr Arguments'''
-    if len(p) == 1:
+    if len(p) == 2:
         p[0] = p[1]
     else:
         p[0] = ['PrimaryExpr', p[1], p[2]]
@@ -854,73 +908,17 @@ def p_defer_stmt(p):
     '''DeferStmt : DEFER Expression'''
     p[0] = ['DeferStmt', [p[1]], p[2]]
 
-#----------------------------------------------------------------------------------------
-def p_source_file(p):
-    '''SourceFile  : PackageClause SEMICOLON ImportDeclStar TopLevelDeclStar'''
-    p[0] = ['SourceFile', p[1], p[3], p[4]]
-def p_import_decl_star(p):
-    '''ImportDeclStar : ImportDeclStar ImportDecl SEMICOLON 
-    |'''
-    if len(p) == 1:
-        p[0] = []
-    else:
-        p[0] = ['ImportDeclStar', p[1], p[2]]
-def p_top_level_decl_star(p):
-    '''TopLevelDeclStar : TopLevelDeclStar TopLevelDecl SEMICOLON 
-    |'''
-    if len(p) == 1:
-        p[0] = []
-    else:
-        p[0] = ['TopLevelDeclStar', p[1], p[2]]
-def p_packageclause(p):
-    '''PackageClause : PACKAGE PackageName'''
-    p[0] = ['PackageClause', p[2]]
-def p_packagename(p):
-    '''PackageName : IDENT'''
-    p[0] = p[1]
-def p_importdecl(p):
-    '''ImportDecl : IMPORT ImportSpecOr'''
-    p[0] = ['ImportDecl', p[2]]
-def p_import_spec_or(p):
-    '''ImportSpecOr : ImportSpec 
-    | LEFT_PARENTHESIS ImportSpecSemicolonStar RIGHT_PARENTHESIS'''
-    if len(p) == 2:
-        p[0] = p[1]
-    else:
-        p[0] = p[2]
-def p_import_spec_semicolon_star(p):
-    '''ImportSpecSemicolonStar : ImportSpecSemicolonStar ImportSpec SEMICOLON 
-    |'''
-    if len(p) == 1:
-        p[0] = []
-    else:
-        p[0] = ['ImportSpecSemicolonStar', p[1], p[2]]
-def p_import_spec(p):
-    '''ImportSpec : PeriodPackageNamePlus ImportPath'''
-    p[0] = ['ImportSpec', p[1], p[2]]
-def p_period_package_name_plus(p):
-    '''PeriodPackageNamePlus : PeriodPackageNameOr 
-    |'''
-    if len(p) == 1:
-        p[0] = []
-    else:
-        p[0] = ['PeriodPackageNamePlus', p[1]]
-def p_period_package_name_or(p):
-    '''PeriodPackageNameOr : PERIOD 
-    | PackageName'''
-    p[0] = p[1]
-def p_import_path(p):
-    '''ImportPath : STRING'''
-    p[0] = p[1]
+
 
 def p_error(p):
-    print("Syntax error in input!")
-    print(p)
+    print("Syntax error in input! ", p)
 
 
 #-------------------------------------------------------------------------------------
 file = open(sys.argv[1], 'r')
 data = file.read()
 tokens = lexer.tokens
-parser = yacc.yacc()
+parser = yacc.yacc(debug=True)
 res = parser.parse(data)
+import pprint
+pprint.pprint(res)

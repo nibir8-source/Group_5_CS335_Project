@@ -1,0 +1,12 @@
+package main;
+
+import "fmt";
+
+type xyz struct {
+	a int;
+} ;
+
+func main() {
+
+	fmt.Println(34);
+};
