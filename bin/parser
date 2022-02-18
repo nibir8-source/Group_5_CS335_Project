@@ -1,0 +1,3 @@
+#!/bin/sh
+rm -rf ./src/parser.out ./src/parsetab.py
+python3 ./src/parser.py $1
