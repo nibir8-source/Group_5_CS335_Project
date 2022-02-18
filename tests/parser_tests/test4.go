@@ -21,4 +21,4 @@ func LongestCommonSubsequence(a string, b string, m int, n int) int {
 	}
 	// returning the length of longest common subsequence
 	return lcs[m][n];
-}
+};
