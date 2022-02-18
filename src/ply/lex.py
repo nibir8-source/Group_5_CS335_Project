@@ -118,6 +118,7 @@ class Lexer:
         self.lexliterals = ''         # Literal characters that can be passed through
         self.lexmodule = None         # Module
         self.lineno = 1               # Current line number
+        self.prev_tok = None            # Previous token
 
     def clone(self, object=None):
         c = copy.copy(self)
@@ -252,6 +253,7 @@ class Lexer:
                     lexpos    = self.lexpos         # This is here in case user has updated lexpos.
                     lexignore = self.lexignore      # This is here in case there was a state change
                     break
+                self.prev_tok = newtok
                 return newtok
             else:
                 # No match, see if in literals
@@ -281,6 +283,7 @@ class Lexer:
                     lexpos = self.lexpos
                     if not newtok:
                         continue
+                    self.prev_tok = newtok
                     return newtok
 
                 self.lexpos = lexpos
@@ -296,6 +299,7 @@ class Lexer:
             tok.lexer = self
             self.lexpos = lexpos
             newtok = self.lexeoff(tok)
+            self.prev_tok = newtok
             return newtok
 
         self.lexpos = lexpos + 1

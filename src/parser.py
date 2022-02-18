@@ -1,11 +1,9 @@
 import sys
-sys.path.insert(0, './src/lex_n_yacc')
-sys.path.insert(0, './lex_n_yacc')
-# import lex
-import yacc
-from lex import TOKEN
+import ply.yacc as yacc
+from ply.lex import TOKEN
 import sys
 import lexer
+from lexer import * 
 
 precedence = (
     ('left','IDENT'),
@@ -102,13 +100,12 @@ def p_type_lit(p):
     | FunctionType 
     | InterfaceType 
     | SliceType 
-    | MapType
-    | ChannelType'''
+    | MapType'''
     p[0] = p[1]
 def p_array_type(p):
     '''ArrayType : LEFT_BRACKET Expression RIGHT_BRACKET Type
                 | LEFT_BRACKET Expression RIGHT_BRACKET IDENT
-                | LEFT_BRACKET RIGHT_BRACKET IDENT PERIOD IDENT'''    
+                | LEFT_BRACKET Expression RIGHT_BRACKET IDENT PERIOD IDENT'''    
     p[0] = ['ArrayType']
     for idx in range(1,len(p)):
         if p[idx] == '[' or p[idx] == ']' or p[idx] == ';':
@@ -271,23 +268,23 @@ def p_MapType(p):
         p[0].append([p[index]])
       elif(p[index]!="[" and p[index]!="]" and p[index]!="map"):
         p[0].append(p[index])
-def p_channel_type(p):
-    '''ChannelType : CHAN Type
-    | CHAN IDENT
-    | CHAN IDENT PERIOD IDENT
-    | CHAN ARROW Type
-    | CHAN ARROW IDENT
-    | CHAN ARROW IDENT PERIOD IDENT
-    | ARROW CHAN Type
-    | ARROW CHAN IDENT
-    | ARROW CHAN IDENT PERIOD IDENT
-    '''
-    p[0]=['ChannelType']
-    for index in range(1,len(p)):
-      if isinstance(p[index],str):
-        p[0].append([p[index]])
-      else:
-        p[0].append(p[index])
+# def p_channel_type(p):
+#     '''ChannelType : CHAN Type
+#     | CHAN IDENT
+#     | CHAN IDENT PERIOD IDENT
+#     | CHAN ARROW Type
+#     | CHAN ARROW IDENT
+#     | CHAN ARROW IDENT PERIOD IDENT
+#     | ARROW CHAN Type
+#     | ARROW CHAN IDENT
+#     | ARROW CHAN IDENT PERIOD IDENT
+#     '''
+#     p[0]=['ChannelType']
+#     for index in range(1,len(p)):
+#       if isinstance(p[index],str):
+#         p[0].append([p[index]])
+#       else:
+#         p[0].append(p[index])
 def p_block(p):
     '''Block : LEFT_BRACE StatementList RIGHT_BRACE'''
     p[0] = p[2]
@@ -521,7 +518,6 @@ def p_primary_expr(p):
     | IDENT PERIOD IDENT
     | Literal
     | Conversion
-    | MethodExpr 
     | PrimaryExpr Selector 
     | PrimaryExpr Index 
     | PrimaryExpr Slice 
@@ -601,18 +597,18 @@ def p_arguments(p):
             p[0].append([p[idx]])
         elif p[idx]!="(" and p[idx]!=")" and p[idx] != ",":
             p[0].append(p[idx])
-def p_method_expr(p):
-    """MethodExpr : Type PERIOD IDENT
-               | IDENT PERIOD IDENT
-               | IDENT PERIOD IDENT PERIOD IDENT"""
-    p[0]=['MethodExpr']
-    for idx in range(1,len(p)):
-        if p[idx] == 'chan':
-            continue
-        if isinstance(p[idx],str):
-            p[0].append([p[idx]])
-        else:
-            p[0].append(p[idx])
+# def p_method_expr(p):
+#     """MethodExpr : Type PERIOD IDENT
+#                | IDENT PERIOD IDENT
+#                | IDENT PERIOD IDENT PERIOD IDENT"""
+#     p[0]=['MethodExpr']
+#     for idx in range(1,len(p)):
+#         if p[idx] == 'chan':
+#             continue
+#         if isinstance(p[idx],str):
+#             p[0].append([p[idx]])
+#         else:
+#             p[0].append(p[idx])
 def p_expression(p):
     '''Expression : UnaryExpr 
     | Expression binary_op Expression'''
@@ -865,13 +861,7 @@ def p_for_stmt(p):
             p[0].append(p[idx])
 def p_for_clause(p):
     '''ForClause : SimpleStmt SEMICOLON Expression SEMICOLON SimpleStmt
-    | SimpleStmt SEMICOLON SEMICOLON SimpleStmt
-    | SEMICOLON Expression SEMICOLON SimpleStmt
-    | SEMICOLON SEMICOLON SimpleStmt
-    | SimpleStmt SEMICOLON Expression SEMICOLON
-    | SimpleStmt SEMICOLON SEMICOLON
-    | SEMICOLON Expression SEMICOLON
-    | SEMICOLON SEMICOLON'''
+    | SimpleStmt SEMICOLON SEMICOLON SimpleStmt'''
     p[0] = ['ForClause']
     for idx in range(1,len(p)):
         if isinstance(p[idx],str) and p[idx]!=";":
@@ -966,11 +956,12 @@ def p_error(p):
       print("Syntax error at EOF")
 
 
+tokens = lexer.tokens
+lexer = lex.lex()
 #-------------------------------------------------------------------------------------
 file = open(sys.argv[1], 'r')
 data = file.read()
-tokens = lexer.tokens
 parser = yacc.yacc(debug=True)
-res = parser.parse(data)
+res = parser.parse(data, lexer=lexer)
 import pprint
 pprint.pprint(res)

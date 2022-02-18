@@ -1,8 +1,6 @@
 import sys
-sys.path.insert(0, './src/lex_n_yacc')
-sys.path.insert(0, './lex_n_yacc')
-import lex
-from lex import TOKEN
+import ply.lex as lex
+from ply.lex import TOKEN
 
 
 keywords = {
@@ -17,7 +15,7 @@ keywords = {
     'go'           :    'GO',
     'struct'       :    'STRUCT',
     'goto'         :    'GOTO',
-    'chan'         :    'CHAN',
+    # 'chan'         :    'CHAN',
     'else'         :    'ELSE',
     'map'          :    'MAP',
     'fallthrough'  :    'FALLTHROUGH',
@@ -42,7 +40,7 @@ tokens = list(keywords.values()) + [
     'INT',              # 123
     'FLOAT',            # 123.4
     'IMAGINARY',             # 123.4i
-    'CHAR',             # 'a'
+    # 'CHAR',             # 'a'
     'RUNE',
     'STRING',           # "abc"
 
@@ -102,11 +100,6 @@ tokens = list(keywords.values()) + [
     'RIGHT_BRACE',           # }
     'SEMICOLON',        # ;
     'COLON',            # :
-
-    #Special Tokens
-    'COMMENT',
-    'NEWLINE',
-    'EOF',
 ]
 
 # Regular expression rules for different tokens
@@ -208,13 +201,8 @@ unicode_val = r"(" + unicode_char + r"|" + little_u_val + r"|" + big_u_val + r"|
 
 t_RUNE = r"(\'(" + unicode_val + r"|" + byte_val + r")\')"
 
-t_CHAR        = r"[a-zA-Z]"
 t_STRING    = r"(\"[^\"\\\n]*(\\.[^\"\\\n]*)*\")|(\`[^\`]*\`)" 
-t_ignore = " \t"
-
-def t_NEWLINE(t):
-    r"\n+"
-    t.lexer.lineno += len(t.value)
+t_ignore = " \t\n"
 
 def t_error(t):
     print(f"[ERROR] Invalid token: {t.value[0]} in #Line: {t.lineno}")
