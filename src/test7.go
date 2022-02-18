@@ -1,8 +1,8 @@
-package main
+package main;
 
-import "fmt"
+import "fmt";
 
 func main() {
-	var a = 20
-	fmt.Println(a)
+	var a = 20;
+	fmt.Println(a);
 }

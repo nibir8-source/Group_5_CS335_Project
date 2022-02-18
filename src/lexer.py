@@ -102,6 +102,8 @@ tokens = list(keywords.values()) + [
     'COLON',            # :
 ]
 
+prev_tok = ""
+
 # Regular expression rules for different tokens
 t_ADD   = r"\+"
 t_SUBTRACT   = r"-"
@@ -202,11 +204,16 @@ unicode_val = r"(" + unicode_char + r"|" + little_u_val + r"|" + big_u_val + r"|
 t_RUNE = r"(\'(" + unicode_val + r"|" + byte_val + r")\')"
 
 t_STRING    = r"(\"[^\"\\\n]*(\\.[^\"\\\n]*)*\")|(\`[^\`]*\`)" 
-t_ignore = " \t\n"
+t_ignore = " \t"
 
 def t_error(t):
     print(f"[ERROR] Invalid token: {t.value[0]} in #Line: {t.lineno}")
     t.lexer.skip(1)
+
+def t_NEWLINE(t):
+    r'\n+'
+    t.lexer.lineno += len(t.value)
+    pass
 
 @TOKEN(identifier)
 def t_IDENT(t):
