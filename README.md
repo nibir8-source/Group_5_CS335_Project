@@ -25,3 +25,14 @@ For running the first test case given in the tests folder run the following comm
 ./bin/lexer ./tests/test1.go<br>
 
 And similarly for the rest of the test files(test2.go, test3.go, test4.go, test5.go)
+
+
+# Milestone 3
+
+The Parser exists in the folder src named parser.py.</br>
+
+For running the first test case given in the tests folder run the following command:</br>
+
+./bin/parser ./tests/parser_tests/test0.go</br>
+
+And similarly for the rest of the test files(test1.go, test2.go, test3.go, test4.go)</br>
