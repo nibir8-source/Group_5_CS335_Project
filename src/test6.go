@@ -2,15 +2,16 @@ package main;
 
 import "fmt";
 
-type xyz struct {
+type pogo struct {
 	a int;
-} ;
+	b int;
+};
 
 func main() {
 
-	var a int = 5;
-	var b int = 7;
-	var c int;
-	c = a + b;
-	fmt.Println(c);
+	var a int = 4 / 7 - 5;
+	var b = pogo(4,5);
+	
+
+
 };

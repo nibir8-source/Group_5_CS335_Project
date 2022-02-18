@@ -11,9 +11,6 @@ precedence = (
     ('left','COMMA'),
     ('left','LEFT_BRACKET'),
     ('left','RIGHT_BRACKET'),
-    ('left','LEFT_BRACE'),
-    ('left','RIGHT_BRACE'),
-    ('left','ELLIPSIS'),
     ('left','PERIOD'),
     ('left','SEMICOLON'),
     ('left','COLON'),
@@ -25,13 +22,12 @@ precedence = (
     ('left','RETURN'),
     ('left','LEFT_PARENTHESIS'),
     ('left','RIGHT_PARENTHESIS'),
-    ('right', 'ASSIGNMENT'),
+    ('right', 'ASSIGNMENT', 'NOT'),
     ('left', 'LOGICAL_OR'),
     ('left', 'LOGICAL_AND'),
     ('left', 'EQUAL', 'NOT_EQUAL', 'LESS_THAN', 'LESS_THAN_EQUAL', 'GREATER_THAN', 'GREATER_THAN_EQUAL'),
     ('left', 'ADD', 'SUBTRACT', 'OR', 'XOR'),
-    ('left', 'MULTIPLY', 'QUOTIENT', 'REMAINDER', 'SHIFT_LEFT', 'SHIFT_RIGHT', 'AND', 'AND_NOT'),
-    ('right', 'NOT'),
+    ('left', 'MULTIPLY', 'QUOTIENT', 'REMAINDER', 'SHIFT_LEFT', 'SHIFT_RIGHT', 'AND', 'AND_NOT')
 )
 
 #----------------------------------------------------------------------------------------
@@ -123,25 +119,19 @@ def p_const_spec(p):
     else:
         p[0]=['ConstSpec', [p[1]], p[2], [p[3]], p[4]]
 def p_identifier_list(p):
-    '''IdentifierList : IDENT IdentifierListStar'''
-    p[0]=['IdentifierList', [p[1]], p[2]]
-def p_identifier_list_star(p):
-    '''IdentifierListStar : COMMA IDENT IdentifierListStar
-    |'''
-    if len(p) == 1:
-        p[0] = []
+    '''IdentifierList : IDENT
+    | IDENT COMMA IdentifierList'''
+    if len(p)==2:
+        p[0]=[p[1]]
     else:
-        p[0] = ['IdentifierListStar', [p[2]], p[3]]
+        p[0]=['IdentifierList', [p[1]], p[2]]
 def p_expression_list(p):
-    '''ExpressionList : Expression ExpressionListStar'''
-    p[0]=['ExpressionList', p[1], p[2]]
-def p_expression_list_star(p):
-    '''ExpressionListStar : COMMA Expression ExpressionListStar
-    |'''
-    if len(p) == 1:
-        p[0] = []
+    '''ExpressionList : Expression
+    | ExpressionList COMMA Expression'''
+    if len(p)==2:
+        p[0]=p[1]
     else:
-        p[0] = ['ExpressionListStar', p[2], p[3]]
+        p[0]=['ExpressionList', p[1], p[3]]
 def p_type_decl(p):
     '''TypeDecl : TYPE TypeSpec
                 | TYPE LEFT_PARENTHESIS TypeSpecStar RIGHT_PARENTHESIS'''
@@ -150,7 +140,7 @@ def p_type_decl(p):
     else:
         p[0]=['TypeDecl', [p[1]], p[3]]
 def p_type_spec_star(p):
-    '''TypeSpecStar : TypeSpecStar TypeSpec SEMICOLON
+    '''TypeSpecStar : TypeSpec SEMICOLON TypeSpecStar
     |'''
     if len(p) == 1:
         p[0] = []
@@ -189,7 +179,7 @@ def p_var_decl(p):
     else:
         p[0] = ['VarDecl', [p[1]], p[3]]
 def p_var_spec_star(p):
-    '''VarSpecStar : VarSpecStar VarSpec SEMICOLON 
+    '''VarSpecStar : VarSpec SEMICOLON VarSpecStar
     |'''
     if len(p) == 1:
         p[0] = []
@@ -353,26 +343,18 @@ def p_parameters(p):
     else:
         p[0] = ['Parameters', p[2]]
 def p_parameter_list(p):
-    '''ParameterList : ParameterDecl ParameterDeclStar'''
-    p[0] = ['ParamterList', p[1], p[2]]
-def p_parameter_decl_star(p):
-    """ParameterDeclStar : COMMA ParameterDecl ParameterDeclStar
-    |"""
-    if len(p) == 1:
-        p[0] = []
+    '''ParameterList : ParameterDecl 
+    | ParameterDecl COMMA ParameterList'''
+    if len(p) == 2:
+        p[0] = p[1]
     else:
-        p[0] = ['ParameterDeclStar', p[2], p[3]]
+        p[0] = ['ParamterList', p[1], p[3]]
 
 def p_ParameterDecl(p):
-    '''ParameterDecl : IdentifierList ELLIPSIS Type
-    | IdentifierList ELLIPSIS IDENT
-    | IdentifierList ELLIPSIS IDENT PERIOD IDENT
+    '''ParameterDecl :
     | IdentifierList Type
     | IdentifierList IDENT
     | IdentifierList IDENT PERIOD IDENT
-    | ELLIPSIS Type
-    | ELLIPSIS IDENT
-    | ELLIPSIS IDENT PERIOD IDENT
     | Type
     | IDENT
     | IDENT PERIOD IDENT'''
@@ -419,23 +401,6 @@ def p_MapType(p):
         p[0].append([p[index]])
       elif(p[index]!="[" and p[index]!="]" and p[index]!="map"):
         p[0].append(p[index])
-# def p_channel_type(p):
-#     '''ChannelType : CHAN Type
-#     | CHAN IDENT
-#     | CHAN IDENT PERIOD IDENT
-#     | CHAN ARROW Type
-#     | CHAN ARROW IDENT
-#     | CHAN ARROW IDENT PERIOD IDENT
-#     | ARROW CHAN Type
-#     | ARROW CHAN IDENT
-#     | ARROW CHAN IDENT PERIOD IDENT
-#     '''
-#     p[0]=['ChannelType']
-#     for index in range(1,len(p)):
-#       if isinstance(p[index],str):
-#         p[0].append([p[index]])
-#       else:
-#         p[0].append(p[index])
 def p_block(p):
     '''Block : LEFT_BRACE StatementList RIGHT_BRACE'''
     p[0] = p[2]
@@ -449,7 +414,25 @@ def p_statement_list(p):
 #############################
 def p_expression(p):
     '''Expression : UnaryExpr 
-    | Expression binary_op Expression'''
+    | Expression LOGICAL_OR Expression
+    | Expression LOGICAL_AND Expression
+    | Expression EQUAL Expression
+    | Expression NOT_EQUAL Expression
+    | Expression LESS_THAN Expression
+    | Expression LESS_THAN_EQUAL Expression
+    | Expression GREATER_THAN Expression
+    | Expression GREATER_THAN_EQUAL Expression
+    | Expression ADD Expression
+    | Expression SUBTRACT Expression
+    | Expression OR Expression
+    | Expression XOR Expression
+    | Expression MULTIPLY Expression
+    | Expression QUOTIENT Expression
+    | Expression REMAINDER Expression
+    | Expression SHIFT_LEFT Expression
+    | Expression SHIFT_RIGHT Expression
+    | Expression AND Expression
+    | Expression AND_NOT Expression'''
     if len(p) == 2:
         p[0] = p[1]
     else:
@@ -461,40 +444,7 @@ def p_unary_expr(p):
         p[0] = p[1]
     else:
         p[0] = ['UnaryExpr', p[1], p[2]]
-def p_binary_op(p):
-    '''binary_op : LOGICAL_OR 
-    | LOGICAL_AND 
-    | rel_op 
-    | add_op 
-    | mul_op'''
-    p[0] = ['binary_op']
-    if(isinstance(p[1],str)):
-        p[0].append([p[1]])
-    else:
-        p[0].append(p[1])
-def p_rel_op(p):
-    '''rel_op : EQUAL 
-    | NOT_EQUAL 
-    | LESS_THAN 
-    | LESS_THAN_EQUAL 
-    | GREATER_THAN 
-    | GREATER_THAN_EQUAL'''
-    p[0] = [p[1]]
-def p_add_op(p):
-    '''add_op : ADD 
-    | SUBTRACT 
-    | OR 
-    | XOR'''
-    p[0] = [p[1]]
-def p_mul_op(p):
-    '''mul_op : MULTIPLY 
-    | QUOTIENT 
-    | REMAINDER 
-    | SHIFT_LEFT 
-    | SHIFT_RIGHT 
-    | AND 
-    | AND_NOT'''
-    p[0] = [p[1]]
+   
 def p_unary_op(p):
     '''unary_op : ADD 
     | SUBTRACT 
@@ -523,7 +473,6 @@ def p_primary_expr(p):
     | LEFT_PARENTHESIS Expression RIGHT_PARENTHESIS
     | IDENT PERIOD IDENT
     | Literal
-    | Conversion
     | PrimaryExpr Selector 
     | PrimaryExpr Index 
     | PrimaryExpr Slice 
@@ -571,32 +520,18 @@ def p_arguments(p):
     '''Arguments : LEFT_PARENTHESIS RIGHT_PARENTHESIS
               | LEFT_PARENTHESIS ExpressionList RIGHT_PARENTHESIS
               | LEFT_PARENTHESIS ExpressionList COMMA RIGHT_PARENTHESIS
-              | LEFT_PARENTHESIS ExpressionList ELLIPSIS RIGHT_PARENTHESIS
-              | LEFT_PARENTHESIS ExpressionList ELLIPSIS COMMA RIGHT_PARENTHESIS
               | LEFT_PARENTHESIS Type RIGHT_PARENTHESIS
               | LEFT_PARENTHESIS Type COMMA RIGHT_PARENTHESIS
-              | LEFT_PARENTHESIS Type ELLIPSIS RIGHT_PARENTHESIS
-              | LEFT_PARENTHESIS Type ELLIPSIS COMMA RIGHT_PARENTHESIS
               | LEFT_PARENTHESIS Type COMMA ExpressionList RIGHT_PARENTHESIS
               | LEFT_PARENTHESIS Type COMMA ExpressionList COMMA RIGHT_PARENTHESIS
-              | LEFT_PARENTHESIS Type COMMA ExpressionList ELLIPSIS RIGHT_PARENTHESIS
-              | LEFT_PARENTHESIS Type COMMA ExpressionList ELLIPSIS COMMA RIGHT_PARENTHESIS
               | LEFT_PARENTHESIS IDENT RIGHT_PARENTHESIS
               | LEFT_PARENTHESIS IDENT COMMA RIGHT_PARENTHESIS
-              | LEFT_PARENTHESIS IDENT ELLIPSIS RIGHT_PARENTHESIS
-              | LEFT_PARENTHESIS IDENT ELLIPSIS COMMA RIGHT_PARENTHESIS
               | LEFT_PARENTHESIS IDENT COMMA ExpressionList RIGHT_PARENTHESIS
               | LEFT_PARENTHESIS IDENT COMMA ExpressionList COMMA RIGHT_PARENTHESIS
-              | LEFT_PARENTHESIS IDENT COMMA ExpressionList ELLIPSIS RIGHT_PARENTHESIS
-              | LEFT_PARENTHESIS IDENT COMMA ExpressionList ELLIPSIS COMMA RIGHT_PARENTHESIS
               | LEFT_PARENTHESIS IDENT PERIOD IDENT RIGHT_PARENTHESIS
               | LEFT_PARENTHESIS IDENT PERIOD IDENT COMMA RIGHT_PARENTHESIS
-              | LEFT_PARENTHESIS IDENT PERIOD IDENT ELLIPSIS RIGHT_PARENTHESIS
-              | LEFT_PARENTHESIS IDENT PERIOD IDENT ELLIPSIS COMMA RIGHT_PARENTHESIS
               | LEFT_PARENTHESIS IDENT PERIOD IDENT COMMA ExpressionList RIGHT_PARENTHESIS
-              | LEFT_PARENTHESIS IDENT PERIOD IDENT COMMA ExpressionList COMMA RIGHT_PARENTHESIS
-              | LEFT_PARENTHESIS IDENT PERIOD IDENT COMMA ExpressionList ELLIPSIS RIGHT_PARENTHESIS
-              | LEFT_PARENTHESIS IDENT PERIOD IDENT COMMA ExpressionList ELLIPSIS COMMA RIGHT_PARENTHESIS'''
+              | LEFT_PARENTHESIS IDENT PERIOD IDENT COMMA ExpressionList COMMA RIGHT_PARENTHESIS'''
     p[0] = ['Arguments']
     for idx in range(1,len(p)):
         if isinstance(p[idx],str) and p[idx]!="(" and p[idx]!=")" and p[idx] != ",":
@@ -616,21 +551,21 @@ def p_arguments(p):
 #         else:
 #             p[0].append(p[idx])
 
-def p_conversion(p):
-    '''Conversion : Type LEFT_PARENTHESIS Expression COMMA RIGHT_PARENTHESIS
-    | Type LEFT_PARENTHESIS Expression LEFT_PARENTHESIS
-    | IDENT LEFT_PARENTHESIS Expression RIGHT_PARENTHESIS
-    | IDENT LEFT_PARENTHESIS Expression COMMA RIGHT_PARENTHESIS
-    | IDENT PERIOD IDENT LEFT_PARENTHESIS Expression RIGHT_PARENTHESIS
-    | IDENT PERIOD IDENT LEFT_PARENTHESIS Expression COMMA RIGHT_PARENTHESIS'''
-    p[0] = ['Conversion']
-    for idx in range(1,len(p)):
-        if p[idx] == '(' or p[idx] == ')' or p[idx] == ',':
-            continue
-        if isinstance(p[idx],str):
-            p[0].append([p[idx]])
-        else:
-            p[0].append(p[idx])
+# def p_conversion(p):
+#     '''Conversion : Type LEFT_PARENTHESIS Expression COMMA RIGHT_PARENTHESIS
+#     | Type LEFT_PARENTHESIS Expression LEFT_PARENTHESIS
+#     | IDENT LEFT_PARENTHESIS Expression RIGHT_PARENTHESIS
+#     | IDENT LEFT_PARENTHESIS Expression COMMA RIGHT_PARENTHESIS
+#     | IDENT PERIOD IDENT LEFT_PARENTHESIS Expression RIGHT_PARENTHESIS
+#     | IDENT PERIOD IDENT LEFT_PARENTHESIS Expression COMMA RIGHT_PARENTHESIS'''
+#     p[0] = ['Conversion']
+#     for idx in range(1,len(p)):
+#         if p[idx] == '(' or p[idx] == ')' or p[idx] == ',':
+#             continue
+#         if isinstance(p[idx],str):
+#             p[0].append([p[idx]])
+#         else:
+#             p[0].append(p[idx])
 
 def p_composite_lit(p):
     '''CompositeLit : StructType LiteralValue
@@ -639,10 +574,7 @@ def p_composite_lit(p):
                 | MapType LiteralValue
                 | Type LiteralValue
                 | IDENT LiteralValue
-                | IDENT PERIOD IDENT LiteralValue
-                | LEFT_BRACKET ELLIPSIS RIGHT_BRACKET Type LiteralValue
-                | LEFT_BRACKET ELLIPSIS RIGHT_BRACKET IDENT LiteralValue
-                | LEFT_BRACKET ELLIPSIS RIGHT_BRACKET IDENT PERIOD IDENT LiteralValue'''
+                | IDENT PERIOD IDENT LiteralValue'''
     p[0] = ['CompositeLit']
     for idx in range(1,len(p)):
         if isinstance(p[idx],str) and p[idx]!="[" and p[idx]!="]" and p[idx]!=",":
@@ -658,15 +590,12 @@ def p_literal_value(p):
     else:
         p[0] = p[2]
 def p_element_list(p):
-    '''ElementList : KeyedElement KeyedElementStar'''
-    p[0] = ['ElementList', p[1], p[2]]
-def p_keyed_element_star(p):
-    '''KeyedElementStar : KeyedElementStar COMMA KeyedElement 
-                        |'''
-    if len(p) == 1:
-        p[0] = []
+    '''ElementList : KeyedElement 
+    | ElementList COMMA KeyedElement'''
+    if len(p) == 2:
+        p[0] = p[1]
     else:
-        p[0] = ['KeyedElementStar', p[1], p[3]]
+        p[0] = ['ElementList', p[1], p[3]]
 def p_keyed_element(p):
     '''KeyedElement : Element
                     | IDENT COLON Element
@@ -752,8 +681,8 @@ def p_assign_op(p):
 def p_if_stmt(p):
     '''IfStmt : IF Expression Block
     | IF SimpleStmt SEMICOLON Expression Block
-    | IF Expression Block Expression Block ELSE IfStmt
-    | IF Expression Block Expression Block ELSE Block
+    | IF Expression Block ELSE IfStmt
+    | IF Expression Block ELSE Block
     | IF SimpleStmt SEMICOLON Expression Block ELSE IfStmt
     | IF SimpleStmt SEMICOLON Expression Block ELSE Block'''
     p[0] = ['IfStmt']
