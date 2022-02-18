@@ -7,17 +7,19 @@ from lexer import *
 
 precedence = (
     ('left','IDENT'),
+    ('left','DEFINE'),
+    ('left','COMMA'),
     ('left','LEFT_BRACKET'),
+    ('left','RIGHT_BRACKET'),
+    ('left','LEFT_BRACE'),
     ('left','RIGHT_BRACE'),
-    ('left','FLOAT'),
-    ('left','STRING'),
     ('left','ELLIPSIS'),
     ('left','PERIOD'),
     ('left','SEMICOLON'),
     ('left','COLON'),
-    ('left','RIGHT_BRACKET'),
-    ('left','LEFT_BRACE'),
     ('left','INT'),
+    ('left','FLOAT'),
+    ('left','STRING'),
     ('left','BREAK'),
     ('left','CONTINUE'),
     ('left','RETURN'),
@@ -77,6 +79,155 @@ def p_import_spec(p):
         p[0]=['ImportSpec',[p[1]],p[2]]
 def p_import_path(p):
     '''ImportPath : STRING'''
+    p[0] = p[1]
+
+#-----------------------------------------------------------------------------
+def p_top_level_decl(p):
+    '''TopLevelDecl : Declaration 
+    | FunctionDecl 
+    | MethodDecl'''
+    p[0] = p[1]
+def p_declaration(p):
+    '''Declaration : ConstDecl 
+    | TypeDecl 
+    | VarDecl'''
+    p[0] = p[1]
+def p_const_decl(p):
+    '''ConstDecl : CONST ConstSpec
+                | CONST LEFT_PARENTHESIS ConstSpecStar RIGHT_PARENTHESIS'''
+    if len(p)==3:
+        p[0]=p[2]
+    else:
+        p[0]=p[3]
+def p_const_spec_star(p):
+    '''ConstSpecStar : ConstSpecStar ConstSpec SEMICOLON
+    |'''
+    if len(p) == 1:
+        p[0] = []
+    else:
+        p[0] = ['ConstSpecStar', p[1], p[2]]
+def p_const_spec(p):
+    '''ConstSpec : IdentifierList
+                | IdentifierList ASSIGNMENT ExpressionList
+                | IdentifierList Type ASSIGNMENT ExpressionList
+                | IdentifierList IDENT ASSIGNMENT ExpressionList
+                | IdentifierList IDENT PERIOD IDENT ASSIGNMENT ExpressionList'''
+    if len(p)==2:
+        p[0]=p[1]
+    elif (len(p)==4):
+        p[0]=['ConstSpec', p[1], [p[2]], p[3] ]
+    elif len(p) == 7:
+        p[0]=['ConstSpec', p[1], [p[2]], [p[3]], [p[4]], [p[5]], p[6]]
+    elif isinstance(p[1],str):
+        p[0]=['ConstSpec', [p[1]], [p[2]], [p[3]], p[4]]
+    else:
+        p[0]=['ConstSpec', [p[1]], p[2], [p[3]], p[4]]
+def p_identifier_list(p):
+    '''IdentifierList : IDENT IdentifierListStar'''
+    p[0]=['IdentifierList', [p[1]], p[2]]
+def p_identifier_list_star(p):
+    '''IdentifierListStar : COMMA IDENT IdentifierListStar
+    |'''
+    if len(p) == 1:
+        p[0] = []
+    else:
+        p[0] = ['IdentifierListStar', [p[2]], p[3]]
+def p_expression_list(p):
+    '''ExpressionList : Expression ExpressionListStar'''
+    p[0]=['ExpressionList', p[1], p[2]]
+def p_expression_list_star(p):
+    '''ExpressionListStar : COMMA Expression ExpressionListStar
+    |'''
+    if len(p) == 1:
+        p[0] = []
+    else:
+        p[0] = ['ExpressionListStar', p[2], p[3]]
+def p_type_decl(p):
+    '''TypeDecl : TYPE TypeSpec
+                | TYPE LEFT_PARENTHESIS TypeSpecStar RIGHT_PARENTHESIS'''
+    if len(p)==3:
+        p[0]=['TypeDecl', [p[1]], p[2]]
+    else:
+        p[0]=['TypeDecl', [p[1]], p[3]]
+def p_type_spec_star(p):
+    '''TypeSpecStar : TypeSpecStar TypeSpec SEMICOLON
+    |'''
+    if len(p) == 1:
+        p[0] = []
+    else:
+        p[0] = ['TypeSpecStar', p[1], p[2]]
+def p_type_spec(p):
+    '''TypeSpec : AliasDecl 
+    | TypeDef'''
+    p[0] = p[1] 
+def p_alias_decl(p):
+    '''AliasDecl : IDENT ASSIGNMENT Type
+    | IDENT ASSIGNMENT IDENT
+    | IDENT ASSIGNMENT IDENT PERIOD IDENT'''
+    p[0] = ['AliasDecl']
+    for idx in range(1,len(p)):
+        if isinstance(p[idx],str):
+            p[0].append([p[idx]])
+        else:
+            p[0].append(p[idx])
+def p_type_def(p):
+    '''TypeDef : IDENT Type
+    | IDENT IDENT PERIOD IDENT
+    | IDENT IDENT'''
+    if len(p)==5:
+        p[0] = ['TypeDef', [p[1]], [p[2]], [p[3]], [p[4]]]
+    elif isinstance(p[2], str):
+        p[0] = ['TypeDef', [p[1]], [p[2]]]
+    else:
+        p[0] = ['TypeDef', [p[1]], p[2]]
+    
+def p_var_decl(p):
+    '''VarDecl : VARIABLE VarSpec
+    | VARIABLE LEFT_PARENTHESIS VarSpecStar RIGHT_PARENTHESIS'''   
+    if len(p) == 3:
+        p[0] = ['VarDecl', [p[1]], p[2]]
+    else:
+        p[0] = ['VarDecl', [p[1]], p[3]]
+def p_var_spec_star(p):
+    '''VarSpecStar : VarSpecStar VarSpec SEMICOLON 
+    |'''
+    if len(p) == 1:
+        p[0] = []
+    else:
+        p[0] = ['VarSpecStar', p[1], p[2]]
+def p_var_spec(p):
+    '''VarSpec : IdentifierList Type 
+                | IdentifierList Type ASSIGNMENT Expression
+                | IdentifierList IDENT ASSIGNMENT ExpressionList
+                | IdentifierList IDENT PERIOD IDENT ASSIGNMENT ExpressionList
+                | IdentifierList IDENT PERIOD IDENT
+                | IdentifierList IDENT
+                | IdentifierList ASSIGNMENT ExpressionList'''
+    p[0] = ['VarSpec']
+    for idx in range(1,len(p)):
+      if(isinstance(p[idx],str)):
+        p[0].append([p[idx]])
+      else:
+        p[0].append(p[idx])
+def p_short_var_decl(p):
+    '''ShortVarDecl : IdentifierList DEFINE ExpressionList'''
+    p[0] = ['ShortVarDecl', p[1], [p[2]], p[3]]
+def p_function_decl(p):
+    '''FunctionDecl : FUNCTION IDENT Signature Block
+                    | FUNCTION IDENT Signature'''
+    if len(p) == 4:
+        p[0] = ['FunctionDecl', [p[2]], p[3]]
+    else:
+        p[0] = ['FunctionDecl', [p[2]], p[3], p[4]]
+def p_method_decl(p):
+    '''MethodDecl : FUNCTION Receiver IDENT Signature Block
+                    | FUNCTION Receiver IDENT Signature'''
+    if len(p) == 5:
+        p[0] = ['FunctionDecl', p[2], [p[3]], p[4]]
+    else:
+        p[0] = ['FunctionDecl', p[2], [p[3]], p[4], p[5]]
+def p_receiver(p):
+    '''Receiver : Parameters'''
     p[0] = p[1]
 
 # --------------------- TYPES -------------------------------------
@@ -295,154 +446,64 @@ def p_statement_list(p):
         p[0] = []
     else:
         p[0] = ['StatementList', p[1], p[2]]
-#-----------------------------------------------------------------------------
-def p_declaration(p):
-    '''Declaration : ConstDecl 
-    | TypeDecl 
-    | VarDecl'''
-    p[0] = p[1]
-def p_top_level_decl(p):
-    '''TopLevelDecl : Declaration 
-    | FunctionDecl 
-    | MethodDecl'''
-    p[0] = p[1]
-def p_const_decl(p):
-    '''ConstDecl : CONST ConstSpec
-                | CONST LEFT_PARENTHESIS ConstSpecStar RIGHT_PARENTHESIS'''
-    if len(p)==3:
-        p[0]=p[2]
+#############################
+def p_expression(p):
+    '''Expression : UnaryExpr 
+    | Expression binary_op Expression'''
+    if len(p) == 2:
+        p[0] = p[1]
     else:
-        p[0]=p[3]
-def p_const_spec_star(p):
-    '''ConstSpecStar : ConstSpecStar ConstSpec SEMICOLON
-    |'''
-    if len(p) == 1:
-        p[0] = []
+        p[0] = ['Expression', p[1], p[2], p[3]]
+def p_unary_expr(p):
+    '''UnaryExpr : PrimaryExpr 
+    | unary_op UnaryExpr'''
+    if len(p) == 2:
+        p[0] = p[1]
     else:
-        p[0] = ['ConstSpecStar', p[1], p[2]]
-def p_const_spec(p):
-    '''ConstSpec : IdentifierList
-                | IdentifierList ASSIGNMENT ExpressionList
-                | IdentifierList Type ASSIGNMENT ExpressionList
-                | IdentifierList IDENT ASSIGNMENT ExpressionList
-                | IdentifierList IDENT PERIOD IDENT ASSIGNMENT ExpressionList'''
-    if len(p)==2:
-        p[0]=p[1]
-    elif (len(p)==4):
-        p[0]=['ConstSpec', p[1], [p[2]], p[3] ]
-    elif len(p) == 7:
-        p[0]=['ConstSpec', p[1], [p[2]], [p[3]], [p[4]], [p[5]], p[6]]
-    elif isinstance(p[1],str):
-        p[0]=['ConstSpec', [p[1]], [p[2]], [p[3]], p[4]]
+        p[0] = ['UnaryExpr', p[1], p[2]]
+def p_binary_op(p):
+    '''binary_op : LOGICAL_OR 
+    | LOGICAL_AND 
+    | rel_op 
+    | add_op 
+    | mul_op'''
+    p[0] = ['binary_op']
+    if(isinstance(p[1],str)):
+        p[0].append([p[1]])
     else:
-        p[0]=['ConstSpec', [p[1]], p[2], [p[3]], p[4]]
-def p_identifier_list(p):
-    '''IdentifierList : IDENT IdentifierListStar'''
-    p[0]=['IdentifierList', [p[1]], p[2]]
-def p_identifier_list_star(p):
-    '''IdentifierListStar : COMMA IDENT IdentifierListStar
-    |'''
-    if len(p) == 1:
-        p[0] = []
-    else:
-        p[0] = ['IdentifierListStar', [p[2]], p[3]]
-def p_expression_list(p):
-    '''ExpressionList : Expression ExpressionListStar'''
-    p[0]=['ExpressionList', p[1], p[2]]
-def p_expression_list_star(p):
-    '''ExpressionListStar : COMMA Expression ExpressionListStar
-    |'''
-    if len(p) == 1:
-        p[0] = []
-    else:
-        p[0] = ['ExpressionListStar', p[2], p[3]]
-def p_type_decl(p):
-    '''TypeDecl : TYPE TypeSpec
-                | TYPE LEFT_PARENTHESIS TypeSpecStar RIGHT_PARENTHESIS'''
-    if len(p)==3:
-        p[0]=['TypeDecl', [p[1]], p[2]]
-    else:
-        p[0]=['TypeDecl', [p[1]], p[3]]
-def p_type_spec_star(p):
-    '''TypeSpecStar : TypeSpecStar TypeSpec SEMICOLON
-    |'''
-    if len(p) == 1:
-        p[0] = []
-    else:
-        p[0] = ['TypeSpecStar', p[1], p[2]]
-def p_type_spec(p):
-    '''TypeSpec : AliasDecl 
-    | TypeDef'''
-    p[0] = p[1] 
-def p_alias_decl(p):
-    '''AliasDecl : IDENT ASSIGNMENT Type
-    | IDENT ASSIGNMENT IDENT
-    | IDENT ASSIGNMENT IDENT PERIOD IDENT'''
-    p[0] = ['AliasDecl']
-    for idx in range(1,len(p)):
-        if isinstance(p[idx],str):
-            p[0].append([p[idx]])
-        else:
-            p[0].append(p[idx])
-def p_type_def(p):
-    '''TypeDef : IDENT Type
-    | IDENT IDENT PERIOD IDENT
-    | IDENT IDENT'''
-    if len(p)==5:
-        p[0] = ['TypeDef', [p[1]], [p[2]], [p[3]], [p[4]]]
-    elif isinstance(p[2], str):
-        p[0] = ['TypeDef', [p[1]], [p[2]]]
-    else:
-        p[0] = ['TypeDef', [p[1]], p[2]]
-    
-def p_var_decl(p):
-    '''VarDecl : VARIABLE VarSpec
-    | VARIABLE LEFT_PARENTHESIS VarSpecStar RIGHT_PARENTHESIS'''   
-    if len(p) == 3:
-        p[0] = ['VarDecl', [p[1]], p[2]]
-    else:
-        p[0] = ['VarDecl', [p[1]], p[3]]
-def p_var_spec_star(p):
-    '''VarSpecStar : VarSpecStar VarSpec SEMICOLON 
-    |'''
-    if len(p) == 1:
-        p[0] = []
-    else:
-        p[0] = ['VarSpecStar', p[1], p[2]]
-def p_var_spec(p):
-    '''VarSpec : IdentifierList Type 
-                | IdentifierList Type ASSIGNMENT Expression
-                | IdentifierList IDENT ASSIGNMENT ExpressionList
-                | IdentifierList IDENT PERIOD IDENT ASSIGNMENT ExpressionList
-                | IdentifierList IDENT PERIOD IDENT
-                | IdentifierList IDENT
-                | IdentifierList ASSIGNMENT ExpressionList'''
-    p[0] = ['VarSpec']
-    for idx in range(1,len(p)):
-      if(isinstance(p[idx],str)):
-        p[0].append([p[idx]])
-      else:
-        p[0].append(p[idx])
-def p_short_var_decl(p):
-    '''ShortVarDecl : IdentifierList DEFINE ExpressionList'''
-    p[0] = ['ShortVarDecl', p[1], [p[2]], p[3]]
-def p_function_decl(p):
-    '''FunctionDecl : FUNCTION IDENT Signature Block
-                    | FUNCTION IDENT Signature'''
-    if len(p) == 4:
-        p[0] = ['FunctionDecl', [p[2]], p[3]]
-    else:
-        p[0] = ['FunctionDecl', [p[2]], p[3], p[4]]
-def p_method_decl(p):
-    '''MethodDecl : FUNCTION Receiver IDENT Signature Block
-                    | FUNCTION Receiver IDENT Signature'''
-    if len(p) == 5:
-        p[0] = ['FunctionDecl', p[2], [p[3]], p[4]]
-    else:
-        p[0] = ['FunctionDecl', p[2], [p[3]], p[4], p[5]]
-def p_receiver(p):
-    '''Receiver : Parameters'''
-    p[0] = p[1]
+        p[0].append(p[1])
+def p_rel_op(p):
+    '''rel_op : EQUAL 
+    | NOT_EQUAL 
+    | LESS_THAN 
+    | LESS_THAN_EQUAL 
+    | GREATER_THAN 
+    | GREATER_THAN_EQUAL'''
+    p[0] = [p[1]]
+def p_add_op(p):
+    '''add_op : ADD 
+    | SUBTRACT 
+    | OR 
+    | XOR'''
+    p[0] = [p[1]]
+def p_mul_op(p):
+    '''mul_op : MULTIPLY 
+    | QUOTIENT 
+    | REMAINDER 
+    | SHIFT_LEFT 
+    | SHIFT_RIGHT 
+    | AND 
+    | AND_NOT'''
+    p[0] = [p[1]]
+def p_unary_op(p):
+    '''unary_op : ADD 
+    | SUBTRACT 
+    | NOT 
+    | XOR 
+    | MULTIPLY 
+    | AND 
+    | ARROW'''
+    p[0] = [p[1]]
 def p_literal(p):
     '''Literal : BasicLit 
     | CompositeLit 
@@ -456,62 +517,7 @@ def p_basic_lit(p):
     | STRING'''
     p[0] = [p[1]]   
 
-def p_composite_lit(p):
-    '''CompositeLit : StructType LiteralValue
-                | ArrayType LiteralValue
-                | SliceType LiteralValue
-                | MapType LiteralValue
-                | Type LiteralValue
-                | IDENT LiteralValue
-                | IDENT PERIOD IDENT LiteralValue
-                | LEFT_BRACKET ELLIPSIS RIGHT_BRACKET Type LiteralValue
-                | LEFT_BRACKET ELLIPSIS RIGHT_BRACKET IDENT LiteralValue
-                | LEFT_BRACKET ELLIPSIS RIGHT_BRACKET IDENT PERIOD IDENT LiteralValue'''
-    p[0] = ['CompositeLit']
-    for idx in range(1,len(p)):
-        if isinstance(p[idx],str) and p[idx]!="[" and p[idx]!="]" and p[idx]!=",":
-            p[0].append([p[idx]])
-        elif p[idx]!="[" and p[idx]!="]" and p[idx]!=",":
-            p[0].append(p[idx])
-def p_literal_value(p):
-    '''LiteralValue : LEFT_BRACE RIGHT_BRACE
-                    | LEFT_BRACE ElementList RIGHT_BRACE
-                    | LEFT_BRACE ElementList COMMA RIGHT_BRACE'''
-    if len(p) == 3:
-        p[0] = []
-    else:
-        p[0] = p[2]
-def p_element_list(p):
-    '''ElementList : KeyedElement KeyedElementStar'''
-    p[0] = ['ElementList', p[1], p[2]]
-def p_keyed_element_star(p):
-    '''KeyedElementStar : KeyedElementStar COMMA KeyedElement 
-                        |'''
-    if len(p) == 1:
-        p[0] = []
-    else:
-        p[0] = ['KeyedElementStar', p[1], p[3]]
-def p_keyed_element(p):
-    '''KeyedElement : Element
-                    | IDENT COLON Element
-                    | Expression COLON Element
-                    | LiteralValue COLON Element'''
-    if len(p) == 2:
-        p[0] = p[1]
-    else:
-        p[0] = ['KeyedElement']
-        for idx in range(1,len(p)):
-            if(isinstance(p[idx],str)):
-                p[0].append([p[idx]])
-            else:
-                p[0].append(p[idx])
-def p_element(p):
-    '''Element : Expression 
-    | LiteralValue'''
-    p[0] = p[1]
-def p_function_lit(p):
-    '''FunctionLit : FUNCTION Signature Block'''
-    p[0] = ['FunctionLit', p[2], p[3]]
+
 def p_primary_expr(p):
     '''PrimaryExpr : IDENT
     | LEFT_PARENTHESIS Expression RIGHT_PARENTHESIS
@@ -609,63 +615,7 @@ def p_arguments(p):
 #             p[0].append([p[idx]])
 #         else:
 #             p[0].append(p[idx])
-def p_expression(p):
-    '''Expression : UnaryExpr 
-    | Expression binary_op Expression'''
-    if len(p) == 2:
-        p[0] = p[1]
-    else:
-        p[0] = ['Expression', p[1], p[2], p[3]]
-def p_unary_expr(p):
-    '''UnaryExpr : PrimaryExpr 
-    | unary_op UnaryExpr'''
-    if len(p) == 2:
-        p[0] = p[1]
-    else:
-        p[0] = ['UnaryExpr', p[1], p[2]]
-def p_binary_op(p):
-    '''binary_op : LOGICAL_OR 
-    | LOGICAL_AND 
-    | rel_op 
-    | add_op 
-    | mul_op'''
-    p[0] = ['binary_op']
-    if(isinstance(p[1],str)):
-        p[0].append([p[1]])
-    else:
-        p[0].append(p[1])
-def p_rel_op(p):
-    '''rel_op : EQUAL 
-    | NOT_EQUAL 
-    | LESS_THAN 
-    | LESS_THAN_EQUAL 
-    | GREATER_THAN 
-    | GREATER_THAN_EQUAL'''
-    p[0] = [p[1]]
-def p_add_op(p):
-    '''add_op : ADD 
-    | SUBTRACT 
-    | OR 
-    | XOR'''
-    p[0] = [p[1]]
-def p_mul_op(p):
-    '''mul_op : MULTIPLY 
-    | QUOTIENT 
-    | REMAINDER 
-    | SHIFT_LEFT 
-    | SHIFT_RIGHT 
-    | AND 
-    | AND_NOT'''
-    p[0] = [p[1]]
-def p_unary_op(p):
-    '''unary_op : ADD 
-    | SUBTRACT 
-    | NOT 
-    | XOR 
-    | MULTIPLY 
-    | AND 
-    | ARROW'''
-    p[0] = [p[1]]
+
 def p_conversion(p):
     '''Conversion : Type LEFT_PARENTHESIS Expression COMMA RIGHT_PARENTHESIS
     | Type LEFT_PARENTHESIS Expression LEFT_PARENTHESIS
@@ -681,6 +631,63 @@ def p_conversion(p):
             p[0].append([p[idx]])
         else:
             p[0].append(p[idx])
+
+def p_composite_lit(p):
+    '''CompositeLit : StructType LiteralValue
+                | ArrayType LiteralValue
+                | SliceType LiteralValue
+                | MapType LiteralValue
+                | Type LiteralValue
+                | IDENT LiteralValue
+                | IDENT PERIOD IDENT LiteralValue
+                | LEFT_BRACKET ELLIPSIS RIGHT_BRACKET Type LiteralValue
+                | LEFT_BRACKET ELLIPSIS RIGHT_BRACKET IDENT LiteralValue
+                | LEFT_BRACKET ELLIPSIS RIGHT_BRACKET IDENT PERIOD IDENT LiteralValue'''
+    p[0] = ['CompositeLit']
+    for idx in range(1,len(p)):
+        if isinstance(p[idx],str) and p[idx]!="[" and p[idx]!="]" and p[idx]!=",":
+            p[0].append([p[idx]])
+        elif p[idx]!="[" and p[idx]!="]" and p[idx]!=",":
+            p[0].append(p[idx])
+def p_literal_value(p):
+    '''LiteralValue : LEFT_BRACE RIGHT_BRACE
+                    | LEFT_BRACE ElementList RIGHT_BRACE
+                    | LEFT_BRACE ElementList COMMA RIGHT_BRACE'''
+    if len(p) == 3:
+        p[0] = []
+    else:
+        p[0] = p[2]
+def p_element_list(p):
+    '''ElementList : KeyedElement KeyedElementStar'''
+    p[0] = ['ElementList', p[1], p[2]]
+def p_keyed_element_star(p):
+    '''KeyedElementStar : KeyedElementStar COMMA KeyedElement 
+                        |'''
+    if len(p) == 1:
+        p[0] = []
+    else:
+        p[0] = ['KeyedElementStar', p[1], p[3]]
+def p_keyed_element(p):
+    '''KeyedElement : Element
+                    | IDENT COLON Element
+                    | Expression COLON Element
+                    | LiteralValue COLON Element'''
+    if len(p) == 2:
+        p[0] = p[1]
+    else:
+        p[0] = ['KeyedElement']
+        for idx in range(1,len(p)):
+            if(isinstance(p[idx],str)):
+                p[0].append([p[idx]])
+            else:
+                p[0].append(p[idx])
+def p_element(p):
+    '''Element : Expression 
+    | LiteralValue'''
+    p[0] = p[1]
+def p_function_lit(p):
+    '''FunctionLit : FUNCTION Signature Block'''
+    p[0] = ['FunctionLit', p[2], p[3]]
 
 #----------------------------------------------------------
 def p_statement(p):
