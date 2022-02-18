@@ -1,7 +1,7 @@
 package main;
 
 import (
-	"math"
+	"math";
 );
 
 type Point struct {
@@ -44,18 +44,18 @@ func PointDistance(p *Point, equation [3]float64) float64 {
 };
 
 func main() {
-	p1 := Point{0, 0};
-	p2 := Point{3, 4};
+	// p1 := Point{0, 0};
+	// p2 := Point{3, 4};
 
 	var Distance float64 = Distance(&p1, &p2);
 	if Distance != 5. {
 		print("wrong distance");
-	}
+	};
 
 	var midpoint Point = Section(&p1, &p2, 1);
-	if midpoint != (Point{1.5, 2.}) {
-		print("wrong midpoint");
-	}
+	// if midpoint != (Point{1.5, 2.}) {
+	// 	print("wrong midpoint");
+	// };
 
 	var equation [3]float64 = [3]float64{1, 1, 0};
 	PointDistanc := PointDistance(&p2, equation);

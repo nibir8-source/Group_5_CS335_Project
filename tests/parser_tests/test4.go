@@ -1,11 +1,13 @@
+package main;
+import (
+	"math";
+	"fmt";
+);
 func LongestCommonSubsequence(a string, b string, m int, n int) int {
-	// m is the length of string a and n is the length of string b
-
-	// here we are making a 2d slice of size (m+1)*(n+1)
 	lcs := make([][]int, m+1);
 	for i := 0; i <= m; i++ {
 		lcs[i] = make([]int, n+1);
-	}
+	};
 
 	// block that implements LCS
 	for i := 0; i <= m; i++ {
@@ -16,9 +18,13 @@ func LongestCommonSubsequence(a string, b string, m int, n int) int {
 				lcs[i][j] = lcs[i-1][j-1] + 1;
 			} else {
 				lcs[i][j] = Max(lcs[i-1][j], lcs[i][j-1]);
-			}
-		}
-	}
+			};
+		};
+	};
 	// returning the length of longest common subsequence
 	return lcs[m][n];
+};
+
+func main(){
+	LongestCommonSubsequence("hello","hel23",5,5);
 };
