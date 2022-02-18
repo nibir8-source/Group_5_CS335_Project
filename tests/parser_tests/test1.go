@@ -1,21 +1,21 @@
 import (
 	"fmt"
 	"math"
-)
+);
 
-type HashKey uint32
-type HashKeyOrder []HashKey
+type HashKey uint32;
+type HashKeyOrder []HashKey;
 
-func (h HashKeyOrder) Len() int           { return len(h) }
-func (h HashKeyOrder) Swap(i, j int)      { h[i], h[j] = h[j], h[i] }
-func (h HashKeyOrder) Less(i, j int) bool { return h[i] < h[j] }
+func (h HashKeyOrder) Len() int           { return len(h); };
+func (h HashKeyOrder) Swap(i, j int)      { h[i], h[j] = h[j], h[i] };
+func (h HashKeyOrder) Less(i, j int) bool { return h[i] < h[j] };
 
 type HashRing struct {
-	ring       map[HashKey]string
-	sortedKeys []HashKey
-	nodes      []string
-	weights    map[string]int
-}
+	ring       map[HashKey]string;
+	sortedKeys []HashKey;
+	nodes      []string;
+	weights    map[string]int;
+};
 
 func New(nodes []string) *HashRing {
 	hashRing := &HashRing{
@@ -23,52 +23,52 @@ func New(nodes []string) *HashRing {
 		sortedKeys: make([]HashKey, 0),
 		nodes:      nodes,
 		weights:    make(map[string]int),
-	}
-	hashRing.generateCircle()
-	return hashRing
-}
+	};
+	hashRing.generateCircle();
+	return hashRing;
+};
 
 func NewWithWeights(weights map[string]int) *HashRing {
-	nodes := make([]string, 0, len(weights))
+	nodes := make([]string, 0, len(weights));
 	for node := range weights {
-		nodes = append(nodes, node)
+		nodes = append(nodes, node);
 	}
 	hashRing := &HashRing{
 		ring:       make(map[HashKey]string),
 		sortedKeys: make([]HashKey, 0),
 		nodes:      nodes,
 		weights:    weights,
-	}
-	hashRing.generateCircle()
-	return hashRing
-}
+	};
+	hashRing.generateCircle();
+	return hashRing;
+};
 
 func (h *HashRing) Size() int {
-	return len(h.nodes)
-}
+	return len(h.nodes);
+};
 
 func (h *HashRing) UpdateWithWeights(weights map[string]int) {
-	nodesChgFlg := false
+	nodesChgFlg := false;
 	if len(weights) != len(h.weights) {
-		nodesChgFlg = true
+		nodesChgFlg = true;
 	} else {
 		for node, newWeight := range weights {
-			oldWeight, ok := h.weights[node]
+			oldWeight, ok := h.weights[node];
 			if !ok || oldWeight != newWeight {
-				nodesChgFlg = true
-				break
+				nodesChgFlg = true;
+				break;
 			}
 		}
 	}
 
 	if nodesChgFlg {
-		newhring := NewWithWeights(weights)
-		h.weights = newhring.weights
-		h.nodes = newhring.nodes
-		h.ring = newhring.ring
-		h.sortedKeys = newhring.sortedKeys
+		newhring := NewWithWeights(weights);
+		h.weights = newhring.weights;
+		h.nodes = newhring.nodes;
+		h.ring = newhring.ring;
+		h.sortedKeys = newhring.sortedKeys;
 	}
-}
+};
 
 func (h *HashRing) generateCircle() {
 	totalWeight := 0
@@ -99,7 +99,7 @@ func (h *HashRing) generateCircle() {
 	}
 
 	sort.Sort(HashKeyOrder(h.sortedKeys))
-}
+};
 
 func (h *HashRing) GetNode(stringKey string) (node string, ok bool) {
 	pos, ok := h.GetNodePos(stringKey)
@@ -107,128 +107,129 @@ func (h *HashRing) GetNode(stringKey string) (node string, ok bool) {
 		return "", false
 	}
 	return h.ring[h.sortedKeys[pos]], true
-}
+};
 
 func (h *HashRing) GetNodePos(stringKey string) (pos int, ok bool) {
 	if len(h.ring) == 0 {
-		return 0, false
+		return 0, false;
 	}
 
-	key := h.GenKey(stringKey)
+	key := h.GenKey(stringKey);
 
-	nodes := h.sortedKeys
-	pos = sort.Search(len(nodes), func(i int) bool { return nodes[i] > key })
+	nodes := h.sortedKeys;
+	pos = sort.Search(len(nodes), func(i int) bool { return nodes[i] > key });
 
 	if pos == len(nodes) {
 		// Wrap the search, should return first node
-		return 0, true
+		return 0, true;
 	} else {
-		return pos, true
+		return pos, true;
 	}
 }
 
 func (h *HashRing) GenKey(key string) HashKey {
-	bKey := hashDigest(key)
-	return hashVal(bKey[0:4])
+	bKey := hashDigest(key);
+	return hashVal(bKey[0:4]);
 }
 
 func (h *HashRing) GetNodes(stringKey string, size int) (nodes []string, ok bool) {
 	pos, ok := h.GetNodePos(stringKey)
 	if !ok {
-		return nil, false
+		return nil, false;
 	}
 
 	if size > len(h.nodes) {
-		return nil, false
+		return nil, false;
 	}
 
-	returnedValues := make(map[string]bool, size)
+	returnedValues := make(map[string]bool, size);
 	//mergedSortedKeys := append(h.sortedKeys[pos:], h.sortedKeys[:pos]...)
-	resultSlice := make([]string, 0, size)
+	resultSlice := make([]string, 0, size);
 
 	for i := pos; i < pos+len(h.sortedKeys); i++ {
 		key := h.sortedKeys[i%len(h.sortedKeys)]
-		val := h.ring[key]
+		val := h.ring[key];
 		if !returnedValues[val] {
-			returnedValues[val] = true
-			resultSlice = append(resultSlice, val)
+			returnedValues[val] = true;
+			resultSlice = append(resultSlice, val);
 		}
 		if len(returnedValues) == size {
-			break
+			break;
 		}
 	}
 
-	return resultSlice, len(resultSlice) == size
-}
+	return resultSlice, len(resultSlice) == size;
+};
 
 func (h *HashRing) AddNode(node string) *HashRing {
-	return h.AddWeightedNode(node, 1)
-}
+	return h.AddWeightedNode(node, 1);
+};
 
 func (h *HashRing) AddWeightedNode(node string, weight int) *HashRing {
 	if weight <= 0 {
-		return h
+		return h;
 	}
 
 	if _, ok := h.weights[node]; ok {
-		return h
+		return h;
 	}
 
-	nodes := make([]string, len(h.nodes), len(h.nodes)+1)
-	copy(nodes, h.nodes)
-	nodes = append(nodes, node)
+	nodes := make([]string, len(h.nodes), len(h.nodes)+1);
+	copy(nodes, h.nodes);
+	nodes = append(nodes, node);
 
-	weights := make(map[string]int)
+	weights := make(map[string]int);;
 	for eNode, eWeight := range h.weights {
-		weights[eNode] = eWeight
+		weights[eNode] = eWeight;
 	}
-	weights[node] = weight
+	weights[node] = weight;
 
 	hashRing := &HashRing{
 		ring:       make(map[HashKey]string),
 		sortedKeys: make([]HashKey, 0),
 		nodes:      nodes,
 		weights:    weights,
-	}
-	hashRing.generateCircle()
-	return hashRing
-}
+	};
+	hashRing.generateCircle();
+	return hashRing;
+};
 
 func (h *HashRing) UpdateWeightedNode(node string, weight int) *HashRing {
 	if weight <= 0 {
-		return h
+		return h;
 	}
 
 	/* node is not need to update for node is not existed or weight is not changed */
 	if oldWeight, ok := h.weights[node]; (!ok) || (ok && oldWeight == weight) {
-		return h
+		return h;
 	}
 
-	nodes := make([]string, len(h.nodes), len(h.nodes))
-	copy(nodes, h.nodes)
+	nodes := make([]string, len(h.nodes), len(h.nodes));
+	copy(nodes, h.nodes);
 
-	weights := make(map[string]int)
+	weights := make(map[string]int);
 	for eNode, eWeight := range h.weights {
-		weights[eNode] = eWeight
+		weights[eNode] = eWeight;
 	}
-	weights[node] = weight
+	weights[node] = weight;
 
 	hashRing := &HashRing{
 		ring:       make(map[HashKey]string),
 		sortedKeys: make([]HashKey, 0),
 		nodes:      nodes,
 		weights:    weights,
-	}
-	hashRing.generateCircle()
-	return hashRing
-}
+	};
+	hashRing.generateCircle();
+	return hashRing;
+};
+
 func (h *HashRing) RemoveNode(node string) *HashRing {
 	/* if node isn't exist in hashring, don't refresh hashring */
 	if _, ok := h.weights[node]; !ok {
-		return h
+		return h;
 	}
 
-	nodes := make([]string, 0)
+	nodes := make([]string, 0);
 	for _, eNode := range h.nodes {
 		if eNode != node {
 			nodes = append(nodes, eNode)
@@ -238,7 +239,7 @@ func (h *HashRing) RemoveNode(node string) *HashRing {
 	weights := make(map[string]int)
 	for eNode, eWeight := range h.weights {
 		if eNode != node {
-			weights[eNode] = eWeight
+			weights[eNode] = eWeight;
 		}
 	}
 
@@ -247,18 +248,18 @@ func (h *HashRing) RemoveNode(node string) *HashRing {
 		sortedKeys: make([]HashKey, 0),
 		nodes:      nodes,
 		weights:    weights,
-	}
-	hashRing.generateCircle()
-	return hashRing
-}
+	};
+	hashRing.generateCircle();
+	return hashRing;
+};
 
 func hashVal(bKey []byte) HashKey {
 	return ((HashKey(bKey[3]) << 24) |
 		(HashKey(bKey[2]) << 16) |
 		(HashKey(bKey[1]) << 8) |
-		(HashKey(bKey[0])))
-}
+		(HashKey(bKey[0])));
+};
 
 func hashDigest(key string) [md5.Size]byte {
-	return md5.Sum([]byte(key))
-}
+	return md5.Sum([]byte(key));
+};
