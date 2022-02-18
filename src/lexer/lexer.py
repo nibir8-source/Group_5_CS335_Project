@@ -99,11 +99,9 @@ tokens = list(keywords.values()) + [
     'SEMICOLON',        # ;
     'COLON',            # :
 
-    #Special Tokens
-    'COMMENT',
-    'NEWLINE',
-    'EOF',
 ]
+
+prev_tok = ""
 
 # Regular expression rules for different tokens
 t_ADD   = r"\+"
@@ -180,7 +178,13 @@ binary_literal  = r"(0[bB]\_?" + binary_digits + r")"
 octal_literal   = r"(0[oO]?\_?" + octal_digits + r")" 
 hex_literal     = r"(0[xX]\_?" + hex_digits + r")"
 
-t_INT = r"(" + binary_literal + r"|" + octal_literal + r"|" + hex_literal + r"|" + decimal_literal + r")"
+int = r"(" + binary_literal + r"|" + octal_literal + r"|" + hex_literal + r"|" + decimal_literal + r")"
+
+@TOKEN(int)
+def t_INT(t):
+    global prev_tok
+    prev_tok = t.value
+    return t
 
 decimal_exponent  =  r"([eE][\+-]?" + decimal_digits + r")"
 decimal_float_literal = r"(((" + decimal_digits + r")\.(" + decimal_digits + r")?(" + decimal_exponent + r")?)|(" + decimal_digits + decimal_exponent + r")|(\." + decimal_digits + r"(" + decimal_exponent + r")?))"
@@ -189,9 +193,21 @@ hex_exponent    = r"([pP][\+-]?" + decimal_digits + r")"
 hex_mantissa    = r"(((\_?" + hex_digits + r"\." + hex_digits + r"?)|(\_?" + hex_digits + r")|(\." + hex_digits + r")))"
 hex_float_literal   = r"(0[xX]" + hex_mantissa + hex_exponent + r")"
 
-t_FLOAT = r"((" + hex_float_literal + ")|(" + decimal_float_literal + r"))"
+float = r"((" + hex_float_literal + ")|(" + decimal_float_literal + r"))"
 
-t_IMAGINARY = r"(" + decimal_digits + "|" + t_INT + "|" + t_FLOAT + r")i" 
+@TOKEN(float)
+def t_FLOAT(t):
+    global prev_tok
+    prev_tok = t.type
+    return t
+
+imaginary = r"(" + decimal_digits + "|" + t_INT + "|" + t_FLOAT + r")i" 
+
+@TOKEN(imaginary)
+def t_IMAGINARY(t):
+    global prev_tok
+    prev_tok = t.type
+    return t
 
 escp_char = r"(\\(a|b|f|n|r|t|v|\\|\'|\"))"
 big_u_val = r"(\\U" + hex_digit + hex_digit + hex_digit + hex_digit + hex_digit + hex_digit + hex_digit + hex_digit + r")"
@@ -202,22 +218,32 @@ byte_val = r"(" + octal_byte_val + "|" + hex_byte_val + r")"
 unicode_char = r"([^\n\'\\])"
 unicode_val = r"(" + unicode_char + r"|" + little_u_val + r"|" + big_u_val + r"|" + escp_char + r")"
 
-t_RUNE = r"(\'(" + unicode_val + r"|" + byte_val + r")\')"
+rune = r"(\'(" + unicode_val + r"|" + byte_val + r")\')"
+
+@TOKEN(rune)
+def t_RUNE(t):
+    global prev_tok
+    prev_tok = t.type
+    return t
 
 uni_char = r"(([^\n\`]))"
 raw_string_lit= r"(\`(" + uni_char + r"|" +  r"(\n))*\`)"
 interpreted_string_lit =r"(\"(" + unicode_val + r"|" + byte_val+  r")*\")"
 
-t_STRING = r"(" + raw_string_lit + r"|" + interpreted_string_lit + r")"
+string = r"(" + raw_string_lit + r"|" + interpreted_string_lit + r")"
+
+@TOKEN(string)
+def t_STRING(t):
+    global prev_tok
+    prev_tok = t.type
+    t.lexer.lineno += t.value.count('\n')
+    return t
+
 t_ignore = " \t"
 
 def t_NEWLINE(t):
     r"\n+"
     t.lexer.lineno += len(t.value)
-
-def t_error(t):
-    print(f"[ERROR] Invalid token: {t.value[0]} in #Line: {t.lineno}")
-    t.lexer.skip(1)
 
 @TOKEN(identifier)
 def t_IDENT(t):
@@ -226,25 +252,18 @@ def t_IDENT(t):
 
 def t_COMMENT(t):
     r"(//.*)|(/\*(.|\n)*?\*/)"
-    pass
+    global prev_tok
+    prev_tok = t.type
+    t.lexer.lineno += t.value.count("\n")
+
+def t_error(t):
+    print(f"[ERROR] Invalid token: {t.value[0]} in #Line: {t.lineno}")
+    t.lexer.skip(1)
 
 #Function to find #Column
 def find_column(input, token):
     line_start = input.rfind('\n', 0, token.lexpos) + 1
     return (token.lexpos - line_start) + 1
 
-#Token Processing
-def Process(data):
-    lexer = lex.lex()
-    lexer.input(data)
 
-    tokens = []
-
-    while True:
-        tok = lexer.token()
-        if not tok:
-            break
-        elif tok.type == 'COMMENT':
-            continue
-        tokens.append(tok)
-    return tokens
+lexer = lex.lex()
