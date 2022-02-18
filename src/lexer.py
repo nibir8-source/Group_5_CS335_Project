@@ -7,15 +7,10 @@ keywords = {
     #Keywords
     'break'        :    'BREAK',
     'default'      :    'DEFAULT',
-    'select'       :    'SELECT',
     'func'         :    'FUNCTION',
     'case'         :    'CASE',
-    'interface'    :    'INTERFACE',
-    'defer'        :    'DEFER',
-    'go'           :    'GO',
     'struct'       :    'STRUCT',
     'goto'         :    'GOTO',
-    # 'chan'         :    'CHAN',
     'else'         :    'ELSE',
     'map'          :    'MAP',
     'fallthrough'  :    'FALLTHROUGH',
@@ -87,7 +82,6 @@ tokens = list(keywords.values()) + [
     'LESS_THAN_EQUAL',              # <=
     'GREATER_THAN_EQUAL',              # >=
     'DEFINE',           # :=
-    'ELLIPSIS',         # ...
 
     'LEFT_PARENTHESIS',           # (
     'LEFT_BRACKET',           # [
@@ -147,7 +141,6 @@ t_NOT_EQUAL   = r"!="
 t_LESS_THAN_EQUAL   = r"<="
 t_GREATER_THAN_EQUAL   = r">="
 t_DEFINE    = r":="
-t_ELLIPSIS  = r"\.\.\."
 
 t_LEFT_PARENTHESIS    = r"\("
 t_LEFT_BRACKET    = r"\["

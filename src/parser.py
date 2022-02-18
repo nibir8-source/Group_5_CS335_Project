@@ -80,8 +80,7 @@ def p_import_path(p):
 #-----------------------------------------------------------------------------
 def p_top_level_decl(p):
     '''TopLevelDecl : Declaration 
-    | FunctionDecl 
-    | MethodDecl'''
+    | FunctionDecl'''
     p[0] = p[1]
 def p_declaration(p):
     '''Declaration : ConstDecl 
@@ -133,33 +132,19 @@ def p_expression_list(p):
     else:
         p[0]=['ExpressionList', p[1], p[3]]
 def p_type_decl(p):
-    '''TypeDecl : TYPE TypeSpec
-                | TYPE LEFT_PARENTHESIS TypeSpecStar RIGHT_PARENTHESIS'''
+    '''TypeDecl : TYPE TypeDef
+                | TYPE LEFT_PARENTHESIS TypeDefStar RIGHT_PARENTHESIS'''
     if len(p)==3:
         p[0]=['TypeDecl', [p[1]], p[2]]
     else:
         p[0]=['TypeDecl', [p[1]], p[3]]
 def p_type_spec_star(p):
-    '''TypeSpecStar : TypeSpec SEMICOLON TypeSpecStar
+    '''TypeDefStar : TypeDef SEMICOLON TypeDefStar
     |'''
     if len(p) == 1:
         p[0] = []
     else:
-        p[0] = ['TypeSpecStar', p[1], p[2]]
-def p_type_spec(p):
-    '''TypeSpec : AliasDecl 
-    | TypeDef'''
-    p[0] = p[1] 
-def p_alias_decl(p):
-    '''AliasDecl : IDENT ASSIGNMENT Type
-    | IDENT ASSIGNMENT IDENT
-    | IDENT ASSIGNMENT IDENT PERIOD IDENT'''
-    p[0] = ['AliasDecl']
-    for idx in range(1,len(p)):
-        if isinstance(p[idx],str):
-            p[0].append([p[idx]])
-        else:
-            p[0].append(p[idx])
+        p[0] = ['TypeDefStar', p[1], p[2]]
 def p_type_def(p):
     '''TypeDef : IDENT Type
     | IDENT IDENT PERIOD IDENT
@@ -209,16 +194,6 @@ def p_function_decl(p):
         p[0] = ['FunctionDecl', [p[2]], p[3]]
     else:
         p[0] = ['FunctionDecl', [p[2]], p[3], p[4]]
-def p_method_decl(p):
-    '''MethodDecl : FUNCTION Receiver IDENT Signature Block
-                    | FUNCTION Receiver IDENT Signature'''
-    if len(p) == 5:
-        p[0] = ['FunctionDecl', p[2], [p[3]], p[4]]
-    else:
-        p[0] = ['FunctionDecl', p[2], [p[3]], p[4], p[5]]
-def p_receiver(p):
-    '''Receiver : Parameters'''
-    p[0] = p[1]
 
 # --------------------- TYPES -------------------------------------
 def p_type(p):
@@ -239,7 +214,6 @@ def p_type_lit(p):
     | StructType 
     | PointerType 
     | FunctionType 
-    | InterfaceType 
     | SliceType 
     | MapType'''
     p[0] = p[1]
@@ -344,20 +318,19 @@ def p_parameters(p):
         p[0] = ['Parameters', p[2]]
 def p_parameter_list(p):
     '''ParameterList : ParameterDecl 
-    | ParameterDecl COMMA ParameterList'''
+    | ParameterList COMMA ParameterDecl
+    | ParameterList COMMA Type
+    | ParameterList COMMA IDENT
+    | ParameterList COMMA IDENT PERIOD IDENT'''
     if len(p) == 2:
         p[0] = p[1]
     else:
-        p[0] = ['ParamterList', p[1], p[3]]
+        p[0] = ['ParameterList', p[1], p[3]]
 
 def p_ParameterDecl(p):
-    '''ParameterDecl :
-    | IdentifierList Type
+    '''ParameterDecl : IdentifierList Type
     | IdentifierList IDENT
-    | IdentifierList IDENT PERIOD IDENT
-    | Type
-    | IDENT
-    | IDENT PERIOD IDENT'''
+    | IdentifierList IDENT PERIOD IDENT'''
     p[0]=['ParameterDecl']
     for index in range(1,len(p)):
       if isinstance(p[index],str):
@@ -365,26 +338,6 @@ def p_ParameterDecl(p):
       else:
         p[0].append(p[index])
 #--------------------------------------------------------------------
-def p_interface_type(p):
-    '''InterfaceType : INTERFACE LEFT_BRACE MethodSpecStar RIGHT_BRACE'''
-    p[0] = ['InterfaceType', [p[1]], p[3]]
-def p_method_spec_star(p):
-    '''MethodSpecStar : MethodSpecStar MethodSpec SEMICOLON
-    |'''
-    if len(p) == 1:
-        p[0] = []
-    else:
-        p[0] = ['MethodSpecStar', p[1], p[2]]
-def p_method_spec(p):
-    '''MethodSpec : IDENT Signature
-                    | IDENT
-                    | IDENT PERIOD IDENT'''
-    if len(p) == 2:
-        p[0] = [p[1]]
-    elif len(p)==3:
-        p[0] = ['MethodSpec',[p[1]],p[2]]
-    else:
-        p[0] = ['MethodSpec',[p[1]],[p[2]],[p[3]]]
 def p_MapType(p):
     '''MapType : MAP LEFT_BRACKET Type RIGHT_BRACKET Type
     | MAP LEFT_BRACKET Type RIGHT_BRACKET IDENT
@@ -476,7 +429,6 @@ def p_primary_expr(p):
     | PrimaryExpr Selector 
     | PrimaryExpr Index 
     | PrimaryExpr Slice 
-    | PrimaryExpr TypeAssertion 
     | PrimaryExpr Arguments'''
     p[0] = ['PrimaryExpr']
     for idx in range(1,len(p)):
@@ -504,17 +456,6 @@ def p_slice(p):
         if isinstance(p[idx],str):
             p[0].append([p[idx]])
         else:
-            p[0].append(p[idx])
-
-def p_type_assertion(p):
-    '''TypeAssertion : PERIOD LEFT_PARENTHESIS Type RIGHT_PARENTHESIS
-    | PERIOD LEFT_PARENTHESIS IDENT RIGHT_PARENTHESIS
-    | PERIOD LEFT_PARENTHESIS IDENT PERIOD IDENT RIGHT_PARENTHESIS'''
-    p[0] = ['TypeAssertion']
-    for idx in range(1,len(p)):
-        if isinstance(p[idx],str) and p[idx]!="(" and p[idx]!=")":
-            p[0].append([p[idx]])
-        elif p[idx]!="(" and p[idx]!=")":
             p[0].append(p[idx])
 def p_arguments(p):
     '''Arguments : LEFT_PARENTHESIS RIGHT_PARENTHESIS
@@ -572,7 +513,6 @@ def p_composite_lit(p):
                 | ArrayType LiteralValue
                 | SliceType LiteralValue
                 | MapType LiteralValue
-                | Type LiteralValue
                 | IDENT LiteralValue
                 | IDENT PERIOD IDENT LiteralValue'''
     p[0] = ['CompositeLit']
@@ -623,7 +563,6 @@ def p_statement(p):
     '''Statement : Declaration 
     | LabeledStmt 
     | SimpleStmt 
-    | GoStmt 
     | ReturnStmt 
     | BreakStmt 
     | ContinueStmt 
@@ -632,13 +571,10 @@ def p_statement(p):
     | Block 
     | IfStmt 
     | SwitchStmt 
-    | SelectStmt 
-    | ForStmt 
-    | DeferStmt '''
+    | ForStmt  '''
     p[0] = p[1]
 def p_simple_stmt(p):
     '''SimpleStmt : ExpressionStmt 
-    | SendStmt 
     | IncDecStmt 
     | Assignment 
     | ShortVarDecl 
@@ -654,9 +590,6 @@ def p_labeled_stmt(p):
 def p_expression_stmt(p):
     '''ExpressionStmt : Expression'''
     p[0] = p[1]
-def p_send_stmt(p):
-    '''SendStmt : Expression ARROW Expression'''
-    p[0] = ['SendStmt', p[1], [p[2]], p[3]]
 def p_inc_dec_stmt(p):
     '''IncDecStmt : Expression INCREMENT
                     | Expression DECREMENT'''
@@ -814,40 +747,6 @@ def p_range_clause(p):
             p[0].append([p[idx]])
         elif p[idx]!=";":
             p[0].append(p[idx])
-def p_go_stmt(p):
-    '''GoStmt : GO Expression '''
-    p[0] = ['GoStmt', [p[1]], p[2]]
-
-def p_selectstmt(p):
-    '''SelectStmt : SELECT LEFT_BRACE CommClauseStar RIGHT_BRACE '''
-    p[0] = ['SelectStmt', p[3]]
-
-def p_comm_clause_plus(p):
-    '''CommClauseStar : CommClauseStar CommClause 
-    |'''
-    if len(p) == 1:
-        p[0] = p[1]
-    else:
-        p[0] = ['CommClauseStar', p[1], p[2]]
-def p_comm_clause(p):
-    '''CommClause : CommCase COLON StatementList'''
-    p[0] = ['CommClause', p[1], [p[2]], p[3]]
-def p_comm_case(p):
-    '''CommCase : CASE SendStmt
-    | CASE RecvStmt 
-    | DEFAULT'''
-    if len(p)==2:
-        p[0] = [p[1]]
-    else:
-        p[0]=['CommCase', [p[1]], p[2]]
-def p_recv_stmt(p):
-    """RecvStmt : IdentifierList DEFINE Expression
-             | ExpressionList ASSIGNMENT Expression
-             | Expression"""
-    if len(p)==2:
-        p[0]=p[1]
-    else:
-        p[0]=['RecvStmt', p[1], [p[2]], p[3] ]
  
 def p_returnstmt(p):
     '''ReturnStmt : RETURN ExpressionList
@@ -878,9 +777,6 @@ def p_goto_stmt(p):
 def p_fallthrough_stmt(p):
     '''FallthroughStmt : FALLTHROUGH'''
     p[0] = [p[1]]
-def p_defer_stmt(p):
-    '''DeferStmt : DEFER Expression'''
-    p[0] = ['DeferStmt', [p[1]], p[2]]
 
 
 
