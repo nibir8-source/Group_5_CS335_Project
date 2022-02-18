@@ -1,8 +1,10 @@
-from ply import lex
-import ply.yacc as yacc
-from ply.lex import TOKEN
 import sys
-sys.path.insert(0, '/home/nibir/nibir/cs335/project/Group_5_CS335_Project/src/lexer')
+sys.path.insert(0, './src/lex_n_yacc')
+sys.path.insert(0, './lex_n_yacc')
+# import lex
+import yacc
+from lex import TOKEN
+import sys
 import lexer
 
 precedence = (

@@ -1,4 +1,11 @@
-Created by PLY version 3.11 (http://www.dabeaz.com/ply)
+Created by PLY (http://www.dabeaz.com/ply)
+
+Unused terminals:
+
+    CHAR
+    COMMENT
+    EOF
+    NEWLINE
 
 Grammar
 
@@ -401,8 +408,10 @@ ASSIGNMENT           : 115 116 117 118 131 132 133 142 143 144 147 316 364 374
 BREAK                : 378 379
 CASE                 : 332 341 370 371
 CHAN                 : 92 93 94 95 96 97 98 99 100
+CHAR                 : 
 COLON                : 179 180 181 198 199 200 201 202 202 203 203 299 331 340 369
 COMMA                : 61 63 120 123 174 176 209 211 213 215 216 217 217 218 219 219 221 223 224 225 225 226 227 227 229 231 232 233 233 234 235 235 272 275 277 346 347 348
+COMMENT              : 
 CONST                : 110 111
 CONTINUE             : 380 381
 DECREMENT            : 303
@@ -411,6 +420,7 @@ DEFER                : 384
 DEFINE               : 148 338 363 373
 ELLIPSIS             : 65 66 67 71 72 73 169 170 171 210 211 214 215 218 219 222 223 226 227 230 231 234 235
 ELSE                 : 319 320 321 322
+EOF                  : 
 EQUAL                : 248
 FALLTHROUGH          : 383
 FLOAT                : 158
@@ -437,6 +447,7 @@ LOGICAL_OR           : 243
 MAP                  : 83 84 85 86 87 88 89 90 91
 MULTIPLY             : 44 45 49 50 51 258 269
 MUL_ASSIGNMENT       : 307
+NEWLINE              : 
 NOT                  : 267
 NOT_EQUAL            : 249
 OR                   : 256
@@ -586,7 +597,6 @@ mul_op               : 247
 rel_op               : 245
 unary_op             : 242
 
-Parsing method: LALR
 
 state 0
 
