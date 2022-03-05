@@ -4,6 +4,8 @@ from ply.lex import TOKEN
 import sys
 import lexer
 from lexer import * 
+from data_structures import SymTable
+from data_structures import Node
 
 precedence = (
     ('left','IDENT'),
@@ -30,24 +32,88 @@ precedence = (
     ('left', 'MULTIPLY', 'QUOTIENT', 'REMAINDER', 'SHIFT_LEFT', 'SHIFT_RIGHT', 'AND', 'AND_NOT')
 )
 
+curr_scope = 0
+scope_list = [0]
+scope_table= {}
+open_for = 0
+open_switch = 0
+
+
+def open_scope():
+    global curr_scope
+    prev_scope = curr_scope
+    curr_scope += 1
+    scope_list.append(curr_scope)
+    scope_table[curr_scope] = SymTable()
+    scope_table[curr_scope].set_parent(prev_scope)
+
+
+def close_scope():
+    global curr_scope
+    curr_scope = scope_list[-2] 
+    scope_list.pop()
+
+
+
+def p_open_scope(p):
+    '''OpenScope : '''
+    open_scope()
+
+def p_close_scope(p):
+    '''CloseScope : '''
+    close_scope()
+
+def p_open_for(p):
+    '''OpenFor : '''
+    global open_for
+    open_for += 1
+
+def p_close_for(p):
+    '''CloseFor : '''
+    global open_for
+    open_for -= 1
+
+def p_open_switch(p):
+    '''OpenSwitch : '''
+    global open_switch
+    open_switch += 1
+
+def p_close_switch(p):
+    '''CloseSwitch : '''
+    global open_switch
+    open_switch -= 1
+
+
 #----------------------------------------------------------------------------------------
 def p_source_file(p):
     '''SourceFile  : PackageClause SEMICOLON ImportDeclStar TopLevelDeclStar'''
-    p[0] = ['SourceFile', p[1], p[3], p[4]]
+    p[0].code = p[1].code + p[3].code + p[4].code
+    # p[0] = ['SourceFile', p[1], p[3], p[4]]
+
 def p_import_decl_star(p):
     '''ImportDeclStar : ImportDeclStar ImportDecl SEMICOLON 
     |'''
-    if len(p) == 1:
-        p[0] = []
-    else:
-        p[0] = ['ImportDeclStar', p[1], p[2]]
+    p[0] = Node()
+    if(len(p)>1):
+        p[0].code+=p[1].code
+        p[0].code+=p[2].code
+    # if len(p) == 1:
+    #     p[0] = []
+    # else:
+    #     p[0] = ['ImportDeclStar', p[1], p[2]]
+
 def p_top_level_decl_star(p):
     '''TopLevelDeclStar : TopLevelDeclStar TopLevelDecl SEMICOLON 
     |'''
-    if len(p) == 1:
-        p[0] = []
-    else:
-        p[0] = ['TopLevelDeclStar', p[1], p[2]]
+    p[0] = Node()
+    if(len(p)>1):
+        p[0].code+=p[1].code
+        p[0].code+=p[2].code
+    # if len(p) == 1:
+    #     p[0] = []
+    # else:
+    #     p[0] = ['TopLevelDeclStar', p[1], p[2]]
+
 def p_package_clause(p):
     '''PackageClause : PACKAGE IDENT'''
     p[0] = ['PackageClause', [p[2]]]
@@ -568,11 +634,15 @@ def p_statement(p):
     | ContinueStmt 
     | GotoStmt 
     | FallthroughStmt 
-    | Block 
+    | OpenScope Block CloseScope 
     | IfStmt 
     | SwitchStmt 
     | ForStmt  '''
-    p[0] = p[1]
+    if len(p) == 2:
+        p[0] = p[1]
+    else:
+        p[0] = p[2]
+
 def p_simple_stmt(p):
     '''SimpleStmt : ExpressionStmt 
     | IncDecStmt 
