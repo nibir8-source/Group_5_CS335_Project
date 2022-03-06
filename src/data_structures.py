@@ -1,8 +1,10 @@
 class Node:
-    def __init__(self):
+    def __init__(self, name):
         self.code = []
+        self.name = name
         self.ident_list = []
         self.type_list = []
+        self.expr_list = []
         self.data = {}
 
 
@@ -21,8 +23,9 @@ class Errors:
         self.errors = []
         self.n = 0
 
-    def add(self, msg, lineno):
+    def add_error(self, type, lineno, msg):
         error = {}
+        error['type'] = type
         error['msg'] = msg
         error['lineno'] = lineno
         self.errors.append(error)
@@ -30,5 +33,5 @@ class Errors:
 
     def print_all(self):
         for error in self.errors:
-            print_err = 'Error: ' + error['msg'] + ' on line ' + str(error['lineno'])
+            print_err = error['type'] + ': ' + error['msg'] + ' on line ' + str(error['lineno'])
             print(print_err)

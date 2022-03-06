@@ -6,6 +6,7 @@ import lexer
 from lexer import * 
 from data_structures import SymTable
 from data_structures import Node
+from data_structures import Errors
 
 precedence = (
     ('left','IDENT'),
@@ -35,9 +36,13 @@ precedence = (
 curr_scope = 0
 scope_list = [0]
 scope_table= {}
+scope_table[0] = SymTable()
 open_for = 0
 open_switch = 0
-
+curr_func = 0
+errors = Errors()
+start_for = []
+end_for = []
 
 def open_scope():
     global curr_scope
@@ -821,26 +826,39 @@ def p_range_clause(p):
 def p_returnstmt(p):
     '''ReturnStmt : RETURN ExpressionList
                     | RETURN'''
+    if len(p) == 2 and scope_table[curr_scope][curr_func]['return_type'] != "void":
+        errors.add_error('Type Error',p.lineno(1), "Return statement without return value")
+    elif len(p) == 3 and scope_table[curr_scope][curr_func]['return_type'] != p[2].type_list:
+        errors.add_error('Type Error', p.lineno(1), "Return statement with wrong return value")
+    elif curr_scope == 0:
+        errors.add_error('Scope Error', p.lineno(1), "Return statement is not inside a function")
+    p[0] = Node('ReturnStmt')
+
     if len(p) == 2:
-        p[0] = [p[1]]
+        p[0].code = [["return"]]
     else:
-        p[0] = ['ReturnStmt', [p[1]], p[2]]
+        p[0].code = p[2].code +  [["return"]]
+        
+
+    
+
 #---------------------------------
 def p_break_stmt(p):
     '''BreakStmt : BREAK IDENT
                 | BREAK'''
-    if len(p) == 2:
-        p[0] = [p[1]]
-    else:
-        p[0] = ['ReturnStmt', [p[1]], [p[2]]]
+    if open_for == 0 and open_switch == 0:
+        errors.add_error('Scope Error', p.lineno(1), "Break statement can only exist inside a loop")
+    p[0] = Node('BreakStmt')
+    p[0].code.append(['goto', end_for[-1]])
 #-------------------------------------
 def p_continue_stmt(p):
     '''ContinueStmt : CONTINUE IDENT
                 | CONTINUE'''
-    if len(p) == 2:
-        p[0] = [p[1]]
-    else:
-        p[0] = ['ContinueStmt', [p[1]], [p[2]]]
+    if open_for == 0 and open_switch == 0:
+        errors.add_error('Scope Error', p.lineno(1), "Continue statement can only exist inside a loop")
+    p[0] = Node('ContinueStmt')
+    p[0].code.append(['goto', start_for[-1]])
+
 def p_goto_stmt(p):
     '''GotoStmt : GOTO IDENT'''
     p[0] = ['GotoStmt', [p[1]], [p[2]]]
