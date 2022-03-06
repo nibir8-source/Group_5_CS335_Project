@@ -43,6 +43,7 @@ curr_func = 0
 errors = Errors()
 start_for = []
 end_for = []
+label_count = 0
 
 def open_scope():
     global curr_scope
@@ -88,6 +89,15 @@ def p_close_switch(p):
     global open_switch
     open_switch -= 1
 
+def create_label(p = None):
+    global label_count
+    label = "label_no#" + str(label_count)
+    label_count += 1
+    if not p is None and p == 1:
+        start_for.append(label)
+    if not p is None and p == 2:
+        end_for.append(label) 
+    return label
 
 #----------------------------------------------------------------------------------------
 def p_source_file(p):
@@ -686,19 +696,66 @@ def p_assign_op(p):
                 | SHIFT_RIGHT_ASSIGNMENT
                 | ASSIGNMENT'''
     p[0] = p[1]
+
 def p_if_stmt(p):
-    '''IfStmt : IF Expression Block
-    | IF SimpleStmt SEMICOLON Expression Block
-    | IF Expression Block ELSE IfStmt
-    | IF Expression Block ELSE Block
-    | IF SimpleStmt SEMICOLON Expression Block ELSE IfStmt
-    | IF SimpleStmt SEMICOLON Expression Block ELSE Block'''
-    p[0] = ['IfStmt']
-    for idx in range(1,len(p)):
-        if isinstance(p[idx],str) and p[idx]!=";":
-            p[0].append([p[idx]])
-        elif p[idx]!=";":
-            p[0].append(p[idx])
+    '''IfStmt : IF OpenScope Expression Block CloseScope
+    | IF OpenScope SimpleStmt SEMICOLON Expression Block CloseScope
+    | IF OpenScope Expression Block CloseScope ELSE OpenScope IfStmt CloseScope
+    | IF OpenScope Expression Block CloseScope ELSE OpenScope Block CloseScope
+    | IF OpenScope SimpleStmt SEMICOLON Expression Block CloseScope ELSE OpenScope IfStmt CloseScope
+    | IF OpenScope SimpleStmt SEMICOLON Expression Block CloseScope ELSE OpenScope Block CloseScope'''
+    
+    if len(p) == 6:
+        if(p[3].type_list[0] != ["bool"] or len(p[3].type_list)>1):
+            errors.add_error('Type Error', p.lineno(1), "The type of expression in if is not boolean")
+        p[0] = Node('IfStmt')
+        p[0].code += p[3].code
+        label = create_label()
+        p[0].code.append(['ifnot', p[3].expr_list[0], 'goto', label])
+        p[0].code += p[4].code
+        p[0].code.append([label, ': '])
+
+    elif len(p) == 8:
+        if(p[5].type_list[0] != ["bool"] or len(p[5].type_list)>1):
+            errors.add_error('Type Error', p.lineno(1), "The type of expression in if is not boolean")
+        p[0] = Node('IfStmt')
+        p[0].code += p[3].code
+        p[0].code += p[5].code
+        label = create_label()
+        p[0].code.append(['ifnot', p[5].expr_list[0], 'goto', label])
+        p[0].code += p[6].code
+        p[0].code.append([label, ': '])
+
+    elif len(p) == 10:
+        if(p[3].type_list[0] != ["bool"] or len(p[3].type_list)>1):
+            errors.add_error('Type Error', p.lineno(1), "The type of expression in if is not boolean")
+        p[0] = Node('IfStmt')
+        p[0].code += p[3].code
+        label1 = create_label()
+        label2 = create_label()
+        p[0].code.append(['ifnot', p[5].expr_list[0], 'goto', label1])
+        p[0].code += p[4].code
+        p[0].code.append(['goto', label2])
+        p[0].code.append([label1, ': '])
+        p[0].code += p[8].code
+        p[0].code.append([label2, ': '])
+    
+    else:
+        if(p[5].type_list[0] != ["bool"] or len(p[5].type_list)>1):
+            errors.add_error('Type Error', p.lineno(1), "The type of expression in if is not boolean")
+        p[0] = Node('IfStmt')
+        p[0].code += p[3].code
+        p[0].code += p[5].code
+        label1 = create_label()
+        label2 = create_label()
+        p[0].code.append(['ifnot', p[5].expr_list[0], 'goto', label1])
+        p[0].code += p[6].code
+        p[0].code.append(['goto', label2])
+        p[0].code.append([label1, ': '])
+        p[0].code += p[10].code
+        p[0].code.append([label2, ': '])
+
+
 def p_switch_stmt(p):
     '''SwitchStmt : ExprSwitchStmt 
     | TypeSwitchStmt'''
