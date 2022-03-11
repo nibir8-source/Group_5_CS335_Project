@@ -1,3 +1,4 @@
+from ast import expr
 import sys
 import ply.yacc as yacc
 from ply.lex import TOKEN
@@ -44,6 +45,9 @@ errors = Errors()
 start_for = []
 end_for = []
 label_count = 0
+curr_switch_type = 0
+temp_count = 0
+switch_expr = ""
 
 def open_scope():
     global curr_scope
@@ -84,6 +88,18 @@ def p_open_switch(p):
     global open_switch
     open_switch += 1
 
+def open_for(p):
+    '''OpenFor : '''
+    global open_for
+    open_for += 1
+    create_label(1)
+    create_label(2)
+    
+def close_for(p):
+    '''CloseFor : '''
+    global open_for
+    open_for -= 1
+
 def p_close_switch(p):
     '''CloseSwitch : '''
     global open_switch
@@ -98,6 +114,17 @@ def create_label(p = None):
     if not p is None and p == 2:
         end_for.append(label) 
     return label
+
+def create_temp(p = None):
+    global temp_count
+    if p is None:
+        temp = "temp_no#" + str(temp_count)
+        temp_count += 1
+        scope_table[curr_scope].insert(temp,"temp")
+    else:
+        temp = "var_temp_no#" + str(temp_count)
+        temp_count += 1
+    return temp
 
 #----------------------------------------------------------------------------------------
 def p_source_file(p):
@@ -706,7 +733,7 @@ def p_if_stmt(p):
     | IF OpenScope SimpleStmt SEMICOLON Expression Block CloseScope ELSE OpenScope Block CloseScope'''
     
     if len(p) == 6:
-        if(p[3].type_list[0] != ["bool"] or len(p[3].type_list)>1):
+        if(p[3].type_list[0][0] != "bool" or len(p[3].type_list)>1):
             errors.add_error('Type Error', p.lineno(1), "The type of expression in if is not boolean")
         p[0] = Node('IfStmt')
         p[0].code += p[3].code
@@ -716,7 +743,7 @@ def p_if_stmt(p):
         p[0].code.append([label, ': '])
 
     elif len(p) == 8:
-        if(p[5].type_list[0] != ["bool"] or len(p[5].type_list)>1):
+        if(p[5].type_list[0][0] != "bool" or len(p[5].type_list)>1):
             errors.add_error('Type Error', p.lineno(1), "The type of expression in if is not boolean")
         p[0] = Node('IfStmt')
         p[0].code += p[3].code
@@ -727,7 +754,7 @@ def p_if_stmt(p):
         p[0].code.append([label, ': '])
 
     elif len(p) == 10:
-        if(p[3].type_list[0] != ["bool"] or len(p[3].type_list)>1):
+        if(p[3].type_list[0][0] != "bool" or len(p[3].type_list)>1):
             errors.add_error('Type Error', p.lineno(1), "The type of expression in if is not boolean")
         p[0] = Node('IfStmt')
         p[0].code += p[3].code
@@ -741,7 +768,7 @@ def p_if_stmt(p):
         p[0].code.append([label2, ': '])
     
     else:
-        if(p[5].type_list[0] != ["bool"] or len(p[5].type_list)>1):
+        if(p[5].type_list[0][0] != "bool" or len(p[5].type_list)>1):
             errors.add_error('Type Error', p.lineno(1), "The type of expression in if is not boolean")
         p[0] = Node('IfStmt')
         p[0].code += p[3].code
@@ -757,128 +784,217 @@ def p_if_stmt(p):
 
 
 def p_switch_stmt(p):
-    '''SwitchStmt : ExprSwitchStmt 
-    | TypeSwitchStmt'''
+    '''SwitchStmt : ExprSwitchStmt''' 
+    # ''' | TypeSwitchStmt'''
     p[0] = p[1]
+
 def p_expr_switch_stmt(p):
-    '''ExprSwitchStmt : SWITCH LEFT_BRACE ExprCaseClauseStar RIGHT_BRACE
-    | SWITCH SimpleStmt SEMICOLON LEFT_BRACE ExprCaseClauseStar RIGHT_BRACE
-    | SWITCH SimpleStmt SEMICOLON Expression LEFT_BRACE ExprCaseClauseStar RIGHT_BRACE
-    | SWITCH Expression LEFT_BRACE ExprCaseClauseStar RIGHT_BRACE'''
-    p[0]= ['ExprSwitchStmt']
-    for idx in range(1,len(p)):
-        if isinstance(p[idx],str) and p[idx]!=";" and p[idx] != "}" and p[idx] != "{":
-            p[0].append([p[idx]])
-        elif p[idx]!=";" and p[idx] != "}" and p[idx] != "{":
-            p[0].append(p[idx])
+    '''ExprSwitchStmt : SWITCH LEFT_BRACE OpenSwitch ExprCaseClauseStar CloseSwitch RIGHT_BRACE
+    | SWITCH SimpleStmt SEMICOLON LEFT_BRACE OpenSwitch ExprCaseClauseStar CloseSwitch RIGHT_BRACE
+    | SWITCH SimpleStmt SEMICOLON Expression LEFT_BRACE OpenSwitch ExprCaseClauseStar CloseSwitch RIGHT_BRACE
+    | SWITCH Expression LEFT_BRACE OpenSwitch ExprCaseClauseStar CloseSwitch RIGHT_BRACE'''
+    p[0] = Node('ExprSwitchStmt')
+    label = create_label(2)
+    global curr_switch_type
+    if len(p) == 7:
+        p[0].code += p[4].code
+        curr_switch_type = None
+    elif len(p) == 8:
+        if len(p[2].type_list) > 1:
+            errors.add_error('Type Error', p.lineno(1), "The type of expression in switch is not a single type")
+        if(p[2].type_list[0][0]!="int" and p[2].type_list[0][0]!="rune" and p[2].type_list[0][0]!="bool"):
+            errors.add_error('Type Error', p.lineno(1), "The type of expression in switch is not an integer, rune or boolean")
+        curr_switch_type = p[2].type_list[0][0]
+        switch_expr = p[2].expr_list[0]
+        p[0].code += p[2].code
+        p[0].code += p[5].code
+
+    elif len(p) == 10:
+        if len(p[4].type_list) > 1:
+            errors.add_error('Type Error', p.lineno(1), "The type of expression in switch is not a single type")
+        if(p[4].type_list[0][0]!="int" and p[2].type_list[0][0]!="rune" and p[2].type_list[0][0]!="bool"):
+            errors.add_error('Type Error', p.lineno(1), "The type of expression in switch is not an integer, rune or boolean")
+        curr_switch_type = p[4].type_list[0][0]
+        expr_switch = p[4].expr_list[0]
+        p[0].code += p[2].code
+        p[0].code += p[4].code
+        p[0].code += p[7].code
+    else:
+        curr_switch_type = None
+        p[0].code += p[2].code
+        p[0].code += p[6].code
+    p[0].code.append([end_for[-1], ': '])
+    end_for = end_for[0: -1]
+
+
 def p_expr_case_clause_star(p):
     '''ExprCaseClauseStar : ExprCaseClauseStar ExprCaseClause 
     |'''
-    if len(p) == 1:
-        p[0] = []
-    else:
-        p[0] = ['ExprCaseClausePlus', p[1], p[2]]
+    if len(p) > 1:
+        p[0] = p[1]
+        p[0].code += p[2].code
+
+#Changed grammar after parser
 def p_expr_case_clause(p):
-    '''ExprCaseClause : ExprSwitchCase COLON StatementList'''
-    p[0] = ['ExprCaseClause', p[1], [p[2]], p[3]]
-def p_expr_switch_case(p):
-    '''ExprSwitchCase : CASE ExpressionList 
-    | DEFAULT'''
-    if len(p) == 2:
-        p[0] = [p[1]]
+    '''ExprCaseClause : OpenScope CASE ExpressionList COLON StatementList CloseScope
+    | DEFAULT COLON OpenScope StatementList CloseScope'''
+
+    if len(p) == 6:
+        p[0] = Node('DefClause')
+        p[0].code += p[4].code
     else:
-        p[0] = ['ExprSwitchCase', [p[1]], p[2]]
-def p_type_switch_stmt(p):
-    '''TypeSwitchStmt  : SWITCH TypeSwitchGuard LEFT_BRACE TypeCaseClauseStar RIGHT_BRACE
-    | SWITCH SimpleStmt SEMICOLON TypeSwitchGuard LEFT_BRACE TypeCaseClauseStar RIGHT_BRACE'''
-    p[0] = ['TypeSwitchstmt']
-    for idx in range(1,len(p)):
-        if isinstance(p[idx],str) and p[idx]!=";" and p[idx] != "}" and p[idx] != "{":
-            p[0].append([p[idx]])
-        elif p[idx]!=";" and p[idx] != "}" and p[idx] != "{":
-            p[0].append(p[idx])
-def p_type_case_clause_star(p):
-    '''TypeCaseClauseStar : TypeCaseClauseStar TypeCaseClause 
-    |'''
-    if len(p) == 1:
-        p[0] = []
-    else:
-        p[0] = ['TypeCaseClauseStar', p[1], p[2]]
-def p_type_switch_guard(p):
-    '''TypeSwitchGuard : IDENT DEFINE PrimaryExpr PERIOD LEFT_PARENTHESIS TYPE RIGHT_PARENTHESIS
-    | PrimaryExpr PERIOD LEFT_PARENTHESIS TYPE RIGHT_PARENTHESIS'''
-    p[0] = ['TypeSwitchGuard']
-    for idx in range(1,len(p)):
-        if isinstance(p[idx],str) and p[idx]!=";" and p[idx] != ")" and p[idx] != "(":
-            p[0].append([p[idx]])
-        elif p[idx]!=";" and p[idx] != "(" and p[idx] != ")":
-            p[0].append(p[idx])
-def p_type_case_clause(p):
-    '''TypeCaseClause  : TypeSwitchCase COLON StatementList '''
-    p[0] = ['TypeCaseClause', p[1], [p[2]], p[3]]
-def p_type_switch_case(p):
-    '''TypeSwitchCase : CASE TypeList 
-    | DEFAULT'''
-    if len(p) == 2:
-        p[0] = [p[1]]
-    else:
-        p[0] = ['TypeSwitchCase', [p[1]], p[2]]
-def p_type_list(p):
-    '''TypeList : Type CommaTypeStar
-    | IDENT CommaTypeStar
-    | IDENT PERIOD IDENT CommaTypeStar'''
-    p[0] = ['TypeList']
-    for idx in range(1,len(p)):
-        if p[idx] == ",":
-            continue
-        if isinstance(p[idx],str):
-            p[0].append([p[idx]])
-        else:
-            p[0].append(p[idx])
+        p[0] = Node('ExprCaseClause')
+        for i in range(0,len(p[3].type_list)):
+            if(p[3].type_list[i][0]!="int" and p[3].type_list[i][0]!="rune"):
+                errors.add_error('Type Error', p.lineno(1), "The type of expression in switch is not an integer or rune")
+            if(curr_switch_type is not None and curr_switch_type !=p[3].type_list[i][0]):
+                errors.add_error('Type Error', p.lineno(1), "The type of expression in case does not match type of expression in switch")
+            var = create_temp()
+            label = create_label()
+            p[0].code.append([var, '=', switch_expr, '==', p[3].expr_list[i]])
+            p[0].code.append(['ifnot', var, 'goto', label])
+            p[0].code += p[5].code
+            p[0].code.append(['goto', end_for[-1]])
+            p[0].code.append([label, ': '])
+        p[0].code.append(['goto', end_for[-1]])
+
+# def p_type_switch_stmt(p):
+#     '''TypeSwitchStmt  : SWITCH TypeSwitchGuard LEFT_BRACE TypeCaseClauseStar RIGHT_BRACE
+#     | SWITCH SimpleStmt SEMICOLON TypeSwitchGuard LEFT_BRACE TypeCaseClauseStar RIGHT_BRACE'''
+#     p[0] = ['TypeSwitchstmt']
+#     for idx in range(1,len(p)):
+#         if isinstance(p[idx],str) and p[idx]!=";" and p[idx] != "}" and p[idx] != "{":
+#             p[0].append([p[idx]])
+#         elif p[idx]!=";" and p[idx] != "}" and p[idx] != "{":
+#             p[0].append(p[idx])
+# def p_type_case_clause_star(p):
+#     '''TypeCaseClauseStar : TypeCaseClauseStar TypeCaseClause 
+#     |'''
+#     if len(p) == 1:
+#         p[0] = []
+#     else:
+#         p[0] = ['TypeCaseClauseStar', p[1], p[2]]
+# def p_type_switch_guard(p):
+#     '''TypeSwitchGuard : IDENT DEFINE PrimaryExpr PERIOD LEFT_PARENTHESIS TYPE RIGHT_PARENTHESIS
+#     | PrimaryExpr PERIOD LEFT_PARENTHESIS TYPE RIGHT_PARENTHESIS'''
+#     p[0] = ['TypeSwitchGuard']
+#     for idx in range(1,len(p)):
+#         if isinstance(p[idx],str) and p[idx]!=";" and p[idx] != ")" and p[idx] != "(":
+#             p[0].append([p[idx]])
+#         elif p[idx]!=";" and p[idx] != "(" and p[idx] != ")":
+#             p[0].append(p[idx])
+# def p_type_case_clause(p):
+#     '''TypeCaseClause  : TypeSwitchCase COLON StatementList '''
+#     p[0] = ['TypeCaseClause', p[1], [p[2]], p[3]]
+# def p_type_switch_case(p):
+#     '''TypeSwitchCase : CASE TypeList 
+#     | DEFAULT'''
+#     if len(p) == 2:
+#         p[0] = [p[1]]
+#     else:
+#         p[0] = ['TypeSwitchCase', [p[1]], p[2]]
+# def p_type_list(p):
+#     '''TypeList : Type CommaTypeStar
+#     | IDENT CommaTypeStar
+#     | IDENT PERIOD IDENT CommaTypeStar'''
+#     p[0] = ['TypeList']
+#     for idx in range(1,len(p)):
+#         if p[idx] == ",":
+#             continue
+#         if isinstance(p[idx],str):
+#             p[0].append([p[idx]])
+#         else:
+#             p[0].append(p[idx])
    
-def p_comma_type_star(p):
-    '''CommaTypeStar : CommaTypeStar COMMA Type 
-    | CommaTypeStar COMMA IDENT
-    | CommaTypeStar COMMA IDENT PERIOD IDENT
-    |'''
-    p[0] = ['CommaTypeStar']
-    for idx in range(1,len(p)):
-        if p[idx] == ",":
-            continue
-        if isinstance(p[idx],str):
-            p[0].append([p[idx]])
-        else:
-            p[0].append(p[idx])
+# def p_comma_type_star(p):
+#     '''CommaTypeStar : CommaTypeStar COMMA Type 
+#     | CommaTypeStar COMMA IDENT
+#     | CommaTypeStar COMMA IDENT PERIOD IDENT
+#     |'''
+#     p[0] = ['CommaTypeStar']
+#     for idx in range(1,len(p)):
+#         if p[idx] == ",":
+#             continue
+#         if isinstance(p[idx],str):
+#             p[0].append([p[idx]])
+#         else:
+#             p[0].append(p[idx])
 def p_for_stmt(p):
-    '''ForStmt : FOR ForClause Block
-    | FOR RangeClause Block
-    | FOR Expression Block
-    | FOR Block'''
-    p[0] = ['ForStmt']
-    for idx in range(1,len(p)):
-        if isinstance(p[idx],str):
-            p[0].append([p[idx]])
-        else:
-            p[0].append(p[idx])
+    '''ForStmt : FOR OpenScope OpenFor ForClause Block CloseFor CloseScope
+    | FOR OpenScope OpenFor Expression Block CloseFor CloseScope 
+    | FOR OpenScope OpenFor Block CloseFor CloseScope'''
+    # | FOR OpenScope OpenFor RangeClause Block CloseFor CloseScope'''
+    
+    global start_for,end_for
+    p[0] = Node("ForStmt")
+    p[0].code.append([start_for[-1], ': '])
+    if len(p)==8 and p[4].data.get("forclause") is not None:
+        p[0].code = p[4].code
+        p[0].code += p[5].code
+        p[0].code += p[4].info["for_label_pass"]
+
+    # elif len(p) == 8 and p[4].data.get("rangeclause") is not None:
+    #     p[0].code = p[4].code
+    #     p[0].code += p[5].code
+    #     p[0].code += p[4].info["for_label_pass"] 
+
+    elif len(p)==8:
+        if len(p[4].type_list)>1 or p[4].type_list[0][0]!="bool":
+            errors.add_error('Type Error', p.lineno(1), "The type of expression in for loop is not a boolean")
+        label1 = create_label()
+        label2 = create_label()
+        p[0].code += p[4].code
+        p[0].code.append([label2,": "])
+        p[0].code.append(["ifnot", p[4].expr_list[0], "goto", label1])
+        p[0].code += p[5].code
+        p[0].code.append(["goto",label2])
+        p[0].code.append([label1,":"])
+
+    else:
+        label1 = create_label()
+        p[0].code.append([label1,":"])
+        p[0].code += p[4].code
+        p[0].code.append(["goto",label1])
+
+    p[0].code.append([endFor[-1],":"])
+    startFor=startFor[0:-1]
+    endFor=endFor[0:-1]
+
 def p_for_clause(p):
     '''ForClause : SimpleStmt SEMICOLON Expression SEMICOLON SimpleStmt
     | SimpleStmt SEMICOLON SEMICOLON SimpleStmt'''
-    p[0] = ['ForClause']
-    for idx in range(1,len(p)):
-        if isinstance(p[idx],str) and p[idx]!=";":
-            p[0].append([p[idx]])
-        elif p[idx]!=";":
-            p[0].append(p[idx])
-def p_range_clause(p):
-    '''RangeClause : RANGE Expression
-    | IdentifierList DEFINE RANGE Expression
-    | ExpressionList ASSIGNMENT RANGE Expression'''
-    p[0] = ['RangeClause']
-    for idx in range(1,len(p)):
-        if isinstance(p[idx],str) and p[idx]!=";":
-            p[0].append([p[idx]])
-        elif p[idx]!=";":
-            p[0].append(p[idx])
+    
+    p[0] = Node('ForClause')
+    p[0].data["forclause"] = 1
+    if len(p) == 6 and len(p[3].type_list) > 1 or p[3].type_list[0][0] != "bool":
+        errors.add_error('Type Error', p.lineno(1), "The type of expression in for loop is not a boolean")
+    p[0].code = p[1].code
+    p[0].code.append([start_for[-1],": "])
+    label1 = create_label()
+    p[0].code.append([label1,": "])
+    if len(p)==6:
+        label2=create_label()
+        p[0].code += p[3].code
+        p[0].code.append(["ifnot", p[3].expr_list[0],"goto",label2])
+        p[0].info["for_label_pass"] = []
+        p[0].info["for_label_pass"] += p[5].code
+        p[0].info["for_label_pass"].append(["goto",label1])
+        p[0].info["for_label_pass"].append([label2,":"])
+    else:
+        p[0].info["for_label_pass"] = []
+        p[0].info["for_label_pass"] += p[4].code
+        p[0].info["for_label_pass"].append(["goto",label1])
+
+# def p_range_clause(p):
+#     '''RangeClause : RANGE Expression
+#     | IdentifierList DEFINE RANGE Expression
+#     | ExpressionList ASSIGNMENT RANGE Expression'''
+#     p[0] = ['RangeClause']
+#     for idx in range(1,len(p)):
+#         if isinstance(p[idx],str) and p[idx]!=";":
+#             p[0].append([p[idx]])
+#         elif p[idx]!=";":
+#             p[0].append(p[idx])
  
 def p_returnstmt(p):
     '''ReturnStmt : RETURN ExpressionList
