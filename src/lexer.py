@@ -17,7 +17,7 @@ keywords = {
     'package'      :    'PACKAGE',
     'switch'       :    'SWITCH',
     'const'        :    'CONSTANT',
-    'range'        :    'RANGE',
+    # 'range'        :    'RANGE',
     'type'         :    'TYPE',
     'if'           :    'IF',
     'continue'     :    'CONTINUE',
