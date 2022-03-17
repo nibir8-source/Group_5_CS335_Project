@@ -23,6 +23,8 @@ class SymTable:
         if(not self.table.get(ident)):
             self.table[ident] = {}
             self.table[ident]["type"] = attr
+    def search(self,ident):
+        return self.table.get(ident)
 
     def update(self, ident, key, value):
         if self.table.get(ident):
@@ -41,6 +43,7 @@ class Errors:
         error['msg'] = msg
         error['lineno'] = lineno
         self.errors.append(error)
+        print(error)
         self.n += 1
 
     def print_all(self):

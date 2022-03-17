@@ -252,20 +252,23 @@ def p_import_spec_semicolon_star(p):
     '''ImportSpecSemicolonStar : ImportSpecSemicolonStar ImportSpec SEMICOLON 
     |'''
     p[0]=Node('ImportSpecSemicolonStar')
-    if len(p)>1:
-        p[0].code+=p[1].code+p[2].code
+    # if len(p)>1:
+    #     p[0].code+=p[1].code+p[2].code
 
 def p_import_spec(p):
     '''ImportSpec : PERIOD ImportPath
                     | IDENT ImportPath
                     | ImportPath'''
     p[0]=Node('ImportSpec')
-    p[0].code += p[2].code
+    if(len(p)>2):
+        p[0] = p[2]
+    else:
+        p[0] = p[1]
 
 def p_import_path(p):
     '''ImportPath : STRING'''
     p[0]=Node('ImportPath')
-    p[0].code+=p[1].code
+    p[0]=p[1]
 
 #-----------------------------------------------------------------------------
 def p_declaration(p):
@@ -956,7 +959,7 @@ def p_expression(p):
         p[0] = Node('Expression')
         if len(p[1].expr_type_list)>1 or len(p[3].expr_type_list)>1:
             errors.add_error("Operation Error", p.lineno(1), "Can't apply binary operators to multiple values")
-        if check_operation(p[1].expr_type_list[0], p[2].expr_type_list[0], p[3].expr_type_list[0]) is None:
+        if check_operation(p[1].expr_type_list[0], p[2], p[3].expr_type_list[0]) is None:
             errors.add_error("Operation Error", p.lineno(1), "Invalid types for operator")
         p[0].code = p[1].code+p[3].code
         if p[1].data.get("deref") is None:
@@ -969,11 +972,11 @@ def p_expression(p):
             p[0].code.append([var2,"=","*",p[3].expr_list[0]])
         else:
             var2=p[3].expr_list[0]
-        p[0].expr_type_list.append(check_operation(p[1].expr_type_list[0] , p[2].expr_type_list[0], p[3].expr_type_list[0] ))
+        p[0].expr_type_list.append(check_operation(p[1].expr_type_list[0] , [p[2]], p[3].expr_type_list[0] ))
         p[0].data["memory"]=0
         var3 = create_temp()
         p[0].expr_list = [var3]
-        p[0].code.append([var3,"=",var1,p[2].expr_type_list[0][0]+p[3].expr_type_list[0][0],var2])
+        p[0].code.append([var3,"=",var1,p[2]+p[3].expr_type_list[0][0],var2])
 def p_unary_expr(p):
     '''UnaryExpr : PrimaryExpr 
     | unary_op UnaryExpr'''
@@ -1040,22 +1043,22 @@ def p_primary_expr(p):
         p[0].data["memory"] = 0
         p[0].expr_list = p[1].expr_list
     elif len(p)==2:
-        if(presence_of_identifier(p[1],"anywhere")==False):
+        if(presence_of_identifier(p[1],"declared_anywhere")==False):
             errors.add_error("Undeclared Error", p.lineno(1), "Variable "+p[1]+" is not declared")
         p[0]=Node('PrimaryExpr')
-        p[0].expr_type_list.append(scope_table[presence_of_identifier(p[1],"anywhere")].table[p[1]]["type"])
+        p[0].expr_type_list.append(scope_table[presence_of_identifier(p[1],"declared_anywhere")].table[p[1]]["type"])
         p[0].data["memory"]=1
         p[0].data["isID"]=p[1]
-        x=presence_of_identifier(p[1],'anywhere')
+        x=presence_of_identifier(p[1],'declared_anywhere')
         temp1=scope_table[x].table[p[1]]["type"]
         if(temp1!=["func"]):
-            p[0].expr_list=[scope_table[presence_of_identifier(p[1],'anywhere')].table[p[1]]["tmp"]]
+            p[0].expr_list=[scope_table[presence_of_identifier(p[1],'declared_anywhere')].table[p[1]]["tmp"]]
         else:
             p[0].expr_list=["func"]
         if(scope_table[x].table.get(temp1[0])!=None):
             if(scope_table[x].table[temp1[0]]["type"]==["struct"]):
                 var1=create_temp()
-                p[0].code.append([var1,"=", "&",scope_table[presence_of_identifier(p[1],'anywhere')].table[p[1]]["tmp"]])
+                p[0].code.append([var1,"=", "&",scope_table[presence_of_identifier(p[1],'declared_anywhere')].table[p[1]]["tmp"]])
                 p[0].data["deref"]=1
                 p[0].expr_list=[var1]
         elif(temp1[0][0:3]=="arr" or temp1[0]=="pointer"):
@@ -1204,24 +1207,37 @@ def p_literal(p):
     # | FunctionLit'''
     p[0] = p[1]
 def p_basic_lit(p):
-    '''BasicLit : INT 
-    | FLOAT 
-    | RUNE 
-    | STRING'''
+    '''BasicLit : IntLit 
+    | FloatLit
+    | RuneLit
+    | StringLit'''
     # | IMAGINARY 
-    p[0] = Node('BasicLit')
-    if p[1] == "int":
-        p[0].expr_type_list.append(["int"])
-        p[0].expr_list.append(p[1])
-    elif p[1] == "float":
-        p[0].expr_type_lList.append(["float"])
-        p[0].expr_list.append(p[1])
-    elif p[1] == "rune":
-        p[0].expr_type_list.append(["rune"])
-        p[0].expr_list.append(p[1])
-    else:
-        p[0].expr_type_list.append(["string"])
-        p[0].expr_list.append(p[1])
+    p[0] = p[1]
+
+def p_int_lit(p):
+    '''IntLit : INT'''
+    p[0] = Node('IntLit')
+    p[0].expr_type_list.append(["int"])
+    p[0].expr_list.append(p[1])
+
+def p_float_lit(p):
+    '''FloatLit : FLOAT'''
+    p[0] = Node('FloatLit')
+    p[0].expr_type_list.append(["float"])
+    p[0].expr_list.append(p[1])
+
+def p_rune_lit(p):
+    '''RuneLit : RUNE'''
+    p[0] = Node('RuneLit')
+    p[0].expr_type_list.append(["rune"])
+    p[0].expr_list.append(p[1])
+
+def p_string_lit(p):
+    '''StringLit : STRING'''
+    p[0] = Node('StringLit')
+    p[0].expr_type_list.append(["string"])
+    p[0].expr_list.append(p[1])
+
 
 # def p_composite_lit(p):
 #     '''CompositeLit : StructType LiteralValue
@@ -1335,7 +1351,7 @@ def p_assignment(p):
     p[0] = Node('Assignment')
     for i in range(0,len(p[3].expr_type_list)):
         if(p[2].data["op"] == "="):
-            if not (p[1].expr_type_list[i][0] in basic_types_list or p[1].expr_type_list[i][0] == "pointer"):
+            if  not ( p[1].expr_type_list[i][0] in basic_types_list or p[1].expr_type_list[i][0] == "pointer"):
                 errors.add_error('TypeError', p.lineno(1), "Type Mismatch: Cannot assign non-addressable value to addressable value")
         else:
             if(p[1].expr_type_list[i][0] not in basic_types_list):
@@ -1347,7 +1363,7 @@ def p_assignment(p):
 
     for i in range(0,len(p[1].expr_type_list)):
         if p[1].expr_type_list[i] != p[3].expr_type_list[i]:
-            errors.add_error('Type Error', p.lineno(1), "Mismatch of type for ",p[1].expr_type_list[i])
+            errors.add_error('Type Error', p.lineno(1), "Mismatch of type for "+str(p[1].expr_type_list[i])+str(p[3].expr_type_list[i])+"hel")
     p[0].code += p[1].code + p[3].code
     for i in range (0,len(p[1].expr_type_list)):
         temp = None
@@ -1612,10 +1628,10 @@ def p_returnstmt(p):
         errors.add_error('Scope Error', p.lineno(1), "Return statement is not inside a function")
     p[0] = Node('ReturnStmt')
 
-    if len(p) == 2:
-        p[0].code = [["return"]]
-    else:
-        p[0].code = p[2].code +  [["return"]]
+    # if len(p) == 2:
+    #     p[0].code = [["return"]]
+    # else:
+    #     p[0].code = p[2].code +  [["return"]]
         
 
     
