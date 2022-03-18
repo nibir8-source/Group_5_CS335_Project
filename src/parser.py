@@ -8,6 +8,7 @@ from lexer import *
 from data_structures import SymTable
 from data_structures import Node
 from data_structures import Errors
+import csv
 
 precedence = (
     ('left','IDENT'),
@@ -35,6 +36,7 @@ precedence = (
 )
 
 curr_scope = 0
+scope_number=0
 scope_list = [0]
 scope_table= {}
 scope_table[0] = SymTable()
@@ -57,8 +59,10 @@ basic_types_list=["int","float","rune","string","bool","int8","int16","int32","i
 
 def open_scope():
     global curr_scope
+    global scope_number
     prev_scope = curr_scope
     curr_scope += 1
+    scope_number +=1
     scope_list.append(curr_scope)
     scope_table[curr_scope] = SymTable()
     scope_table[curr_scope].set_parent(prev_scope)
@@ -86,7 +90,9 @@ def create_label(p = None):
     global label_count
     label = "label_no#" + str(label_count)
     label_count += 1
-    if not p is None and p == 1:
+    # print("helno")
+    if ((not p is None) and (p == 1)):
+        # print("in all")
         start_for.append(label)
     if not p is None and p == 2:
         end_for.append(label) 
@@ -170,8 +176,29 @@ def p_source_file(p):
     '''SourceFile  : PackageClause SEMICOLON ImportDeclStar TopLevelDeclStar'''
     p[0]=Node('SourceFile')
     p[0].code += p[1].code + p[3].code + p[4].code
-    print(p[0].code)
+    # print(p[0].expr_type_list)
     # p[0] = ['SourceFile', p[1], p[3], p[4]]
+    csv_file="symbol_table.csv"
+    with open(csv_file, 'w+') as csvfile:
+        for x in range(0,scope_number+1):
+#           print("Table number",x)
+            writer=csv.writer(csvfile)
+            writer.writerow([])
+            writer.writerow(["Table Number",x])
+            writer.writerow([])
+            writer.writerow(["Parent",x,"=",scope_table[x].parent])
+            writer.writerow([])
+            for key,value in scope_table[x].table.items():
+                writer.writerow([key,value])
+#           pprint.pprint(scopeTab[x].table)
+#           print("-----------------------------------------------------------------------")
+#   print("#############################################################################")
+    f=open('code.txt',"w")
+    for i in range(0,len(p[0].code)):
+        y=""
+        for x in p[0].code[i]:
+            y=y+" "+str(x)
+        f.write(y+'\n')
 
 
 def p_open_scope(p):
@@ -186,6 +213,8 @@ def p_open_for(p):
     '''OpenFor : '''
     global open_for
     open_for += 1
+    create_label(1)
+    create_label(2)
 
 def p_close_for(p):
     '''CloseFor : '''
@@ -1563,6 +1592,7 @@ def p_for_stmt(p):
         if len(p[4].expr_type_list)>1 or p[4].expr_type_list[0][0]!="bool":
             errors.add_error('Type Error', p.lineno(1), "The type of expression in for loop is not a boolean")
         label1 = create_label()
+        print("hello")
         label2 = create_label()
         p[0].code += p[4].code
         p[0].code.append([label2,": "])
@@ -1577,9 +1607,9 @@ def p_for_stmt(p):
         p[0].code += p[4].code
         p[0].code.append(["goto",label1])
 
-    p[0].code.append([endFor[-1],":"])
-    startFor=startFor[0:-1]
-    endFor=endFor[0:-1]
+    p[0].code.append([end_for[-1],":"])
+    start_for=start_for[0:-1]
+    end_for=end_for[0:-1]
 
 def p_for_clause(p):
     '''ForClause : SimpleStmt SEMICOLON Expression SEMICOLON SimpleStmt
@@ -1590,9 +1620,9 @@ def p_for_clause(p):
     if len(p) == 6 and len(p[3].expr_type_list) > 1 or p[3].expr_type_list[0][0] != "bool":
         errors.add_error('Type Error', p.lineno(1), "The type of expression in for loop is not a boolean")
     p[0].code = p[1].code
-    p[0].code.append([start_for[-1],": "])
+    p[0].code.append([start_for[-1],":"])
     label1 = create_label()
-    p[0].code.append([label1,": "])
+    p[0].code.append([label1,":"])
     if len(p)==6:
         label2=create_label()
         p[0].code += p[3].code
