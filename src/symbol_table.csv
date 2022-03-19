@@ -3,7 +3,7 @@ Table Number,0
 
 Parent,0,=,
 
-main,{'type': ['func']}
+main,"{'type': ['func'], 'scope': 0, 'takes': [['void']], 'total_param_size': 0, 'return_type': [['void']], 'total_return_size': 0, 'return_size_list': []}"
 
 Table Number,1
 
@@ -17,5 +17,19 @@ PI,"{'type': ['int'], 'tmp': 'var_temp_no#2', 'offset': 8, 'constant': True}"
 var_temp_no#2,{'type': 'PI'}
 hello,"{'type': ['int'], 'tmp': 'var_temp_no#3', 'offset': 12, 'constant': True}"
 var_temp_no#3,{'type': 'hello'}
-myname,"{'type': ['float'], 'tmp': 'var_temp_no#4', 'offset': 16, 'constant': True}"
+myname,"{'type': ['int'], 'tmp': 'var_temp_no#4', 'offset': 16, 'constant': True}"
 var_temp_no#4,{'type': 'myname'}
+p,"{'type': ['int'], 'tmp': 'var_temp_no#5', 'offset': 20}"
+var_temp_no#5,{'type': 'p'}
+l,"{'type': ['int'], 'tmp': 'var_temp_no#6', 'offset': 24}"
+var_temp_no#6,{'type': 'l'}
+
+Table Number,2
+
+Parent,2,=,1
+
+s,"{'type': ['int'], 'tmp': 'var_temp_no#11', 'offset': 128}"
+var_temp_no#11,{'type': 's'}
+
+Table Number,3
+
