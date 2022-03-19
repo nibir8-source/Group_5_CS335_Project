@@ -196,6 +196,7 @@ def p_source_file(p):
             writer.writerow([])
             writer.writerow(["Table Number",x])
             writer.writerow([])
+            print()
             writer.writerow(["Parent",x,"=",scope_table[x].parent])
             writer.writerow([])
             for key,value in scope_table[x].table.items():
@@ -362,7 +363,7 @@ def p_const_spec(p):
         if len(p[1].ident_list) != len(p[4].expr_list):
             errors.add_error("Imbalaced assignment",p.lineno(1),"Identifier and Expression list length is not equal")
         for x in p[1].ident_list:
-            if presence_of_identifier(x,'redeclaration')==True:
+            if presence_of_identifier(x,'Isredeclared')==True:
                 errors.add_error("Redeclaration error",p.lineno(1), "Redeclaration of variable " + x)
             else:
                 var1 = create_temp(1)
@@ -387,7 +388,7 @@ def p_const_spec(p):
         if len(p[1].ident_list) != len(p[3].expr_list):
             errors.add_error("Imbalaced assignment",p.lineno(1),"Identifier and Expression list length is not equal")
         for i in range(0,len(p[1].ident_list)):
-            if presence_of_identifier(p[1].ident_list,'redeclaration')==True:
+            if presence_of_identifier(p[1].ident_list[i],'Isredeclared')==True:
                 errors.add_error("Redeclaration error",p.lineno(1), "Redeclaration of variable " + p[1].ident_list)
             else:
                     var1 = create_temp(1)
@@ -515,7 +516,7 @@ def p_var_spec(p):
 
     if len(p)==5 or len(p)==3:
         for x in p[1].ident_list:
-            if(presence_of_identifier(x,'redeclaration')==True):
+            if(presence_of_identifier(x,'Isredeclared')==True):
                 errors.add_error('Redeclaration Error', p.lineno(1), 'Redeclaration of identifier:'+x)
             else:
                 if(isinstance(p[2],str)):
@@ -556,7 +557,7 @@ def p_var_spec(p):
                 errors.add_error('Assignment Error', p.lineno(1), "Auto assignment of complex expressions not allowed")
             if not p[3].expr_type_list[i][0] in basic_types_list:
                 errors.add_error('Assignment Error', p.lineno(1), "Auto assignment of only basic types allowed")
-            if presence_of_identifier(p[1].ident_list[i],'redeclaration') is True:
+            if presence_of_identifier(p[1].ident_list[i],'Isredeclared') is True:
                 errors.add_error('Redeclaration Error', p.lineno(1), 'Redeclaration of identifier')
             var1 = create_temp(1)
             scope_table[curr_scope].insert(p[1].ident_list[i],p[3].expr_type_list[i])
@@ -582,7 +583,7 @@ def p_short_var_decl(p):
             errors.add_error('Assignment Error', p.lineno(1), "Auto assignment of complex expressions not allowed")
         if not p[3].expr_type_list[i][0] in basic_types_list:
             errors.add_error('Assignemnt Error', p.lineno(1), "Auto assignment of only basic types allowed")
-        if presence_of_identifier(p[1].ident_list[i],'redeclaration') is True:
+        if presence_of_identifier(p[1].ident_list[i],'Isredeclared') is True:
             errors.add_error('Assignment Error', p.lineno(1), 'Redeclaration of identifier:'+p[1].ident_list[i])
         var1 = create_temp(1)
         scope_table[curr_scope].insert(p[1].ident_list[i],p[3].expr_type_list[i])
@@ -618,7 +619,7 @@ def p_function_name(p):
     """
     p[0] = Node('FunctionName')
     global curr_func
-    if presence_of_identifier(p[1],'redeclaration')==True:
+    if presence_of_identifier(p[1],'Isredeclared')==True:
         errors.add_error("Redecleration",p.lineno(1),p[1]+" is redeclared")
     scope_table[0].insert(p[1],["func"])
     scope_table[0].update(p[1], "scope", curr_func_scope)
@@ -921,7 +922,7 @@ def p_ParameterDecl(p):
     if not isinstance(p[1],str):
         p[0].ident_list = p[1].ident_list
         for x in p[1].ident_list:
-            if(presence_of_identifier(x,'redeclaration')==True):
+            if(presence_of_identifier(x,'Isredeclared')==True):
                 errors.add_error(p.lineno(1), "Redeclaration of identifier "+x)
             else:
                 if(isinstance(p[2],str)):
@@ -939,7 +940,7 @@ def p_ParameterDecl(p):
                     p[0].expr_type_list.append(p[2].type_list)
                     p[0].expr_list.append(p[2].data["typesize"])
     else:
-        if(presence_of_identifier(p[1],'redeclaration')==True):
+        if(presence_of_identifier(p[1],'Isredeclared')==True):
             errors.add_error(p.lineno(1), "Redeclaration of identifier "+p[1])
         else:
             p[0].ident_list = [p[1]]
@@ -1481,7 +1482,9 @@ def p_if_stmt(p):
     | IF OpenScope SimpleStmt SEMICOLON Expression Block CloseScope ELSE OpenScope Block CloseScope'''
     
     if len(p) == 6:
+        print(1)
         if p[3].expr_type_list[0][0] != "bool" or len(p[3].expr_type_list)>1:
+            print(p[3].expr_type_list[0])
             errors.add_error('Type Error', p.lineno(1), "The type of expression in if is not boolean")
         p[0] = Node('IfStmt')
         p[0].code += p[3].code
@@ -1491,6 +1494,7 @@ def p_if_stmt(p):
         p[0].code.append([label, ': '])
 
     elif len(p) == 8:
+        print(2)
         if p[5].expr_type_list[0][0] != "bool" or len(p[5].expr_type_list)>1:
             errors.add_error('Type Error', p.lineno(1), "The type of expression in if is not boolean")
         p[0] = Node('IfStmt')
@@ -1502,6 +1506,7 @@ def p_if_stmt(p):
         p[0].code.append([label, ': '])
 
     elif len(p) == 10:
+        print(3)
         if p[3].expr_type_list[0][0] != "bool" or len(p[3].expr_type_list)>1:
             errors.add_error('Type Error', p.lineno(1), "The type of expression in if is not boolean")
         p[0] = Node('IfStmt')
@@ -1516,6 +1521,7 @@ def p_if_stmt(p):
         p[0].code.append([label2, ': '])
     
     else:
+        print(4)
         if p[5].expr_type_list[0][0] != "bool" or len(p[5].expr_type_list)>1:
             errors.add_error('Type Error', p.lineno(1), "The type of expression in if is not boolean")
         p[0] = Node('IfStmt')
@@ -1698,10 +1704,10 @@ def p_returnstmt(p):
         errors.add_error('Scope Error', p.lineno(1), "Return statement is not inside a function")
     p[0] = Node('ReturnStmt')
 
-    # if len(p) == 2:
-    #     p[0].code = [["return"]]
-    # else:
-    #     p[0].code = p[2].code +  [["return"]]
+    if len(p) == 2:
+        p[0].code = [["return"]]
+    else:
+        p[0].code = p[2].code +  [["return"]]
         
 
     

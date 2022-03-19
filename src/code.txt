@@ -3,5 +3,13 @@
  var_temp_no#1 = 30.12
  var_temp_no#2 = 3
  var_temp_no#3 = 4
- var_temp_no#4 = 5.11
+ var_temp_no#4 = 5
+ var_temp_no#5 = 10
+ var_temp_no#6 = 10
+ temp_no#7 = * var_temp_no#1
+ temp_no#8 = * 30.12
+ temp_no#9 = temp_no#7 ==float temp_no#8
+ ifnot temp_no#9 goto label_no#0
+ var_temp_no#10 = "helloiitk"
+ label_no#0 : 
  return
