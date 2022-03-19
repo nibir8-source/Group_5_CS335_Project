@@ -126,9 +126,18 @@ def check_operation(expr_1, op, expr_2):
     expr_1 = expr_1[0]
     expr_2 = expr_2[0]
     if expr_1 != expr_2:
+        if(expr_1=="int" and expr_2=="float" ) or (expr_1=="float" and expr_2=="int"):
+            if op == ">" or op =="<" or op=="==" or op==">=" or op=="<="or op=="!=":
+                return ["bool"]
+            if op == "|" or op == "^" or op == "<<" or op == ">>" or op == "%" or op == "&" or op=="&^":
+                return None
+            return ["float"]
+
+        
         return None
     if op=="||" or op=="&&":
         if(expr_1=="bool"):
+            # print(expr_1,op,expr_2)
             return [expr_1]
         else:
             return None
@@ -341,7 +350,7 @@ def p_const_decl(p):
         p[0] = p[2]
     else:
         p[0] = p[3]
-    print(p[0].code)
+    # print(p[0].code)
 def p_const_spec_star(p):
     '''ConstSpecStar : ConstSpecStar ConstSpec SEMICOLON
     |'''
@@ -1028,6 +1037,8 @@ def p_expression(p):
         if len(p[1].expr_type_list)>1 or len(p[3].expr_type_list)>1:
             errors.add_error("Operation Error", p.lineno(1), "Can't apply binary operators to multiple values")
         if check_operation(p[1].expr_type_list[0], p[2], p[3].expr_type_list[0]) is None:
+            # print(check_operation(p[1].expr_type_list[0], p[2], p[3].expr_type_list[0]))
+            # print(p[1].expr_type_list[0], p[2], p[3].expr_type_list[0])
             errors.add_error("Operation Error", p.lineno(1), "Invalid types for operator")
         p[0].code = p[1].code+p[3].code
         if p[1].data.get("deref") is None:
@@ -1431,7 +1442,7 @@ def p_assignment(p):
 
     for i in range(0,len(p[1].expr_type_list)):
         if p[1].expr_type_list[i] != p[3].expr_type_list[i]:
-            errors.add_error('Type Error', p.lineno(1), "Mismatch of type for "+str(p[1].expr_type_list[i])+str(p[3].expr_type_list[i])+"hel")
+            errors.add_error('Type Error', p.lineno(1), "Mismatch of type for "+str(p[1].expr_type_list[i])+" and " +str(p[3].expr_type_list[i]))
     p[0].code += p[1].code + p[3].code
     for i in range (0,len(p[1].expr_type_list)):
         temp = None
