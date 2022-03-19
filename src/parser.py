@@ -58,17 +58,28 @@ basic_types_list=["int","float","rune","string","bool"]
 
 def open_scope():
     global curr_scope
+    global scope_list
     global scope_number
-    prev_scope = curr_scope
-    curr_scope += 1
-    scope_number +=1
+    prev_scope=curr_scope
+    scope_number += 1
+    curr_scope = scope_number
     scope_list.append(curr_scope)
+    offset_list.append(4)
     scope_table[curr_scope] = SymTable()
-    scope_table[curr_scope].set_parent(prev_scope)
+    scope_table[curr_scope].assign_parent(prev_scope)
+    scope_table[curr_scope].type_list=scope_table[prev_scope].type_list
+    scope_table[curr_scope].type_size_list=scope_table[prev_scope].type_size_list
+    for x in scope_table[0].table:
+        if(scope_table[0].table[x]["type"]==["func"]):
+            scope_table[curr_scope].insert(x,["func"])
+    for x in scope_table[prev_scope].table:
+        if(scope_table[prev_scope].table[x]["type"]==["struct"]):
+            scope_table[curr_scope].table[x]=scope_table[prev_scope].table[x]
 
 
 def close_scope():
     global curr_scope
+    global scope_list
     curr_scope = scope_list[-2] 
     scope_list.pop()
 
@@ -189,7 +200,7 @@ def p_source_file(p):
             writer.writerow([])
             for key,value in scope_table[x].table.items():
                 writer.writerow([key,value])
-#           pprint.pprint(scopeTab[x].table)
+#           pprint.pprint(scope_table[x].table)
 #           print("-----------------------------------------------------------------------")
 #   print("#############################################################################")
     f=open('code.txt',"w")
@@ -318,9 +329,9 @@ def p_StructName(p):
     curr_struct = p[1]
     struct_off=0
     if p[1] in scope_table[curr_scope].type_list:
-        errors.add_error(p.lineno(1), "Redeclaration of type " + p[1])
+        errors.add_error('Redeclaration Error', p.lineno(1), "Redeclaration of type " + p[1])
     if p[1] in scope_table[curr_scope].table:
-        errors.add_error(p.lineno(1), "Redeclaration of variable " + p[1])
+        errors.add_error('Redeclaration Error', p.lineno(1), "Redeclaration of variable " + p[1])
     scope_table[curr_scope].insert(p[1],["struct"])
 
 def p_const_decl(p):
@@ -516,7 +527,7 @@ def p_var_spec(p):
                     offset_list[curr_func_scope]+=scope_table[curr_scope].type_size_list[p[2]]
                 else:
                     var1 = create_temp(1)
-                    scope_table[curr_scope].insert(x,p[2].type)
+                    scope_table[curr_scope].insert(x,p[2].type_list)
                     scope_table[curr_scope].insert(var1,x)
                     scope_table[curr_scope].update(x,"tmp",var1)
                     scope_table[curr_scope].update(x,"offset",offset_list[curr_func_scope])
@@ -627,7 +638,7 @@ def p_type(p):
             errors.add_error('Type Error', p.lineno(1), "Invalid type of identifier "+p[2])
         if isinstance(p[2],str):
             p[0] = Node('Type')
-            p[0].type.append(p[2])
+            p[0].type_list.append(p[2])
             p[0].data["typesize"] = scope_table[curr_scope].type_size_list[p[2]]
         else:
             p[0]=p[2]
@@ -642,20 +653,20 @@ def p_type_lit(p):
     p[0] = p[1]
 
 def p_array_type(p):
-    '''ArrayType : LEFT_BRACKET Expression RIGHT_BRACKET Type
-                | LEFT_BRACKET Expression RIGHT_BRACKET IDENT'''
+    '''ArrayType : LEFT_BRACKET INT RIGHT_BRACKET Type
+                | LEFT_BRACKET INT RIGHT_BRACKET IDENT'''
                 # | LEFT_BRACKET Expression RIGHT_BRACKET IDENT PERIOD IDENT'''    
     if isinstance(p[4],str) and not p[4] in scope_table[curr_scope].type_list:
         errors.add_error('Type Error', p.lineno(1), "This type hasn't been declared yet "+p[4])
     temp = int(p[2])
     p[0] = Node('ArrayType')
     if isinstance(p[4],str):
-        p[0].type.append("arr"+p[2])
-        p[0].type.append(p[4])
+        p[0].type_list.append("arr"+p[2])
+        p[0].type_list.append(p[4])
         p[0].data["typesize"]=temp*scope_table[curr_scope].type_size_list[p[4]]
     else:
-        p[0].type.append("arr"+p[2])
-        p[0].type+=p[4].type
+        p[0].type_list.append("arr"+p[2])
+        p[0].type_list += p[4].type_list
         p[0].data["typesize"]=temp*p[4].data["typesize"]
 
 
@@ -722,7 +733,7 @@ def p_field_decl(p):
             if(p[1] in struct_sym_list):
                 errors.add_error('Redeclaration Error', p.lineno(1), "This identifier is already declared in this list")
             struct_sym_list.append(p[1])
-            scope_table[curr_scope].update(curr_struct,p[1],p[2].type)
+            scope_table[curr_scope].update(curr_struct,p[1],p[2].type_list)
             scope_table[curr_scope].update(curr_struct,"offset "+p[1],struct_off)
             struct_off += p[2].data["typesize"]
     elif len(p)==5 and not isinstance(p[3],str):
@@ -744,14 +755,14 @@ def p_field_decl(p):
             if(p[1] in struct_sym_list):
                 errors.add_error('Redeclaration Error', p.lineno(1), "This identifier is already declared in this list")
             struct_sym_list.append(p[1])
-            scope_table[curr_scope].update(curr_struct,p[1],p[4].type)
+            scope_table[curr_scope].update(curr_struct,p[1],p[4].type_list)
             scope_table[curr_scope].update(curr_struct,"offset "+p[1],structOff)
             struct_off += p[4].data["typesize"]
             for x in p[3].ident_list:
                 if x in struct_sym_list:
                     errors.add_error('Redeclaration Error', p.lineno(1), "This identifier is already declared in this list")
                 struct_sym_list.append(x)
-                scope_table[curr_scope].update(curr_struct,x,p[4].type)
+                scope_table[curr_scope].update(curr_struct,x,p[4].type_list)
                 scope_table[curr_scope].update(curr_struct,"offset "+x,struct_off)
                 structOff += p[4].data["typesize"]
     elif len(p)==5:
@@ -796,12 +807,12 @@ def p_pointer_type(p):
     if isinstance(p[2],str) and not p[2] in scope_table[curr_scope].type_list:
         errors.add_error('Type Error', p.lineno(1), "Invalid type of identifier "+p[2])
     p[0] = Node('PointerType')
-    p[0].type.append("pointer")
+    p[0].type_list.append("pointer")
     if isinstance(p[2],str):
-        p[0].type.append(p[2])
+        p[0].type_list.append(p[2])
         p[0].data["typesize"]=4
     else:
-        p[0].type+=p[2].type
+        p[0].type_list += p[2].type_list
         p[0].data["typesize"]=4
 # def p_function_type(p):
 #     '''FunctionType : FUNCTION Signature'''
@@ -846,7 +857,7 @@ def p_TypeList(p):
             p[0].ident_list.append([p[1]])
             p[0].expr_list.append(scope_table[curr_scope].type_size_list[p[1]]) 
         else:
-            p[0].ident_list.append(p[1].type)
+            p[0].ident_list.append(p[1].type_list)
             p[0].expr_list.append(p[1].data["typesize"])
     else:
         if(isinstance(p[3],str)):
@@ -857,7 +868,7 @@ def p_TypeList(p):
         else:
             p[0].ident_lList=p[1].ident_list
             p[0].expr_list=p[1].expr_list
-            p[0].ident_list.append(p[3].type)
+            p[0].ident_list.append(p[3].type_list)
             p[0].expr_list.append(p[3].data["typesize"])
 
 
@@ -922,10 +933,10 @@ def p_ParameterDecl(p):
                     p[0].expr_list.append(scope_table[curr_scope].type_size_list[p[2]])
                 else:
                     var1 = create_temp(1)
-                    scope_table[curr_scope].insert(x,p[2].type)
+                    scope_table[curr_scope].insert(x,p[2].type_list)
                     scope_table[curr_scope].insert(var1,x)
                     scope_table[curr_scope].update(x,"tmp",var1)
-                    p[0].expr_type_list.append(p[2].type)
+                    p[0].expr_type_list.append(p[2].type_list)
                     p[0].expr_list.append(p[2].data["typesize"])
     else:
         if(presence_of_identifier(p[1],'redeclaration')==True):
@@ -941,10 +952,10 @@ def p_ParameterDecl(p):
                 p[0].expr_type_list.append(scope_table[curr_scope].type_size_list[p[2]])
             else:
                 var1 = create_temp(1)
-                scope_table[curr_scope].insert(p[1], p[2].type)
+                scope_table[curr_scope].insert(p[1], p[2].type_list)
                 scope_table[curr_scope].insert(var1,p[1])
                 scope_table[curr_scope].update(p[1],"tmp",var1)
-                p[0].expr_type_list.append(p[2].type)
+                p[0].expr_type_list.append(p[2].type_list)
                 p[0].expr_type_list.append(p[2].data["typesize"])
 
 def p_ParaIdentList(p):
@@ -1737,4 +1748,4 @@ data = file.read()
 parser = yacc.yacc(debug=True)
 res = parser.parse(data, lexer=lexer)
 import pprint
-pprint.pprint(res)
+# pprint.pprint(res)

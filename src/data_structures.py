@@ -30,6 +30,9 @@ class SymTable:
         if self.table.get(ident):
             self.table[ident][key]=value
 
+    def assign_parent(self, parent):
+        self.parent = parent
+
 
 class Errors:
 
