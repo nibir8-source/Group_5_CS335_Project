@@ -1,4 +1,3 @@
-from ast import expr
 import sys
 import ply.yacc as yacc
 from ply.lex import TOKEN
@@ -349,7 +348,7 @@ def p_const_spec(p):
     else:
         if len(p) == 5 and p[2] not in basic_types_list:
             errors.add_error(p.lineno(2), "Invalid type for constant " + p[1])
-        if len(p[1]).ident_list != len(p[4].expr_list):
+        if len(p[1].ident_list) != len(p[4].expr_list):
             errors.add_error("Imbalaced assignment",p.lineno(1),"Identifier and Expression list length is not equal")
         for x in p[1].ident_list:
             if presence_of_identifier(x,'redeclaration')==True:
@@ -577,7 +576,7 @@ def p_function_decl(p):
         p[0].code += p[5].code
     p[0].code.append(["return"])
 
-def p_FuncName(p):
+def p_function_name(p):
     """
     FunctionName : IDENT
     """
@@ -586,7 +585,9 @@ def p_FuncName(p):
     if presence_of_identifier(p[1],'redeclaration')==True:
         errors.add_error("Redecleration",p.lineno(1),p[1]+" is redeclared")
     scope_table[0].insert(p[1],["func"])
+    scope_table[0].update(p[1], "scope", curr_func_scope)
     p[0].code.append([p[1],":"])
+    curr_func = p[1]
 
 # --------------------- TYPES -------------------------------------
 # Removed IDENT PERIOD IDENT
@@ -790,11 +791,11 @@ def p_result(p):
     |'''
     p[0] = Node('Result')
     if len(p)==1:
-        scope_table[0].update(curr_func,"returns",[["void"]])
-        scope_table[0].update(curr_func,"total_return_size",0)
-        scope_table[0].update(curr_func,"return_size_list",[])
+        scope_table[0].update(curr_func,'return_type',[["void"]])
+        scope_table[0].update(curr_func,'total_return_size',0)
+        scope_table[0].update(curr_func,'return_size_list',[])
     else:
-        scope_table[0].update(curr_func,"returns",p[2].ident_list)
+        scope_table[0].update(curr_func,'return_type',p[2].ident_list)
         total_sum = -8- scope_table[0].table[curr_func]["total_param_size"]
         return_list = []
         return_sum = 0
@@ -878,10 +879,10 @@ def p_ParameterDecl(p):
     | IDENT IDENT
     | IDENT Type"""
     if isinstance(p[2],str) and not p[2] in scope_table[curr_scope].type_list:
-        raise NameError("Invalid type of identifier "+p[2], p.lineno(1))
+        errors.add_error(p.lineno(2), "Invalid type of identifier "+p[2])
 
     p[0] = Node('ParameterDecl')
-    if(not isinstance(p[1],str)):
+    if not isinstance(p[1],str):
         p[0].ident_list = p[1].ident_list
         for x in p[1].ident_list:
             if(presence_of_identifier(x,'redeclaration')==True):
@@ -1144,14 +1145,14 @@ def p_primary_expr(p):
         if(p[2].expr_type_list != scope_table[0].table[p[1].data["isID"]]["takes"]):
             errors.add_error("Error", p.lineno(1), "The arguments passed are not of the same type as the function")
         p[0]=Node('PrimaryExpr')
-        p[0].expr_type_list=scope_table[0].table[p[1].data["isID"]]["returns"]
+        p[0].expr_type_list=scope_table[0].table[p[1].data["isID"]]['return_type']
         if(p[0].expr_type_list[0][0]=="void"):
             p[0].expr_list=[]
         else:
             for i in range(0,len(p[0].expr_type_list)):
                 var1=create_temp()
                 p[0].expr_list.append(var1)
-        p[0].data["multi_return"]=1
+        p[0].data["multi_return"] = 1
         p[0].data["memory"]=0
         p[0].code=p[2].code
         p[0].code.append(["startf",p[1].data["isID"]])
@@ -1444,7 +1445,7 @@ def p_if_stmt(p):
     | IF OpenScope SimpleStmt SEMICOLON Expression Block CloseScope ELSE OpenScope Block CloseScope'''
     
     if len(p) == 6:
-        if(p[3].expr_type_list[0][0] != "bool" or len(p[3].expr_type_list)>1):
+        if p[3].expr_type_list[0][0] != "bool" or len(p[3].expr_type_list)>1:
             errors.add_error('Type Error', p.lineno(1), "The type of expression in if is not boolean")
         p[0] = Node('IfStmt')
         p[0].code += p[3].code
@@ -1454,7 +1455,7 @@ def p_if_stmt(p):
         p[0].code.append([label, ': '])
 
     elif len(p) == 8:
-        if(p[5].expr_type_list[0][0] != "bool" or len(p[5].expr_type_list)>1):
+        if p[5].expr_type_list[0][0] != "bool" or len(p[5].expr_type_list)>1:
             errors.add_error('Type Error', p.lineno(1), "The type of expression in if is not boolean")
         p[0] = Node('IfStmt')
         p[0].code += p[3].code
@@ -1465,13 +1466,13 @@ def p_if_stmt(p):
         p[0].code.append([label, ': '])
 
     elif len(p) == 10:
-        if(p[3].expr_type_list[0][0] != "bool" or len(p[3].expr_type_list)>1):
+        if p[3].expr_type_list[0][0] != "bool" or len(p[3].expr_type_list)>1:
             errors.add_error('Type Error', p.lineno(1), "The type of expression in if is not boolean")
         p[0] = Node('IfStmt')
         p[0].code += p[3].code
         label1 = create_label()
         label2 = create_label()
-        p[0].code.append(['ifnot', p[5].expr_list[0], 'goto', label1])
+        p[0].code.append(['ifnot', p[3].expr_list[0], 'goto', label1])
         p[0].code += p[4].code
         p[0].code.append(['goto', label2])
         p[0].code.append([label1, ': '])
@@ -1479,7 +1480,7 @@ def p_if_stmt(p):
         p[0].code.append([label2, ': '])
     
     else:
-        if(p[5].expr_type_list[0][0] != "bool" or len(p[5].expr_type_list)>1):
+        if p[5].expr_type_list[0][0] != "bool" or len(p[5].expr_type_list)>1:
             errors.add_error('Type Error', p.lineno(1), "The type of expression in if is not boolean")
         p[0] = Node('IfStmt')
         p[0].code += p[3].code
@@ -1650,9 +1651,12 @@ def p_for_clause(p):
 def p_returnstmt(p):
     '''ReturnStmt : RETURN ExpressionList
                     | RETURN'''
-    if len(p) == 2 and scope_table[curr_scope][curr_func]['return_type'] != "void":
+    # print(curr_scope)
+    # print(curr_func)
+    # print(scope_table[0])
+    if len(p) == 2 and scope_table[0].table[curr_func]['return_type'] != [["void"]]:
         errors.add_error('Type Error',p.lineno(1), "Return statement without return value")
-    elif len(p) == 3 and scope_table[curr_scope][curr_func]['return_type'] != p[2].expr_type_list:
+    elif len(p) == 3 and scope_table[0].table[curr_func]['return_type'] != p[2].expr_type_list:
         errors.add_error('Type Error', p.lineno(1), "Return statement with wrong return value")
     elif curr_scope == 0:
         errors.add_error('Scope Error', p.lineno(1), "Return statement is not inside a function")
