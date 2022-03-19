@@ -54,7 +54,7 @@ struct_off = 0
 curr_func_scope = 0
 offset_list = [0]
 struct_sym_list = []
-basic_types_list=["int","float","rune","string","bool","int8","int16","int32","int64","float64","float32","uint8","uint16","uint32","uint64"]
+basic_types_list=["int","float","rune","string","bool"]
 
 def open_scope():
     global curr_scope
@@ -345,14 +345,14 @@ def p_const_spec(p):
     p[0]=Node("ConstSpec")
     if len(p)==2:
         p[0]=p[1]
-    else:
+    elif len(p)==5:
         if len(p) == 5 and p[2] not in basic_types_list:
-            errors.add_error(p.lineno(2), "Invalid type for constant " + p[1])
+            errors.add_error("Type Error",p.lineno(2), "Invalid type for constant " + p[2])
         if len(p[1].ident_list) != len(p[4].expr_list):
             errors.add_error("Imbalaced assignment",p.lineno(1),"Identifier and Expression list length is not equal")
         for x in p[1].ident_list:
             if presence_of_identifier(x,'redeclaration')==True:
-                errors.add_error(p.lineno(1), "Redeclaration of variable " + x)
+                errors.add_error("Redeclaration error",p.lineno(1), "Redeclaration of variable " + x)
             else:
                 var1 = create_temp(1)
                 scope_table[curr_scope].insert(x,[p[2]])
@@ -363,8 +363,8 @@ def p_const_spec(p):
                 scope_table[curr_scope].update(x,'constant',True)
 
         for i in range(0,len(p[1].ident_list)):
-            if p[4].expr_type_list[i] != scope_table[curr_scope][p[1].ident_list[i]]["type"]:
-                errors.add_error(p.lineno(1), "Type mismatch in assignment")
+            if p[4].expr_type_list[i] != scope_table[curr_scope].table[p[1].ident_list[i]]["type"]:
+                errors.add_error("Type Error",p.lineno(1), "Type mismatch in assignment")
 
         for i in range(0,len(p[1].ident_list)):
             temp = [scope_table[curr_scope].table[p[1].ident_list[i]]["tmp"],"="]
@@ -372,6 +372,31 @@ def p_const_spec(p):
                 temp.append("*")
             temp.append(p[4].expr_list[i])
             p[0].code.append(temp)
+    elif(len(p)==4) :
+        if len(p[1].ident_list) != len(p[3].expr_list):
+            errors.add_error("Imbalaced assignment",p.lineno(1),"Identifier and Expression list length is not equal")
+        for i in range(0,len(p[1].ident_list)):
+            if presence_of_identifier(p[1].ident_list,'redeclaration')==True:
+                errors.add_error("Redeclaration error",p.lineno(1), "Redeclaration of variable " + p[1].ident_list)
+            else:
+                    var1 = create_temp(1)
+                    scope_table[curr_scope].insert(p[1].ident_list[i],p[3].expr_type_list[i])
+                    scope_table[curr_scope].insert(var1,p[1].ident_list[i])
+                    scope_table[curr_scope].update(p[1].ident_list[i],"tmp",var1)
+                    scope_table[curr_scope].update(p[1].ident_list[i],"offset",offset_list[curr_func_scope])
+                    offset_list[curr_func_scope] += scope_table[curr_scope].type_size_list[p[3].expr_type_list[i][0]]
+                    scope_table[curr_scope].update(p[1].ident_list[i],'constant',True)
+        for i in range(0,len(p[1].ident_list)):
+            if p[3].expr_type_list[i] != scope_table[curr_scope].table[p[1].ident_list[i]]["type"]:
+                errors.add_error("Type Error",p.lineno(1), "Type mismatch in assignment")
+        for i in range(0,len(p[1].ident_list)):
+            temp = [scope_table[curr_scope].table[p[1].ident_list[i]]["tmp"],"="]
+            if(p[3].data["dereflist"][i]==1):
+                temp.append("*")
+            temp.append(p[3].expr_list[i])
+            p[0].code.append(temp)
+        
+
 
         
 
@@ -1593,7 +1618,7 @@ def p_for_stmt(p):
         if len(p[4].expr_type_list)>1 or p[4].expr_type_list[0][0]!="bool":
             errors.add_error('Type Error', p.lineno(1), "The type of expression in for loop is not a boolean")
         label1 = create_label()
-        print("hello")
+        # print("hello")
         label2 = create_label()
         p[0].code += p[4].code
         p[0].code.append([label2,": "])
