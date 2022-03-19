@@ -196,7 +196,6 @@ def p_source_file(p):
             writer.writerow([])
             writer.writerow(["Table Number",x])
             writer.writerow([])
-            print()
             writer.writerow(["Parent",x,"=",scope_table[x].parent])
             writer.writerow([])
             for key,value in scope_table[x].table.items():
@@ -308,7 +307,7 @@ def p_import_spec(p):
 def p_import_path(p):
     '''ImportPath : STRING'''
     p[0]=Node('ImportPath')
-    p[0]=p[1]
+    p[0].code.append(p[1])
 
 #-----------------------------------------------------------------------------
 def p_declaration(p):
@@ -342,6 +341,7 @@ def p_const_decl(p):
         p[0] = p[2]
     else:
         p[0] = p[3]
+    print(p[0].code)
 def p_const_spec_star(p):
     '''ConstSpecStar : ConstSpecStar ConstSpec SEMICOLON
     |'''
@@ -919,6 +919,7 @@ def p_ParameterDecl(p):
         errors.add_error(p.lineno(2), "Invalid type of identifier "+p[2])
 
     p[0] = Node('ParameterDecl')
+    flag = 0
     if not isinstance(p[1],str):
         p[0].ident_list = p[1].ident_list
         for x in p[1].ident_list:
@@ -950,14 +951,14 @@ def p_ParameterDecl(p):
                 scope_table[curr_scope].insert(var1,p[1])
                 scope_table[curr_scope].update(p[1],"tmp",var1)
                 p[0].expr_type_list.append([p[2]])
-                p[0].expr_type_list.append(scope_table[curr_scope].type_size_list[p[2]])
+                p[0].expr_list.append(scope_table[curr_scope].type_size_list[p[2]])
             else:
                 var1 = create_temp(1)
                 scope_table[curr_scope].insert(p[1], p[2].type_list)
                 scope_table[curr_scope].insert(var1,p[1])
                 scope_table[curr_scope].update(p[1],"tmp",var1)
                 p[0].expr_type_list.append(p[2].type_list)
-                p[0].expr_type_list.append(p[2].data["typesize"])
+                p[0].expr_list.append(p[2].data["typesize"])
 
 def p_ParaIdentList(p):
     """
@@ -1482,7 +1483,6 @@ def p_if_stmt(p):
     | IF OpenScope SimpleStmt SEMICOLON Expression Block CloseScope ELSE OpenScope Block CloseScope'''
     
     if len(p) == 6:
-        print(1)
         if p[3].expr_type_list[0][0] != "bool" or len(p[3].expr_type_list)>1:
             print(p[3].expr_type_list[0])
             errors.add_error('Type Error', p.lineno(1), "The type of expression in if is not boolean")
@@ -1494,7 +1494,6 @@ def p_if_stmt(p):
         p[0].code.append([label, ': '])
 
     elif len(p) == 8:
-        print(2)
         if p[5].expr_type_list[0][0] != "bool" or len(p[5].expr_type_list)>1:
             errors.add_error('Type Error', p.lineno(1), "The type of expression in if is not boolean")
         p[0] = Node('IfStmt')
@@ -1506,7 +1505,6 @@ def p_if_stmt(p):
         p[0].code.append([label, ': '])
 
     elif len(p) == 10:
-        print(3)
         if p[3].expr_type_list[0][0] != "bool" or len(p[3].expr_type_list)>1:
             errors.add_error('Type Error', p.lineno(1), "The type of expression in if is not boolean")
         p[0] = Node('IfStmt')
@@ -1521,7 +1519,6 @@ def p_if_stmt(p):
         p[0].code.append([label2, ': '])
     
     else:
-        print(4)
         if p[5].expr_type_list[0][0] != "bool" or len(p[5].expr_type_list)>1:
             errors.add_error('Type Error', p.lineno(1), "The type of expression in if is not boolean")
         p[0] = Node('IfStmt')
