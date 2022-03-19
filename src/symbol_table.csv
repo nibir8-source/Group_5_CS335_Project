@@ -3,23 +3,19 @@ Table Number,0
 
 Parent,0,=,
 
-globalvariable,"{'type': ['int'], 'tmp': 'var_temp_no#0', 'offset': 0}"
-var_temp_no#0,{'type': 'globalvariable'}
 main,{'type': ['func']}
 
 Table Number,1
 
 Parent,1,=,0
 
-n,"{'type': ['int'], 'tmp': 'var_temp_no#1', 'offset': 4}"
-var_temp_no#1,{'type': 'n'}
-m,"{'type': ['int'], 'tmp': 'var_temp_no#2', 'offset': 8}"
-var_temp_no#2,{'type': 'm'}
-
-Table Number,2
-
-Parent,2,=,1
-
-temp_no#3,{'type': 'temp'}
-temp_no#4,{'type': 'temp'}
-temp_no#5,{'type': 'temp'}
+n,"{'type': ['float'], 'tmp': 'var_temp_no#0', 'offset': 0}"
+var_temp_no#0,{'type': 'n'}
+m,"{'type': ['float'], 'tmp': 'var_temp_no#1', 'offset': 4}"
+var_temp_no#1,{'type': 'm'}
+PI,"{'type': ['int'], 'tmp': 'var_temp_no#2', 'offset': 8, 'constant': True}"
+var_temp_no#2,{'type': 'PI'}
+hello,"{'type': ['int'], 'tmp': 'var_temp_no#3', 'offset': 12, 'constant': True}"
+var_temp_no#3,{'type': 'hello'}
+myname,"{'type': ['float'], 'tmp': 'var_temp_no#4', 'offset': 16, 'constant': True}"
+var_temp_no#4,{'type': 'myname'}

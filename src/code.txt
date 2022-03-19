@@ -1,9 +1,7 @@
- var_temp_no#0 = 111
  main :
- temp_no#3 = * var_temp_no#1
- temp_no#4 = * 5
- temp_no#5 = temp_no#3 ==int temp_no#4
- ifnot temp_no#5 goto label_no#0
- var_temp_no#2 = 20
- label_no#0 : 
+ var_temp_no#0 = 20.0
+ var_temp_no#1 = 30.12
+ var_temp_no#2 = 3
+ var_temp_no#3 = 4
+ var_temp_no#4 = 5.11
  return
