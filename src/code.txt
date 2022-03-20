@@ -1,4 +1,9 @@
  " f m t "
  main :
- var_temp_no#0 = 5
+ temp_no#0 = * 1.1
+ temp_no#1 = * 2
+ temp_no#2 = temp_no#0 +int temp_no#1
+ ifnot temp_no#2 goto label_no#0
+ var_temp_no#3 = 10
+ label_no#0 : 
  return

@@ -435,7 +435,7 @@ def p_expression_list(p):
     | ExpressionList COMMA Expression
     | LEFT_BRACKET Expression RIGHT_BRACKET IDENT LEFT_BRACE ExpressionList RIGHT_BRACE'''
     p[0] = Node('ExpressionList')
-    print("hello")
+    # print("hello")
     if len(p)==2:
         p[0].expr_type_list += p[1].expr_type_list
         p[0].code = p[1].code
@@ -453,7 +453,9 @@ def p_expression_list(p):
             p[0].data["memory"]=0
     elif (len(p)==8):
         print("hello1")
-        
+        # p[0].expr_type_list=["array"]
+
+
     else:
         p[0].expr_type_list += p[1].expr_type_list
         p[0].expr_type_list+=p[3].expr_type_list
@@ -1498,8 +1500,8 @@ def p_if_stmt(p):
     | IF OpenScope SimpleStmt SEMICOLON Expression Block CloseScope ELSE OpenScope Block CloseScope'''
     
     if len(p) == 6:
-        if p[3].expr_type_list[0][0] != "bool" or len(p[3].expr_type_list)>1:
-            errors.add_error('Type Error', p.lineno(1), "The type of expression in if is not boolean")
+        if (p[3].expr_type_list[0][0] != "bool" and p[3].expr_type_list[0][0]!="int" and p[3].expr_type_list[0][0]!="float") or len(p[3].expr_type_list)>1:
+            errors.add_error('Type Error', p.lineno(1), "The type of expression in if is not (boolean/int/float)")
         p[0] = Node('IfStmt')
         p[0].code += p[3].code
         label = create_label()
