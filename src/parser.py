@@ -177,7 +177,7 @@ def check_unary_operation(unop, exp1):
         exp1 = exp1[1:]
         return exp1
     if unop=="&":
-        exp2 = "pointer"
+        exp2 = ["pointer"]
         exp1= exp2+exp1
         return exp1
 
@@ -341,7 +341,6 @@ def p_const_decl(p):
         p[0] = p[2]
     else:
         p[0] = p[3]
-    print(p[0].code)
 def p_const_spec_star(p):
     '''ConstSpecStar : ConstSpecStar ConstSpec SEMICOLON
     |'''
@@ -1115,21 +1114,21 @@ def p_primary_expr(p):
             errors.add_error("Undeclared Error", p.lineno(1), "Variable "+p[1]+" is not declared")
         p[0]=Node('PrimaryExpr')
         p[0].expr_type_list.append(scope_table[presence_of_identifier(p[1],"declared_anywhere")].table[p[1]]["type"])
-        p[0].data["memory"]=1
-        p[0].data["isID"]=p[1]
+        p[0].data["memory"] = 1
+        p[0].data["isID"] = p[1]
         x=presence_of_identifier(p[1],'declared_anywhere')
         temp1=scope_table[x].table[p[1]]["type"]
         if(temp1!=["func"]):
             p[0].expr_list=[scope_table[presence_of_identifier(p[1],'declared_anywhere')].table[p[1]]["tmp"]]
         else:
             p[0].expr_list=["func"]
-        if(scope_table[x].table.get(temp1[0])!=None):
+        if scope_table[x].table.get(temp1[0])!=None:
             if(scope_table[x].table[temp1[0]]["type"]==["struct"]):
                 var1=create_temp()
                 p[0].code.append([var1,"=", "&",scope_table[presence_of_identifier(p[1],'declared_anywhere')].table[p[1]]["tmp"]])
                 p[0].data["deref"]=1
                 p[0].expr_list=[var1]
-        elif(temp1[0][0:3]=="arr" or temp1[0]=="pointer"):
+        elif temp1[0][0:3]=="arr" or temp1[0]=="pointer":
             p[0].data["deref"]=1
 
     elif(len(p)==4 and p[2]=='.'):
@@ -1178,7 +1177,7 @@ def p_primary_expr(p):
         p[0].expr_list=[var1]
 
     elif p[2].data.get("arguments") is not None:
-        if p[1].expr_type_list[0][0]!="func" or p[1].data.get("isID") is not None:
+        if p[1].expr_type_list[0][0]!="func" or p[1].data.get("isID") is None:
             errors.add_error("Error", p.lineno(1), "The primary expression is not a function")
         if(p[2].expr_type_list != scope_table[0].table[p[1].data["isID"]]["takes"]):
             errors.add_error("Error", p.lineno(1), "The arguments passed are not of the same type as the function")
@@ -1199,7 +1198,7 @@ def p_primary_expr(p):
                 # var1=create_temp()
                 # p[0].code.append([var1,"=","*",p[2].expr_list[i]])
                 # p[0].code.append(["param",var1])
-                p[0].code.append(["param",p[2].expr_list[i],scope_table[0].table[p[1].data["isID"]]["parSizeList"][i]  ])
+                p[0].code.append(["param",p[2].expr_list[i],scope_table[0].table[p[1].data["isID"]]["param_size_list"][i]  ])
             else:
                 p[0].code.append(["param",p[2].expr_list[i]])
         p[0].code.append(["call",p[1].data["isID"]])
@@ -1484,7 +1483,6 @@ def p_if_stmt(p):
     
     if len(p) == 6:
         if p[3].expr_type_list[0][0] != "bool" or len(p[3].expr_type_list)>1:
-            print(p[3].expr_type_list[0])
             errors.add_error('Type Error', p.lineno(1), "The type of expression in if is not boolean")
         p[0] = Node('IfStmt')
         p[0].code += p[3].code
@@ -1534,23 +1532,26 @@ def p_if_stmt(p):
         p[0].code.append([label2, ': '])
 
 
-def p_switch_stmt(p):
-    '''SwitchStmt : ExprSwitchStmt''' 
-    # ''' | TypeSwitchStmt'''
-    p[0] = p[1]
+# def p_switch_stmt(p):
+#     '''SwitchStmt : ExprSwitchStmt''' 
+#     # ''' | TypeSwitchStmt'''
+#     p[0] = p[1]
 
 def p_expr_switch_stmt(p):
-    '''ExprSwitchStmt : SWITCH LEFT_BRACE OpenSwitch ExprCaseClauseStar CloseSwitch RIGHT_BRACE
+    '''SwitchStmt : SWITCH LEFT_BRACE OpenSwitch ExprCaseClauseStar CloseSwitch RIGHT_BRACE
     | SWITCH SimpleStmt SEMICOLON LEFT_BRACE OpenSwitch ExprCaseClauseStar CloseSwitch RIGHT_BRACE
     | SWITCH SimpleStmt SEMICOLON Expression LEFT_BRACE OpenSwitch ExprCaseClauseStar CloseSwitch RIGHT_BRACE
     | SWITCH Expression LEFT_BRACE OpenSwitch ExprCaseClauseStar CloseSwitch RIGHT_BRACE'''
+    print('Nibir0')
     p[0] = Node('ExprSwitchStmt')
     label = create_label(2)
     global curr_switch_type
     if len(p) == 7:
+        print(1)
         p[0].code += p[4].code
         curr_switch_type = None
     elif len(p) == 8:
+        print(2)
         if len(p[2].expr_type_list) > 1:
             errors.add_error('Type Error', p.lineno(1), "The type of expression in switch is not a single type")
         if(p[2].expr_type_list[0][0]!="int" and p[2].expr_type_list[0][0]!="rune" and p[2].expr_type_list[0][0]!="bool"):
@@ -1561,6 +1562,7 @@ def p_expr_switch_stmt(p):
         p[0].code += p[5].code
 
     elif len(p) == 10:
+        print(3)
         if len(p[4].expr_type_list) > 1:
             errors.add_error('Type Error', p.lineno(1), "The type of expression in switch is not a single type")
         if(p[4].expr_type_list[0][0]!="int" and p[2].expr_type_list[0][0]!="rune" and p[2].expr_type_list[0][0]!="bool"):
@@ -1571,6 +1573,7 @@ def p_expr_switch_stmt(p):
         p[0].code += p[4].code
         p[0].code += p[7].code
     else:
+        print(4)
         curr_switch_type = None
         p[0].code += p[2].code
         p[0].code += p[6].code
@@ -1580,25 +1583,28 @@ def p_expr_switch_stmt(p):
 
 def p_expr_case_clause_star(p):
     '''ExprCaseClauseStar : ExprCaseClauseStar ExprCaseClause 
-    |'''
-    if len(p) > 1:
+    | ExprCaseClause'''
+    print(len(p))
+    if len(p) > 2:
         p[0] = p[1]
         p[0].code += p[2].code
+    else:
+        p[0] = p[1]
 
 #Changed grammar after parser
 def p_expr_case_clause(p):
     '''ExprCaseClause : OpenScope CASE ExpressionList COLON StatementList CloseScope
     | DEFAULT COLON OpenScope StatementList CloseScope'''
-
+    print(len(p))
     if len(p) == 6:
         p[0] = Node('DefClause')
         p[0].code += p[4].code
     else:
         p[0] = Node('ExprCaseClause')
         for i in range(0,len(p[3].expr_type_list)):
-            if(p[3].expr_type_list[i][0]!="int" and p[3].expr_type_list[i][0]!="rune"):
+            if p[3].expr_type_list[i][0]!="int" and p[3].expr_type_list[i][0]!="rune":
                 errors.add_error('Type Error', p.lineno(1), "The type of expression in switch is not an integer or rune")
-            if(curr_switch_type is not None and curr_switch_type !=p[3].expr_type_list[i][0]):
+            if curr_switch_type is not None and curr_switch_type != p[3].expr_type_list[i][0]:
                 errors.add_error('Type Error', p.lineno(1), "The type of expression in case does not match type of expression in switch")
             var = create_temp()
             label = create_label()
@@ -1608,6 +1614,7 @@ def p_expr_case_clause(p):
             p[0].code.append(['goto', end_for[-1]])
             p[0].code.append([label, ': '])
         p[0].code.append(['goto', end_for[-1]])
+        print(p[0].code)
 
 def p_for_stmt(p):
     '''ForStmt : FOR OpenScope OpenFor ForClause Block CloseFor CloseScope
