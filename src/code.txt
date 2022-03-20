@@ -1,10 +1,4 @@
+ " f m t "
  main :
- var_temp_no#0 = 20
- var_temp_no#1 = 30
- var_temp_no#2 = 10.1
- var_temp_no#3 = "hello"
- temp_no#4 = * var_temp_no#2
- temp_no#5 = * var_temp_no#0
- temp_no#6 = temp_no#4 +int temp_no#5
- var_temp_no#0 = temp_no#6
+ var_temp_no#0 = 5
  return

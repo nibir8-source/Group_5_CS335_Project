@@ -432,8 +432,10 @@ def p_identifier_list(p):
 
 def p_expression_list(p):
     '''ExpressionList : Expression
-    | ExpressionList COMMA Expression'''
+    | ExpressionList COMMA Expression
+    | LEFT_BRACKET Expression RIGHT_BRACKET IDENT LEFT_BRACE ExpressionList RIGHT_BRACE'''
     p[0] = Node('ExpressionList')
+    print("hello")
     if len(p)==2:
         p[0].expr_type_list += p[1].expr_type_list
         p[0].code = p[1].code
@@ -449,6 +451,9 @@ def p_expression_list(p):
             p[0].data["memory"]=1
         else:
             p[0].data["memory"]=0
+    elif (len(p)==8):
+        print("hello1")
+        
     else:
         p[0].expr_type_list += p[1].expr_type_list
         p[0].expr_type_list+=p[3].expr_type_list
