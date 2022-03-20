@@ -9,27 +9,15 @@ Table Number,1
 
 Parent,1,=,0
 
-n,"{'type': ['float'], 'tmp': 'var_temp_no#0', 'offset': 0}"
+main,{'type': ['func']}
+n,"{'type': ['int'], 'tmp': 'var_temp_no#0', 'offset': 0}"
 var_temp_no#0,{'type': 'n'}
-m,"{'type': ['float'], 'tmp': 'var_temp_no#1', 'offset': 4}"
+m,"{'type': ['int'], 'tmp': 'var_temp_no#1', 'offset': 4}"
 var_temp_no#1,{'type': 'm'}
-PI,"{'type': ['int'], 'tmp': 'var_temp_no#2', 'offset': 8, 'constant': True}"
-var_temp_no#2,{'type': 'PI'}
-hello,"{'type': ['int'], 'tmp': 'var_temp_no#3', 'offset': 12, 'constant': True}"
-var_temp_no#3,{'type': 'hello'}
-myname,"{'type': ['int'], 'tmp': 'var_temp_no#4', 'offset': 16, 'constant': True}"
-var_temp_no#4,{'type': 'myname'}
-p,"{'type': ['int'], 'tmp': 'var_temp_no#5', 'offset': 20}"
-var_temp_no#5,{'type': 'p'}
-l,"{'type': ['int'], 'tmp': 'var_temp_no#6', 'offset': 24}"
-var_temp_no#6,{'type': 'l'}
-
-Table Number,2
-
-Parent,2,=,1
-
-s,"{'type': ['int'], 'tmp': 'var_temp_no#11', 'offset': 128}"
-var_temp_no#11,{'type': 's'}
-
-Table Number,3
-
+l,"{'type': ['float'], 'tmp': 'var_temp_no#2', 'offset': 8}"
+var_temp_no#2,{'type': 'l'}
+p,"{'type': ['string'], 'tmp': 'var_temp_no#3', 'offset': 12}"
+var_temp_no#3,{'type': 'p'}
+temp_no#4,{'type': 'temp'}
+temp_no#5,{'type': 'temp'}
+temp_no#6,{'type': 'temp'}
