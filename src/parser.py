@@ -84,8 +84,8 @@ def close_scope():
     scope_list.pop()
 
 def presence_of_identifier(ident,purpose):
-    if (purpose=="Isredeclared"):
-        if(scope_table[curr_scope].search(ident)!=None):
+    if purpose=="Isredeclared":
+        if scope_table[curr_scope].search(ident)!=None:
             return True
         else :
             return False
@@ -122,7 +122,8 @@ def create_temp(p = None):
 def check_operation(expr_1, op, expr_2):
     if len(expr_1)>1 or len(expr_2)>1:
         return None
-    op = op[0]
+    if len(op) == 1:
+        op = op[0]
     expr_1 = expr_1[0]
     expr_2 = expr_2[0]
     if expr_1 != expr_2:
@@ -195,8 +196,6 @@ def p_source_file(p):
     '''SourceFile  : PackageClause SEMICOLON ImportDeclStar TopLevelDeclStar'''
     p[0]=Node('SourceFile')
     p[0].code += p[1].code + p[3].code + p[4].code
-    # print(p[0].expr_type_list)
-    # p[0] = ['SourceFile', p[1], p[3], p[4]]
     csv_file="symbol_table.csv"
     with open(csv_file, 'w+') as csvfile:
         for x in range(0,scope_number+1):
@@ -218,6 +217,7 @@ def p_source_file(p):
         for x in p[0].code[i]:
             y=y+" "+str(x)
         f.write(y+'\n')
+    print(p[0].code)
 
 
 def p_open_scope(p):
@@ -244,6 +244,8 @@ def p_open_switch(p):
     '''OpenSwitch : '''
     global open_switch
     open_switch += 1
+    create_label(1)
+    create_label(2)
 
 def p_close_switch(p):
     '''CloseSwitch : '''
@@ -263,10 +265,6 @@ def p_import_decl_star(p):
     p[0] = Node('ImportDeclStar')
     if(len(p)>1):
         p[0].code+=p[1].code+p[2].code
-    # if len(p) == 1:
-    #     p[0] = []
-    # else:
-    #     p[0] = ['ImportDeclStar', p[1], p[2]]
 
 def p_top_level_decl_star(p):
     '''TopLevelDeclStar : TopLevelDeclStar TopLevelDecl SEMICOLON 
@@ -524,7 +522,7 @@ def p_var_spec(p):
 
     if len(p)==5 or len(p)==3:
         for x in p[1].ident_list:
-            if(presence_of_identifier(x,'Isredeclared')==True):
+            if presence_of_identifier(x,'Isredeclared')==True and x != "_":
                 errors.add_error('Redeclaration Error', p.lineno(1), 'Redeclaration of identifier:'+x)
             else:
                 if(isinstance(p[2],str)):
@@ -565,8 +563,8 @@ def p_var_spec(p):
                 errors.add_error('Assignment Error', p.lineno(1), "Auto assignment of complex expressions not allowed")
             if not p[3].expr_type_list[i][0] in basic_types_list:
                 errors.add_error('Assignment Error', p.lineno(1), "Auto assignment of only basic types allowed")
-            if presence_of_identifier(p[1].ident_list[i],'Isredeclared') is True:
-                errors.add_error('Redeclaration Error', p.lineno(1), 'Redeclaration of identifier')
+            if presence_of_identifier(p[1].ident_list[i],'Isredeclared') is True and p[1].ident_list[i] != "_":
+                errors.add_error('Redeclaration Error', p.lineno(1), 'Redeclaration of identifier: '+p[1].ident_list[i])
             var1 = create_temp(1)
             scope_table[curr_scope].insert(p[1].ident_list[i],p[3].expr_type_list[i])
             scope_table[curr_scope].insert(var1,p[1].ident_list[i])
@@ -591,7 +589,7 @@ def p_short_var_decl(p):
             errors.add_error('Assignment Error', p.lineno(1), "Auto assignment of complex expressions not allowed")
         if not p[3].expr_type_list[i][0] in basic_types_list:
             errors.add_error('Assignemnt Error', p.lineno(1), "Auto assignment of only basic types allowed")
-        if presence_of_identifier(p[1].ident_list[i],'Isredeclared') is True:
+        if presence_of_identifier(p[1].ident_list[i],'Isredeclared') is True and p[1].ident_list[i] != "_":
             errors.add_error('Assignment Error', p.lineno(1), 'Redeclaration of identifier:'+p[1].ident_list[i])
         var1 = create_temp(1)
         scope_table[curr_scope].insert(p[1].ident_list[i],p[3].expr_type_list[i])
@@ -931,7 +929,7 @@ def p_ParameterDecl(p):
     if not isinstance(p[1],str):
         p[0].ident_list = p[1].ident_list
         for x in p[1].ident_list:
-            if(presence_of_identifier(x,'Isredeclared')==True):
+            if presence_of_identifier(x,'Isredeclared')==True and x != "_":
                 errors.add_error(p.lineno(1), "Redeclaration of identifier "+x)
             else:
                 if(isinstance(p[2],str)):
@@ -949,7 +947,7 @@ def p_ParameterDecl(p):
                     p[0].expr_type_list.append(p[2].type_list)
                     p[0].expr_list.append(p[2].data["typesize"])
     else:
-        if(presence_of_identifier(p[1],'Isredeclared')==True):
+        if presence_of_identifier(p[1],'Isredeclared')==True and p[1] != "_":
             errors.add_error(p.lineno(1), "Redeclaration of identifier "+p[1])
         else:
             p[0].ident_list = [p[1]]
@@ -1065,6 +1063,7 @@ def p_unary_expr(p):
         if len(p[1].expr_type_list)>1:
             errors.add_error("Operation Error", p.lineno(1), "Can't apply binary operators to multiple values")
         if check_unary_operation(p[1].expr_type_list[0], p[2].expr_type_list[0]) is None:
+            print(2)
             errors.add_error("Operation Error", p.lineno(1), "Invalid types for operator")
         p[0].expr_type_list.append(check_unary_operation(p[1].expr_type_list[0], p[2].expr_type_list[0]))
         p[0].code = p[2].code
@@ -1288,9 +1287,17 @@ def p_basic_lit(p):
     '''BasicLit : IntLit 
     | FloatLit
     | RuneLit
-    | StringLit'''
+    | StringLit
+    | TrueFalseLit'''
     # | IMAGINARY 
     p[0] = p[1]
+
+def p_true_false_lit(p):
+    '''TrueFalseLit : TRUE
+    | FALSE'''
+    p[0] = Node('TrueFalseLit')
+    p[0].expr_type_list.append(["bool"])
+    p[0].expr_list.append(p[1])
 
 def p_int_lit(p):
     '''IntLit : INT'''
@@ -1551,51 +1558,43 @@ def p_if_stmt(p):
 def p_expr_switch_stmt(p):
     '''SwitchStmt : SWITCH LEFT_BRACE OpenSwitch ExprCaseClauseStar CloseSwitch RIGHT_BRACE
     | SWITCH SimpleStmt SEMICOLON LEFT_BRACE OpenSwitch ExprCaseClauseStar CloseSwitch RIGHT_BRACE
-    | SWITCH SimpleStmt SEMICOLON Expression LEFT_BRACE OpenSwitch ExprCaseClauseStar CloseSwitch RIGHT_BRACE
-    | SWITCH Expression LEFT_BRACE OpenSwitch ExprCaseClauseStar CloseSwitch RIGHT_BRACE'''
-    print('Nibir0')
+    | SWITCH SimpleStmt SEMICOLON ExpressionName LEFT_BRACE OpenSwitch ExprCaseClauseStar CloseSwitch RIGHT_BRACE
+    | SWITCH ExpressionName LEFT_BRACE OpenSwitch ExprCaseClauseStar CloseSwitch RIGHT_BRACE'''
     p[0] = Node('ExprSwitchStmt')
     label = create_label(2)
-    global curr_switch_type
+    global curr_switch_type, end_for
     if len(p) == 7:
-        print(1)
         p[0].code += p[4].code
-        curr_switch_type = None
     elif len(p) == 8:
-        print(2)
-        if len(p[2].expr_type_list) > 1:
-            errors.add_error('Type Error', p.lineno(1), "The type of expression in switch is not a single type")
-        if(p[2].expr_type_list[0][0]!="int" and p[2].expr_type_list[0][0]!="rune" and p[2].expr_type_list[0][0]!="bool"):
-            errors.add_error('Type Error', p.lineno(1), "The type of expression in switch is not an integer, rune or boolean")
-        curr_switch_type = p[2].expr_type_list[0][0]
-        switch_expr = p[2].expr_list[0]
         p[0].code += p[2].code
         p[0].code += p[5].code
 
     elif len(p) == 10:
-        print(3)
-        if len(p[4].expr_type_list) > 1:
-            errors.add_error('Type Error', p.lineno(1), "The type of expression in switch is not a single type")
-        if(p[4].expr_type_list[0][0]!="int" and p[2].expr_type_list[0][0]!="rune" and p[2].expr_type_list[0][0]!="bool"):
-            errors.add_error('Type Error', p.lineno(1), "The type of expression in switch is not an integer, rune or boolean")
-        curr_switch_type = p[4].expr_type_list[0][0]
-        expr_switch = p[4].expr_list[0]
         p[0].code += p[2].code
         p[0].code += p[4].code
         p[0].code += p[7].code
     else:
-        print(4)
-        curr_switch_type = None
         p[0].code += p[2].code
         p[0].code += p[6].code
     p[0].code.append([end_for[-1], ': '])
     end_for = end_for[0: -1]
 
+def p_ExpressionName(p):
+    """ExpressionName : Expression"""
+    p[0] = p[1]
+    global switch_exp, curr_switch_type
+    if len(p[1].expr_type_list)>1:
+        errors.add_error('Type Error', p.lineno(1), "The type of expression in switch is not a single type")
+    if p[1].expr_type_list[0][0]!="int" and p[1].expr_type_list[0][0]!="rune" and p[1].expr_type_list[0][0]!="bool":
+        errors.add_error('Type Error', p.lineno(1), "The type of expression in switch is not an integer, rune or boolean")
+    curr_switch_type = p[1].expr_type_list[0][0]
+    switch_expr = p[0].expr_list[0]
+    label1 = create_label(2)
+
 
 def p_expr_case_clause_star(p):
     '''ExprCaseClauseStar : ExprCaseClauseStar ExprCaseClause 
     | ExprCaseClause'''
-    print(len(p))
     if len(p) > 2:
         p[0] = p[1]
         p[0].code += p[2].code
@@ -1606,7 +1605,6 @@ def p_expr_case_clause_star(p):
 def p_expr_case_clause(p):
     '''ExprCaseClause : OpenScope CASE ExpressionList COLON StatementList CloseScope
     | DEFAULT COLON OpenScope StatementList CloseScope'''
-    print(len(p))
     if len(p) == 6:
         p[0] = Node('DefClause')
         p[0].code += p[4].code
@@ -1625,7 +1623,6 @@ def p_expr_case_clause(p):
             p[0].code.append(['goto', end_for[-1]])
             p[0].code.append([label, ': '])
         p[0].code.append(['goto', end_for[-1]])
-        print(p[0].code)
 
 def p_for_stmt(p):
     '''ForStmt : FOR OpenScope OpenFor ForClause Block CloseFor CloseScope
@@ -1707,7 +1704,7 @@ def p_for_clause(p):
  
 def p_returnstmt(p):
     '''ReturnStmt : RETURN ExpressionList
-                    | RETURN'''
+    | RETURN'''
     # print(curr_scope)
     # print(curr_func)
     # print(scope_table[0])

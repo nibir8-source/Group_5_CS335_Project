@@ -26,6 +26,8 @@ keywords = {
     'import'       :    'IMPORT',
     'var'          :    'VARIABLE',
     'const'        :    'CONST',
+    'true'         :    'TRUE',
+    'false'        :    'FALSE',
 }
 
 tokens = list(keywords.values()) + [
