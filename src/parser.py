@@ -56,6 +56,36 @@ offset_list = [0]
 struct_sym_list = []
 basic_types_list=["int","float","rune","string","bool"]
 
+
+
+file1 = open("tree.txt","w")#write mode
+#file1 = open(outputHtml,"a")
+file1.write("digraph graphname {")
+file1.write("\n")
+counter=0
+def writeGraph(someList):
+    global counter
+    local=counter
+    counter+=1
+    name=someList[0]
+    if(len(someList) > 1):
+        for innerList in someList[1:]:
+            if(len(innerList) >0):
+                file1.write(str(local))
+                file1.write ("[label=\"")
+                file1.write (name)
+                file1.write ("\" ] ;")
+                file1.write(str(counter))
+                file1.write ("[label=\"")
+                if ((innerList[0][0])=="\""):
+                    innerList[0]=innerList[0][1:-1]
+                file1.write (innerList[0])
+                file1.write ("\" ] ;")
+                file1.write(str(local) + "->" + str(counter) + ";")
+                file1.write("\n")
+                writeGraph(innerList)
+
+
 def open_scope():
     global curr_scope
     global scope_list
@@ -196,6 +226,7 @@ def p_source_file(p):
     '''SourceFile  : PackageClause SEMICOLON ImportDeclStar TopLevelDeclStar'''
     p[0]=Node('SourceFile')
     p[0].code += p[1].code + p[3].code + p[4].code
+    p[0].ast=["SourceFile",p[1].ast,p[3].ast,p[4].ast]
     csv_file="symbol_table.csv"
     with open(csv_file, 'w+') as csvfile:
         for x in range(0,scope_number+1):
@@ -217,7 +248,13 @@ def p_source_file(p):
         for x in p[0].code[i]:
             y=y+" "+str(x)
         f.write(y+'\n')
-    print(p[0].code)
+    print(p[0].ast)
+    
+    writeGraph(p[0].ast)
+    file1.write("}")
+    file1.close()
+    
+    
 
 
 def p_open_scope(p):
@@ -264,6 +301,7 @@ def p_import_decl_star(p):
     |'''
     p[0] = Node('ImportDeclStar')
     if(len(p)>1):
+        p[0].ast=['ImportDeclStar',p[1].ast,p[2].ast]
         p[0].code+=p[1].code+p[2].code
 
 def p_top_level_decl_star(p):
@@ -271,17 +309,25 @@ def p_top_level_decl_star(p):
     |'''
     p[0] = Node('TopLevelDeclStar')
     if(len(p)>1):
+        # if(len(p[1].ast))
+        p[0].ast=['TopLevelDeclStar',p[1].ast,p[2].ast]
+
         p[0].code += p[1].code
         p[0].code += p[2].code
 
 def p_top_level_decl(p):
     '''TopLevelDecl : Declaration 
     | FunctionDecl'''
+    p[0]=Node("TopLevelDecl")
     p[0] = p[1]
+
+    # print(p[1].ast)
 
 def p_package_clause(p):
     '''PackageClause : PACKAGE IDENT'''
+   
     p[0]=Node('PackageClause')
+    p[0].ast=[p[2]]
     p[0].ident_list.append(p[2])
 
 def p_import_decl(p):
@@ -291,15 +337,19 @@ def p_import_decl(p):
 
     if len(p)==3:
         p[0].code+=p[2].code
+        p[0].ast=p[2].ast
+        
     else:
         p[0].code+=p[3].code
+        p[0].ast=p[3].ast
 
 def p_import_spec_semicolon_star(p):
     '''ImportSpecSemicolonStar : ImportSpecSemicolonStar ImportSpec SEMICOLON 
     |'''
     p[0]=Node('ImportSpecSemicolonStar')
-    # if len(p)>1:
-    #     p[0].code+=p[1].code+p[2].code
+    if len(p)>1:
+        # p[0].code+=p[1].code+p[2].code
+        p[0].ast=["ImportSpecSemicolonStar",p[1].ast,p[2].ast]
 
 def p_import_spec(p):
     '''ImportSpec : PERIOD ImportPath
@@ -308,12 +358,14 @@ def p_import_spec(p):
     p[0]=Node('ImportSpec')
     if(len(p)>2):
         p[0] = p[2]
+        
     else:
         p[0] = p[1]
 
 def p_import_path(p):
     '''ImportPath : STRING'''
     p[0]=Node('ImportPath')
+    p[0].ast=[p[1]]
     p[0].code.append(p[1])
 
 #-----------------------------------------------------------------------------
@@ -321,7 +373,11 @@ def p_declaration(p):
     '''Declaration : ConstDecl 
     | StructDecl
     | VarDecl'''
+    p[0]=Node("Declaration")
     p[0] = p[1]
+    # print(p[0].ast)
+    
+    
 
 def p_StructDecl(p):
     """StructDecl : TYPE StructName StructType"""
@@ -344,15 +400,21 @@ def p_StructName(p):
 def p_const_decl(p):
     '''ConstDecl : CONST ConstSpec
                 | CONST LEFT_PARENTHESIS ConstSpecStar RIGHT_PARENTHESIS'''
+    p[0]=Node("ConstDecl")
+    # print(p[0].ast)
     if len(p)==3:
         p[0] = p[2]
+        p[0].ast=p[2].ast
     else:
         p[0] = p[3]
+        p[0].ast=p[2].ast
+
 def p_const_spec_star(p):
     '''ConstSpecStar : ConstSpecStar ConstSpec SEMICOLON
     |'''
     p[0] = Node("ConstSpecStar")
     if len(p) > 1:
+        p[0].ast=["ConstSpecStar",p[1].ast,p[2].ast]
         p[0].code += p[1].code
         p[0].code += p[2].code
 
@@ -364,6 +426,8 @@ def p_const_spec(p):
     if len(p)==2:
         p[0]=p[1]
     elif len(p)==5:
+        p[0].ast=["=",p[1].ast,[p[2]],p[4].ast]
+        print(p[0].ast)
         if len(p) == 5 and p[2] not in basic_types_list:
             errors.add_error("Type Error",p.lineno(2), "Invalid type for constant " + p[2])
         if len(p[1].ident_list) != len(p[4].expr_list):
@@ -391,6 +455,7 @@ def p_const_spec(p):
             temp.append(p[4].expr_list[i])
             p[0].code.append(temp)
     elif(len(p)==4) :
+        p[0].ast=["=",p[1].ast,p[3].ast]
         if len(p[1].ident_list) != len(p[3].expr_list):
             errors.add_error("Imbalaced assignment",p.lineno(1),"Identifier and Expression list length is not equal")
         for i in range(0,len(p[1].ident_list)):
@@ -423,8 +488,10 @@ def p_identifier_list(p):
     | IDENT COMMA IdentifierList'''
     p[0]=Node('IdentifierList')
     if(len(p)==2):
+        p[0].ast=[p[1]]
         p[0].ident_list.append(p[1])
     else:
+        p[0].ast=["IdentifierList",[p[1]],p[3].ast]
         p[0].ident_list.append(p[1])
         p[0].ident_list=p[0].ident_list + p[3].ident_list
 
@@ -437,6 +504,7 @@ def p_expression_list(p):
     if len(p)==2:
         p[0].expr_type_list += p[1].expr_type_list
         p[0].code = p[1].code
+        p[0].ast=p[1].ast
         p[0].data["dereflist"]=[]
         if p[1].data.get("deref") is None:
             p[0].expr_list += p[1].expr_list
@@ -455,6 +523,7 @@ def p_expression_list(p):
 
 
     else:
+        p[0].ast=["ExpressionList",p[1].ast,p[3].ast]
         p[0].expr_type_list += p[1].expr_type_list
         p[0].expr_type_list+=p[3].expr_type_list
         p[0].expr_list += p[1].expr_list
@@ -510,6 +579,7 @@ def p_var_spec_star(p):
     |'''
     p[0] = Node('VarSpecStar')
     if len(p)>1:
+        p[0]=["Varspecstar",p[1].ast,p[3].ast]
         p[0].code += p[1].code
         p[0].code += p[3].code
 def p_var_spec(p):
@@ -519,6 +589,18 @@ def p_var_spec(p):
                 | IdentifierList IDENT
                 | IdentifierList ASSIGNMENT ExpressionList'''
     p[0] = Node('VarSpec')
+    if(len(p)==3 and isinstance(p[2],str)):
+        p[0].ast=["VarSpec",p[1].ast,[p[2]]]
+    elif (len(p)==3):
+        p[0].ast=["VarSpec",p[1].ast,p[2].ast]
+    elif (len(p)==4):
+        p[0].ast=["=",p[1].ast,p[3].ast]
+    elif (len(p)==5 and isinstance(p[2],str)):
+        p[0].ast=["=",p[1].ast,[p[2]],p[4].ast]
+    else:
+        p[0].ast=["=",p[1].ast,p[2].ast,p[4].ast]
+
+
     if (len(p)==5):
         for i in range(0,len(p[4].expr_type_list)):
             if(not (p[4].expr_type_list[i][0] in basic_types_list or p[4].expr_type_list[i][0]=="pointer")):
@@ -589,6 +671,7 @@ def p_var_spec(p):
 
 def p_short_var_decl(p):
     '''ShortVarDecl : IdentifierList DEFINE ExpressionList'''
+
     if(len(p[1].ident_list) != len(p[3].expr_type_list)):
         errors.add_error('Assignment Error', p.lineno(1), "Imbalanced Assignment")
     for i in range(0,len(p[1].ident_list)):
@@ -605,6 +688,7 @@ def p_short_var_decl(p):
         scope_table[curr_scope].update(p[1].ident_list[i],"offset",offset_list[curr_func_scope])
         offset_list[curr_func_scope]+=scope_table[curr_scope].type_size_list[p[3].expr_type_list[i][0]]
     p[0] = Node('ShortVarDecl')
+    p[0].ast=[":=",p[1].ast,p[3].ast]
     p[0].code=p[3].code
     for i in range(0,len(p[1].ident_list)):
         temp=[scope_table[curr_scope].table[p[1].ident_list[i]]["tmp"],"="]
@@ -620,6 +704,11 @@ def p_function_decl(p):
                     | FUNCTION FunctionName OpenScope Signature CloseScope'''
 
     p[0] = Node('FunctionDecl')
+    if( len(p)==6 ):
+        p[0].ast=["FUNCTION",p[2].ast,p[4].ast]
+    else:
+        p[0].ast=["FUNCTION",p[2].ast,p[4].ast,p[5].ast]
+    
     p[0].code = p[2].code
     p[0].code += p[4].code
     if len(p) != 6:
@@ -631,6 +720,7 @@ def p_function_name(p):
     FunctionName : IDENT
     """
     p[0] = Node('FunctionName')
+    p[0].ast=[p[1]]
     global curr_func
     if presence_of_identifier(p[1],'Isredeclared')==True:
         errors.add_error("Redecleration",p.lineno(1),p[1]+" is redeclared")
@@ -652,6 +742,7 @@ def p_type(p):
             errors.add_error('Type Error', p.lineno(1), "Invalid type of identifier "+p[2])
         if isinstance(p[2],str):
             p[0] = Node('Type')
+            p[0].ast=[p[2]]
             p[0].type_list.append(p[2])
             p[0].data["typesize"] = scope_table[curr_scope].type_size_list[p[2]]
         else:
@@ -675,10 +766,12 @@ def p_array_type(p):
     temp = int(p[2])
     p[0] = Node('ArrayType')
     if isinstance(p[4],str):
+        p[0].ast=["ArrayType",[p[2]],[p[4]]]
         p[0].type_list.append("arr"+p[2])
         p[0].type_list.append(p[4])
         p[0].data["typesize"]=temp*scope_table[curr_scope].type_size_list[p[4]]
     else:
+        p[0].ast=["ArrayType",[p[2]],p[4].ast]
         p[0].type_list.append("arr"+p[2])
         p[0].type_list += p[4].type_list
         p[0].data["typesize"]=temp*p[4].data["typesize"]
@@ -701,12 +794,14 @@ def p_struct_type(p):
     '''StructType : STRUCT OpenStruct LEFT_BRACE FieldDeclStar RIGHT_BRACE CloseStruct'''
     p[0] = Node('StructType')
     p[0].code = p[4].code
+    p[0].ast=["STRUCT",p[4].ast]
 # --------------------------------------------------------------------
 def p_field_decl_star(p):
     '''FieldDeclStar : FieldDeclStar FieldDecl SEMICOLON
     |'''
     p[0] = Node('FieldDeclStar')
     if len(p) > 1:
+        p[0].ast=["FieldDeclStar",p[1].ast,p[2].ast]
         p[0].code += p[1].code
         p[0].code += p[2].code
 
@@ -737,6 +832,7 @@ def p_field_decl(p):
     global struct_off
     if len(p)==3:
         if(isinstance(p[2],str)):
+            p[0].ast=["FieldDecl",[p[1]],[p[2]]]
             if(p[1] in struct_sym_list):
                 errors.add_error('Redeclaration Error', p.lineno(1), "This identifier is already declared in this list")
             struct_sym_list.append(p[1])
@@ -744,6 +840,7 @@ def p_field_decl(p):
             scope_table[curr_scope].update(curr_struct,"offset "+p[1],struct_off)
             struct_off += scope_table[curr_scope].type_size_list[p[2]]
         else:
+            p[0].ast=["FieldDecl",[p[1]],p[2].ast]
             if(p[1] in struct_sym_list):
                 errors.add_error('Redeclaration Error', p.lineno(1), "This identifier is already declared in this list")
             struct_sym_list.append(p[1])
@@ -752,6 +849,7 @@ def p_field_decl(p):
             struct_off += p[2].data["typesize"]
     elif len(p)==5 and not isinstance(p[3],str):
         if isinstance(p[4],str):
+            p[0].ast=["FieldDecl",[p[1]],p[3].ast,[p[4]]]
             if p[1] in struct_sym_list:
                 errors.add_error('Redeclaration Error', p.lineno(1), "This identifier is already declared in this list")
             struct_sym_list.append(p[1])
@@ -766,6 +864,7 @@ def p_field_decl(p):
                 scope_table[curr_scope].update(curr_struct,"offset "+x,struct_off)
                 struct_off += scope_table[curr_scope].type_size_list[p[4]]
         else:
+            p[0].ast=["FieldDecl",[p[1]],p[3].ast,p[4].ast]
             if(p[1] in struct_sym_list):
                 errors.add_error('Redeclaration Error', p.lineno(1), "This identifier is already declared in this list")
             struct_sym_list.append(p[1])
@@ -780,6 +879,7 @@ def p_field_decl(p):
                 scope_table[curr_scope].update(curr_struct,"offset "+x,struct_off)
                 structOff += p[4].data["typesize"]
     elif len(p)==5:
+        p[0].ast=["FieldDecl",[p[1]],"STRUCT",[p[3]],[p[4]]]
         if(p[4] != curr_struct):
             errors.add_error('Struct Error', p.lineno(1), "The identifier should be the current struct")
         struct_sym_list.append(p[1])
@@ -787,6 +887,7 @@ def p_field_decl(p):
         scope_table[curr_scope].update(curr_struct,"offset "+p[1],struct_off)
         struct_off += 4
     else:
+        p[0].ast=["FieldDecl",[p[1]],p[3].ast,"STRUCT",[p[5]],[p[6]]]
         if p[6] != curr_struct:
             errors.add_error('Struct Error', p.lineno(1), "The identifier should be the current struct")
         struct_sym_list.append(p[1])
@@ -821,11 +922,14 @@ def p_pointer_type(p):
     if isinstance(p[2],str) and not p[2] in scope_table[curr_scope].type_list:
         errors.add_error('Type Error', p.lineno(1), "Invalid type of identifier "+p[2])
     p[0] = Node('PointerType')
+
     p[0].type_list.append("pointer")
     if isinstance(p[2],str):
+        p[0].ast=["*",[p[2]]]
         p[0].type_list.append(p[2])
         p[0].data["typesize"]=4
     else:
+        p[0].ast=["*",p[2].ast]
         p[0].type_list += p[2].type_list
         p[0].data["typesize"]=4
 # def p_function_type(p):
@@ -835,16 +939,19 @@ def p_pointer_type(p):
 def p_signature(p):
     '''Signature : Parameters Result'''
     p[0] = Node('Signature')
+    p[0].ast=["Parameters",p[1].ast,p[2].ast]
 
 def p_result(p):
     '''Result : LEFT_PARENTHESIS TypeList RIGHT_PARENTHESIS 
     |'''
     p[0] = Node('Result')
     if len(p)==1:
+
         scope_table[0].update(curr_func,'return_type',[["void"]])
         scope_table[0].update(curr_func,'total_return_size',0)
         scope_table[0].update(curr_func,'return_size_list',[])
     else:
+        p[0].ast=["Result",p[1].ast]
         scope_table[0].update(curr_func,'return_type',p[2].ident_list)
         total_sum = -8- scope_table[0].table[curr_func]["total_param_size"]
         return_list = []
@@ -868,18 +975,22 @@ def p_TypeList(p):
     p[0] = Node('TypeList')
     if(len(p)==2):
         if(isinstance(p[1],str)):
+            p[0].ast=[p[1]]
             p[0].ident_list.append([p[1]])
             p[0].expr_list.append(scope_table[curr_scope].type_size_list[p[1]]) 
         else:
+            p[0].ast=p[1].ast
             p[0].ident_list.append(p[1].type_list)
             p[0].expr_list.append(p[1].data["typesize"])
     else:
         if(isinstance(p[3],str)):
+            p[0].ast=["TypeList",p[1].ast,[p[3]]]
             p[0].ident_list=p[1].ident_list
             p[0].expr_list=p[1].expr_list
             p[0].ident_list.append([p[3]])
             p[0].expr_list.append(scope_table[curr_scope].type_size_list[p[3]])
         else:
+            p[0].ast=["TypeList",p[1].ast,p[3].ast]
             p[0].ident_lList=p[1].ident_list
             p[0].expr_list=p[1].expr_list
             p[0].ident_list.append(p[3].type_list)
@@ -895,6 +1006,7 @@ def p_parameters(p):
         scope_table[0].update(curr_func,"takes",[["void"]])
         scope_table[0].update(curr_func,"total_param_size",0)
     else:
+        p[0].ast=p[2].ast
         scope_table[0].update(curr_func,"takes",p[2].expr_type_list)
         arg_offset = -8
         param_sum = 0
@@ -916,6 +1028,7 @@ def p_parameter_list(p):
     if len(p)==2:
         p[0] = p[1]
     else:
+        p[0].ast=["ParameterList",p[1].ast,p[3].ast]
         p[0].ident_list = p[1].ident_list
         p[0].ident_list += (p[3].ident_list)
         p[0].expr_type_list = p[1].expr_type_list
@@ -940,6 +1053,7 @@ def p_ParameterDecl(p):
                 errors.add_error(p.lineno(1), "Redeclaration of identifier "+x)
             else:
                 if(isinstance(p[2],str)):
+                    p[0].ast=["ParameterDecl",p[1].ast,[p[2]]]
                     var1 = create_temp(1)
                     scope_table[curr_scope].insert(x,[p[2]])
                     scope_table[curr_scope].insert(var1,x)
@@ -947,6 +1061,7 @@ def p_ParameterDecl(p):
                     p[0].expr_type_list.append([p[2]])
                     p[0].expr_list.append(scope_table[curr_scope].type_size_list[p[2]])
                 else:
+                    p[0].ast=["ParameterDecl",p[1].ast,p[2].ast]
                     var1 = create_temp(1)
                     scope_table[curr_scope].insert(x,p[2].type_list)
                     scope_table[curr_scope].insert(var1,x)
@@ -959,6 +1074,7 @@ def p_ParameterDecl(p):
         else:
             p[0].ident_list = [p[1]]
             if(isinstance(p[2],str)):
+                p[0].ast=["ParameterDecl",[p[1]],[p[2]]]
                 var1 = create_temp(1)
                 scope_table[curr_scope].insert(p[1], [p[2]])
                 scope_table[curr_scope].insert(var1,p[1])
@@ -966,6 +1082,7 @@ def p_ParameterDecl(p):
                 p[0].expr_type_list.append([p[2]])
                 p[0].expr_list.append(scope_table[curr_scope].type_size_list[p[2]])
             else:
+                p[0].ast=["ParameterDecl",[p[1]],p[2].ast]
                 var1 = create_temp(1)
                 scope_table[curr_scope].insert(p[1], p[2].type_list)
                 scope_table[curr_scope].insert(var1,p[1])
@@ -979,10 +1096,13 @@ def p_ParaIdentList(p):
                | ParaIdentList COMMA IDENT
     """
     p[0] = Node('ParaIdentList')
+
     if(isinstance(p[1],str)):
+        p[0].ast=["ParaIdentList",[p[1]],[p[2]]]
         p[0].ident_list.append(p[1])
         p[0].ident_list.append(p[3])
     else:
+        p[0].ast=["ParaIdentList",p[1].ast,[p[2]]]
         p[0].ident_list = p[1].ident_list
         p[0].ident_list.append(p[3])
 
@@ -1011,6 +1131,7 @@ def p_statement_list(p):
     |'''
     p[0] = Node('StatementList')
     if len(p)>1:
+        p[0].ast=["StatementList",p[1].ast,p[2].ast]
         p[0].code = p[1].code + p[2].code
 #############################
 def p_expression(p):
@@ -1038,6 +1159,7 @@ def p_expression(p):
         p[0] = p[1]
     else:
         p[0] = Node('Expression')
+        p[0].ast = [p[2], p[1].ast, p[3].ast]
         if len(p[1].expr_type_list)>1 or len(p[3].expr_type_list)>1:
             errors.add_error("Operation Error", p.lineno(1), "Can't apply binary operators to multiple values")
         if check_operation(p[1].expr_type_list[0], p[2], p[3].expr_type_list[0]) is None:
@@ -1067,6 +1189,7 @@ def p_unary_expr(p):
         p[0] = p[1]
     else:
         p[0] = Node('UnaryExp')
+        p[0].ast = [p[1], p[2].ast]
         if len(p[1].expr_type_list)>1:
             errors.add_error("Operation Error", p.lineno(1), "Can't apply binary operators to multiple values")
         if check_unary_operation(p[1].expr_type_list[0], p[2].expr_type_list[0]) is None:
@@ -1149,11 +1272,13 @@ def p_primary_expr(p):
             p[0].data["deref"]=1
 
     elif(len(p)==4 and p[2]=='.'):
+
         temp=p[1].expr_type_list[0][0]
         if(scope_table[curr_scope].table.get(temp)!=None and scope_table[curr_scope].table[temp]["type"]==["struct"]):
             if(scope_table[curr_scope].table[temp].get(p[3])==None):
                 errors.add_error("Struct Error", p.lineno(1), "No such attribute of given struct")
             p[0]=Node('PrimaryExpr')
+            p[0].ast=[p[2],p[1].ast,[p[2]]]
             p[0].expr_type_list.append(scope_table[curr_scope].table[temp][p[3]])
             p[0].data["memory"]=1
             p[0].code=p[1].code
@@ -1199,6 +1324,7 @@ def p_primary_expr(p):
         if(p[2].expr_type_list != scope_table[0].table[p[1].data["isID"]]["takes"]):
             errors.add_error("Error", p.lineno(1), "The arguments passed are not of the same type as the function")
         p[0]=Node('PrimaryExpr')
+        p[0].ast=['PrimaryExpr',p[1].ast,p[2].ast]
         p[0].expr_type_list=scope_table[0].table[p[1].data["isID"]]['return_type']
         if(p[0].expr_type_list[0][0]=="void"):
             p[0].expr_list=[]
@@ -1279,10 +1405,12 @@ def p_Arguments(p):
         p[0] = Node()
         p[0].data["arguments"] = 1
         p[0].expr_type_list.append(["void"])
+        p[0].ast=p[1].ast
     else:
         p[0] = p[2]
         p[0].data["arguments"] = 1
         p[0].expr_type_list=p[2].expr_type_list
+        p[0].ast=p[1].ast
 
 
 def p_literal(p):
@@ -1305,30 +1433,35 @@ def p_true_false_lit(p):
     p[0] = Node('TrueFalseLit')
     p[0].expr_type_list.append(["bool"])
     p[0].expr_list.append(p[1])
+    p[0].ast=[p[1]]
 
 def p_int_lit(p):
     '''IntLit : INT'''
     p[0] = Node('IntLit')
     p[0].expr_type_list.append(["int"])
     p[0].expr_list.append(p[1])
+    p[0].ast=[p[1]]
 
 def p_float_lit(p):
     '''FloatLit : FLOAT'''
     p[0] = Node('FloatLit')
     p[0].expr_type_list.append(["float"])
     p[0].expr_list.append(p[1])
+    p[0].ast=[p[1]]
 
 def p_rune_lit(p):
     '''RuneLit : RUNE'''
     p[0] = Node('RuneLit')
     p[0].expr_type_list.append(["rune"])
     p[0].expr_list.append(p[1])
+    p[0].ast=[p[1]]
 
 def p_string_lit(p):
     '''StringLit : STRING'''
     p[0] = Node('StringLit')
     p[0].expr_type_list.append(["string"])
     p[0].expr_list.append(p[1])
+    p[0].ast=[p[1]]
 
 
 # def p_composite_lit(p):
@@ -1416,6 +1549,10 @@ def p_inc_dec_stmt(p):
     '''IncDecStmt : Expression INCREMENT
                     | Expression DECREMENT'''
     p[0] = p[1]
+    if(p[2]=="++"):
+        p[0].ast=["++",p[1].ast]
+    else:
+        p[0].ast=["--",p[1].ast]
     if p[0].expr_type_list != [["int"]]:
         errors.add_error(p.lineno(1), "Type Mismatch: Cannot increment/decrement non-integer value")
     if p[1].data["memory"] == 0:
@@ -1441,6 +1578,7 @@ def p_inc_dec_stmt(p):
 def p_assignment(p):
     '''Assignment : ExpressionList assign_op ExpressionList'''
     p[0] = Node('Assignment')
+    p[0].ast=[p[2].ast,p[1].ast,p[3].ast]
     for i in range(0,len(p[3].expr_type_list)):
         if(p[2].data["op"] == "="):
             if  not ( p[1].expr_type_list[i][0] in basic_types_list or p[1].expr_type_list[i][0] == "pointer"):
@@ -1497,6 +1635,7 @@ def p_assign_op(p):
     p[0] = Node('AssignOp')
     p[0].expr_type_list.append([p[1]])
     p[0].data["op"] = p[1]
+    p[0].ast=[p[1]]
 
 def p_if_stmt(p):
     '''IfStmt : IF OpenScope Expression Block CloseScope
@@ -1510,6 +1649,7 @@ def p_if_stmt(p):
         if (p[3].expr_type_list[0][0] != "bool" and p[3].expr_type_list[0][0]!="int" and p[3].expr_type_list[0][0]!="float") or len(p[3].expr_type_list)>1:
             errors.add_error('Type Error', p.lineno(1), "The type of expression in if is not (boolean/int/float)")
         p[0] = Node('IfStmt')
+        p[0].ast=["IF",p[3].ast,p[4].ast]
         p[0].code += p[3].code
         label = create_label()
         p[0].code.append(['ifnot', p[3].expr_list[0], 'goto', label])
@@ -1520,6 +1660,7 @@ def p_if_stmt(p):
         if p[5].expr_type_list[0][0] != "bool" or len(p[5].expr_type_list)>1:
             errors.add_error('Type Error', p.lineno(1), "The type of expression in if is not boolean")
         p[0] = Node('IfStmt')
+        p[0].ast=["IF",p[3].ast,p[5].ast,p[6].ast]
         p[0].code += p[3].code
         p[0].code += p[5].code
         label = create_label()
@@ -1528,9 +1669,11 @@ def p_if_stmt(p):
         p[0].code.append([label, ': '])
 
     elif len(p) == 10:
+
         if p[3].expr_type_list[0][0] != "bool" or len(p[3].expr_type_list)>1:
             errors.add_error('Type Error', p.lineno(1), "The type of expression in if is not boolean")
         p[0] = Node('IfStmt')
+        p[0].ast=["IF",p[3].ast,p[4].ast,p[8].ast]
         p[0].code += p[3].code
         label1 = create_label()
         label2 = create_label()
@@ -1545,6 +1688,7 @@ def p_if_stmt(p):
         if p[5].expr_type_list[0][0] != "bool" or len(p[5].expr_type_list)>1:
             errors.add_error('Type Error', p.lineno(1), "The type of expression in if is not boolean")
         p[0] = Node('IfStmt')
+        p[0].ast=["IF",p[3].ast,p[5].ast,p[6].ast,p[9].ast]
         p[0].code += p[3].code
         p[0].code += p[5].code
         label1 = create_label()
@@ -1571,18 +1715,22 @@ def p_expr_switch_stmt(p):
     label = create_label(2)
     global curr_switch_type, end_for
     if len(p) == 7:
+        p[0].ast=["SWITCH",p[4].ast]
         p[0].code += p[4].code
     elif len(p) == 8:
+        p[0].ast=["SWITCH",p[2].ast,p[5].ast]
         p[0].code += p[2].code
         p[0].code += p[5].code
 
     elif len(p) == 10:
+        p[0].ast=["SWITCH",p[2].ast,p[4].ast,p[7].ast]
         p[0].code += p[2].code
         p[0].code += p[4].code
         p[0].code += p[7].code
     else:
         p[0].code += p[2].code
         p[0].code += p[6].code
+        p[0].ast=["SWITCH",p[2].ast,p[6].ast]
     p[0].code.append([end_for[-1], ': '])
     end_for = end_for[0: -1]
 
@@ -1604,6 +1752,7 @@ def p_expr_case_clause_star(p):
     | ExprCaseClause'''
     if len(p) > 2:
         p[0] = p[1]
+        p[0].ast=["ExprCaseClauseStar",p[1].ast,p[2].ast]
         p[0].code += p[2].code
     else:
         p[0] = p[1]
@@ -1614,9 +1763,11 @@ def p_expr_case_clause(p):
     | DEFAULT COLON OpenScope StatementList CloseScope'''
     if len(p) == 6:
         p[0] = Node('DefClause')
+        p[0].ast=["DEFAULT",p[4].ast]
         p[0].code += p[4].code
     else:
         p[0] = Node('ExprCaseClause')
+        p[0].ast=["CASE",p[3].ast,p[5].ast]
         for i in range(0,len(p[3].expr_type_list)):
             if p[3].expr_type_list[i][0]!="int" and p[3].expr_type_list[i][0]!="rune":
                 errors.add_error('Type Error', p.lineno(1), "The type of expression in switch is not an integer or rune")
@@ -1641,6 +1792,7 @@ def p_for_stmt(p):
     p[0] = Node("ForStmt")
     p[0].code.append([start_for[-1], ': '])
     if len(p)==8 and p[4].data.get("forclause") is not None:
+        p[0].ast=["FOR",p[4].ast,p[5].ast]
         p[0].code = p[4].code
         p[0].code += p[5].code
         p[0].code += p[4].data["for_label_pass"]
@@ -1651,6 +1803,7 @@ def p_for_stmt(p):
     #     p[0].code += p[4].data["for_label_pass"] 
 
     elif len(p)==8:
+        p[0].ast=["FOR",p[4].ast,p[5].ast]
         if len(p[4].expr_type_list)>1 or p[4].expr_type_list[0][0]!="bool":
             errors.add_error('Type Error', p.lineno(1), "The type of expression in for loop is not a boolean")
         label1 = create_label()
@@ -1664,6 +1817,7 @@ def p_for_stmt(p):
         p[0].code.append([label1,":"])
 
     else:
+        p[0].ast=["FOR",p[4].ast,]
         label1 = create_label()
         p[0].code.append([label1,":"])
         p[0].code += p[4].code
@@ -1686,6 +1840,7 @@ def p_for_clause(p):
     label1 = create_label()
     p[0].code.append([label1,":"])
     if len(p)==6:
+        p[0].ast=["ForClause",p[1].ast,p[3].ast,p[5].ast]
         label2=create_label()
         p[0].code += p[3].code
         p[0].code.append(["ifnot", p[3].expr_list[0],"goto",label2])
@@ -1694,6 +1849,7 @@ def p_for_clause(p):
         p[0].data["for_label_pass"].append(["goto",label1])
         p[0].data["for_label_pass"].append([label2,":"])
     else:
+        p[0].ast=["ForClause",p[1].ast,p[4].ast]
         p[0].data["for_label_pass"] = []
         p[0].data["for_label_pass"] += p[4].code
         p[0].data["for_label_pass"].append(["goto",label1])
@@ -1725,7 +1881,9 @@ def p_returnstmt(p):
 
     if len(p) == 2:
         p[0].code = [["return"]]
+        p[0].ast=["return"]
     else:
+        p[0].ast=["return",p[2].ast]
         p[0].code = p[2].code +  [["return"]]
         
 
@@ -1739,6 +1897,10 @@ def p_break_stmt(p):
         errors.add_error('Scope Error', p.lineno(1), "Break statement can only exist inside a loop")
     p[0] = Node('BreakStmt')
     p[0].code.append(['goto', end_for[-1]])
+    if len(p)==2:
+        p[0].ast=["Break"]
+    else:
+        p[0].ast=["Break",[p[2]]]
 #-------------------------------------
 def p_continue_stmt(p):
     '''ContinueStmt : CONTINUE IDENT
@@ -1747,6 +1909,10 @@ def p_continue_stmt(p):
         errors.add_error('Scope Error', p.lineno(1), "Continue statement can only exist inside a loop")
     p[0] = Node('ContinueStmt')
     p[0].code.append(['goto', start_for[-1]])
+    if len(p)==2:
+        p[0].ast=["Continue"]
+    else:
+        p[0].ast=["Continue",[p[2]]]
 
 # def p_goto_stmt(p):
 #     '''GotoStmt : GOTO IDENT'''

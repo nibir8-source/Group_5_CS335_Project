@@ -1,0 +1,31 @@
+digraph graphname {
+0[label="SourceFile" ] ;1[label="main" ] ;0->1;
+0[label="SourceFile" ] ;2[label="ImportDeclStar" ] ;0->2;
+2[label="ImportDeclStar" ] ;3[label="fmt" ] ;2->3;
+0[label="SourceFile" ] ;4[label="TopLevelDeclStar" ] ;0->4;
+4[label="TopLevelDeclStar" ] ;5[label="TopLevelDeclStar" ] ;4->5;
+5[label="TopLevelDeclStar" ] ;6[label="=" ] ;5->6;
+6[label="=" ] ;7[label="IdentifierList" ] ;6->7;
+7[label="IdentifierList" ] ;8[label="a" ] ;7->8;
+7[label="IdentifierList" ] ;9[label="IdentifierList" ] ;7->9;
+9[label="IdentifierList" ] ;10[label="b" ] ;9->10;
+9[label="IdentifierList" ] ;11[label="c" ] ;9->11;
+6[label="=" ] ;12[label="int" ] ;6->12;
+6[label="=" ] ;13[label="ExpressionList" ] ;6->13;
+13[label="ExpressionList" ] ;14[label="ExpressionList" ] ;13->14;
+14[label="ExpressionList" ] ;15[label="10" ] ;14->15;
+14[label="ExpressionList" ] ;16[label="20" ] ;14->16;
+13[label="ExpressionList" ] ;17[label="30" ] ;13->17;
+4[label="TopLevelDeclStar" ] ;18[label="FUNCTION" ] ;4->18;
+18[label="FUNCTION" ] ;19[label="main" ] ;18->19;
+18[label="FUNCTION" ] ;20[label="Parameters" ] ;18->20;
+18[label="FUNCTION" ] ;21[label="StatementList" ] ;18->21;
+21[label="StatementList" ] ;22[label="IF" ] ;21->22;
+22[label="IF" ] ;23[label=">" ] ;22->23;
+23[label=">" ] ;24[label="5" ] ;23->24;
+23[label=">" ] ;25[label="3" ] ;23->25;
+22[label="IF" ] ;26[label="StatementList" ] ;22->26;
+26[label="StatementList" ] ;27[label=":=" ] ;26->27;
+27[label=":=" ] ;28[label="l" ] ;27->28;
+27[label=":=" ] ;29[label="10" ] ;27->29;
+}

@@ -7,6 +7,7 @@ class Node:
         self.expr_list = []
         self.expr_type_list = []
         self.data = {}
+        self.ast = []
 
 
 class SymTable:
