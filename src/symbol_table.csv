@@ -10,14 +10,14 @@ Table Number,1
 Parent,1,=,0
 
 main,{'type': ['func']}
-n,"{'type': ['int'], 'tmp': 'var_temp_no#0', 'offset': 0}"
-var_temp_no#0,{'type': 'n'}
-m,"{'type': ['int'], 'tmp': 'var_temp_no#1', 'offset': 4}"
-var_temp_no#1,{'type': 'm'}
-l,"{'type': ['float'], 'tmp': 'var_temp_no#2', 'offset': 8}"
-var_temp_no#2,{'type': 'l'}
-p,"{'type': ['string'], 'tmp': 'var_temp_no#3', 'offset': 12}"
-var_temp_no#3,{'type': 'p'}
-temp_no#4,{'type': 'temp'}
-temp_no#5,{'type': 'temp'}
-temp_no#6,{'type': 'temp'}
+
+Table Number,2
+
+Parent,2,=,1
+
+main,{'type': ['func']}
+temp_no#0,{'type': 'temp'}
+temp_no#1,{'type': 'temp'}
+temp_no#2,{'type': 'temp'}
+m,"{'type': ['int'], 'tmp': 'var_temp_no#3', 'offset': 0}"
+var_temp_no#3,{'type': 'm'}
