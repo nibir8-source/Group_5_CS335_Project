@@ -1,23 +1,13 @@
-package main;
-
-import "fmt";
-import "math";
-import "string";
-
-type Address struct {
-    Name    string;
-    city    string;
-    Pincode int;
-};
+package main
+import "ghth"
+func mulReturn (a string) (string,string){
+    var x,y string
+    x=a
+    y=a
+    return x,y
+}
 func main(){
-	// all type of variable Decl
-	var a1 int;
-	var  a2,a3,a4 int =20,30,40;
-	var a5,a6 Address ;
-	var a7,a8  =1,2;
-
-	
-	 
-
-
+    var a string ="ufsrhgihgi"
+    var b1,c string
+    (b1),c=mulReturn(a)
 };

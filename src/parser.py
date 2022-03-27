@@ -1435,12 +1435,13 @@ def p_primary_expr(p):
         p[0] = p[1]
         p[0].data["memory"] = 0
         p[0].expr_list = p[1].expr_list
+
     elif len(p) == 2:
         if(presence_of_identifier(p[1], "declared_anywhere") == False):
             errors.add_error("Undeclared Error", p.lineno(
                 1), "Variable "+p[1]+" is not declared")
         p[0] = Node('PrimaryExpr')
-        p[0].ast = p[1]
+        p[0].ast = [p[1]]
         p[0].expr_type_list.append(scope_table[presence_of_identifier(
             p[1], "declared_anywhere")].table[p[1]]["type"])
         p[0].data["memory"] = 1
@@ -1609,6 +1610,7 @@ def p_Arguments(p):
         p[0].expr_type_list.append(["void"])
         p[0].ast = p[1].ast
     else:
+        # print("hello")
         p[0] = p[2]
         p[0].data["arguments"] = 1
         p[0].expr_type_list = p[2].expr_type_list
