@@ -966,8 +966,7 @@ def p_field_decl(p):
         if isinstance(p[4], str):
             p[0].ast = ["FieldDecl", [p[1]], p[3].ast, [p[4]]]
             if p[1] in struct_sym_list:
-                errors.add_error('Redeclaration Error', p.lineno(
-                    1), "This identifier is already declared in this list")
+                errors.add_error('Redeclaration Error', line_number.get()+1, "This identifier is already declared in this list")
             struct_sym_list.append(p[1])
             scope_table[curr_scope].update(curr_struct, p[1], [p[4]])
             scope_table[curr_scope].update(
