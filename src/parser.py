@@ -499,7 +499,6 @@ def p_const_spec(p):
         p[0] = p[1]
     elif len(p) == 5:
         p[0].ast = ["=", p[1].ast, [p[2]], p[4].ast]
-        print(p[0].ast)
         if len(p) == 5 and p[2] not in basic_types_list:
             errors.add_error("Type Error", p.lineno(
                 2), "Invalid type for constant " + p[2])
@@ -690,7 +689,6 @@ def p_var_spec(p):
     elif (len(p) == 5 and isinstance(p[2], str)):
 
         p[0].ast = ["VarSpec Assignment", p[1].ast, [p[2]], p[4].ast]
-        print(p[0].ast)
     else:
         p[0].ast = ["VarSpec Assignment", p[1].ast, p[2].ast, p[4].ast]
 
@@ -1105,7 +1103,7 @@ def p_result(p):
         scope_table[0].update(curr_func, 'total_return_size', 0)
         scope_table[0].update(curr_func, 'return_size_list', [])
     else:
-        p[0].ast = ["Result", p[1].ast]
+        p[0].ast = ["Result", p[2].ast]
         scope_table[0].update(curr_func, 'return_type', p[2].ident_list)
         total_sum = -8 - scope_table[0].table[curr_func]["total_param_size"]
         return_list = []
@@ -1369,7 +1367,7 @@ def p_unary_expr(p):
         p[0] = p[1]
     else:
         p[0] = Node('UnaryExp')
-        p[0].ast = [p[1], p[2].ast]
+        p[0].ast = [p[1].ast, p[2].ast]
         if len(p[1].expr_type_list) > 1:
             errors.add_error("Operation Error", p.lineno(
                 1), "Can't apply binary operators to multiple values")
@@ -1418,6 +1416,7 @@ def p_unary_op(p):
     | ARROW'''
     p[0] = Node('UnaryOp')
     p[0].expr_type_list.append([p[1]])
+    p[0].ast = p[1]
 
 
 def p_primary_expr(p):
@@ -1469,7 +1468,7 @@ def p_primary_expr(p):
                 errors.add_error("Struct Error", p.lineno(
                     1), "No such attribute of given struct")
             p[0] = Node('PrimaryExpr')
-            p[0].ast = [p[2], p[1].ast, [p[2]]]
+            p[0].ast = [p[2], p[1].ast, [p[3]]]
             p[0].expr_type_list.append(
                 scope_table[curr_scope].table[temp][p[3]])
             p[0].data["memory"] = 1
@@ -1611,7 +1610,7 @@ def p_Arguments(p):
         p[0] = p[2]
         p[0].data["arguments"] = 1
         p[0].expr_type_list = p[2].expr_type_list
-        p[0].ast = p[1].ast
+        p[0].ast = p[2].ast
 
 
 def p_literal(p):
@@ -2089,7 +2088,7 @@ def p_for_clause(p):
 
     p[0] = Node('ForClause')
     p[0].data["forclause"] = 1
-    if len(p) == 6 and len(p[3].expr_type_list) > 1 or p[3].expr_type_list[0][0] != "bool":
+    if len(p) == 6 and (len(p[3].expr_type_list) > 1 or p[3].expr_type_list[0][0] != "bool"):
         errors.add_error('Type Error', p.lineno(
             1), "The type of expression in for loop is not a boolean")
     p[0].code = p[1].code

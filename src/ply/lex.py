@@ -206,16 +206,14 @@ class Lexer:
         lexlen    = self.lexlen
         lexignore = self.lexignore
         lexdata   = self.lexdata
-
-        if self.prev_token != None:
-            print(f'{self.prev_token.value} {self.prev_token.type} {self.prev_token.lineno}')
+        # if self.prev_token != None:
+        #     print(f'{lexpos} {self.prev_token.value} {self.prev_token.type} {self.prev_token.lineno}')
 #nibir
         while lexpos < lexlen:
             # This code provides some short-circuit code for whitespace, tabs, and other ignored characters
             if lexdata[lexpos] in lexignore:
                 if lexdata[lexpos] == '\n':
-                    # print(self.prev_token.type)
-                    if self.prev_token.type == "IDENT" or self.prev_token.type == "NUMBER" or self.prev_token.type == "FLOAT" or self.prev_token.type == "STRING"\
+                    if self.prev_token.type == "IDENT" or self.prev_token.type == "INT" or self.prev_token.type == "FLOAT" or self.prev_token.type == "STRING"\
                     or self.prev_token.type == "RUNE" or self.prev_token.type == "IMAGINARY" or self.prev_token.type == "BREAK" or self.prev_token.type == "CONTINUE"\
                     or self.prev_token.type == "RETURN" or self.prev_token.type == "INCREMENT" or self.prev_token.type == "DECREMENT" or self.prev_token.type == "RIGHT_PARENTHESIS"\
                     or self.prev_token.type == "RIGHT_BRACKET" or self.prev_token.type == "RIGHT_BRACE":
@@ -229,7 +227,6 @@ class Lexer:
                         lexdata = self.lexdata
                         lexlen += 1
                         self.lexlen += 1
-                        self.lineno += 1
                         continue
                     self.lineno += 1
 

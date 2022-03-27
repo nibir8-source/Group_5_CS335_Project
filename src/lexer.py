@@ -10,7 +10,7 @@ keywords = {
     'func'         :    'FUNCTION',
     'case'         :    'CASE',
     'struct'       :    'STRUCT',
-    'goto'         :    'GOTO',
+    # 'goto'         :    'GOTO',
     'else'         :    'ELSE',
     'package'      :    'PACKAGE',
     'switch'       :    'SWITCH',
