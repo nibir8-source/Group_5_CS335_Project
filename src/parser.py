@@ -54,7 +54,7 @@ struct_off = 0
 curr_func_scope = 0
 offset_list = [0]
 struct_sym_list = []
-basic_types_list=["int","float","rune","string","bool"]
+basic_types_list=["int","float","rune","string","bool","imaginary"]
 
 
 
@@ -163,6 +163,12 @@ def check_operation(expr_1, op, expr_2):
             if op == "|" or op == "^" or op == "<<" or op == ">>" or op == "%" or op == "&" or op=="&^":
                 return None
             return ["float"]
+        if (expr_1=="imaginary" and expr_2=="int") or (expr_1=="imaginary" and expr_2=="float") or (expr_1=="int" and expr_2=="imaginary") or (expr_1=="float" and expr_2=="imaginary"):
+            if op == ">" or op =="<" or op==">=" or op=="<=" or op == "|" or op == "^" or op == "<<" or op == ">>" or op == "%" or op == "&" or op=="&^":
+                return None
+            if op == "==" or op == "!=":
+                return ["bool"]
+            return ["imaginary"]
 
         
         return None
@@ -189,13 +195,22 @@ def check_operation(expr_1, op, expr_2):
         else:
             return None
 
+    if expr_1 == "imaginary":
+        if op == "+" or op == "-" or op == "*" or op == "/":
+            return [expr_1]
+        elif op == "!=" or op == "==":
+            return ["bool"]
+        else:
+            return None
+    
+
 def check_unary_operation(unop, exp1):
     unop=unop[0]
     if unop=="+" or unop=="-":
         if(len(exp1)>1):
             return None
         exp1 = exp1[0]
-        if exp1=="int" or exp1=="float" or exp1=="rune":
+        if exp1=="int" or exp1=="float" or exp1=="rune" or exp1=="imaginary":
             return [exp1]
         else:
             return None
@@ -604,9 +619,10 @@ def p_var_spec(p):
     if (len(p)==5):
         for i in range(0,len(p[4].expr_type_list)):
             if(not (p[4].expr_type_list[i][0] in basic_types_list or p[4].expr_type_list[i][0]=="pointer")):
-                errors.add_error('Type Error', p.lineno(1), 'Invalid Assignemnt')
+                errors.add_error('Type Error', p.lineno(1), 'Invalid Assignment')
 
     if(isinstance(p[2],str) and p[2]!="=" and not p[2] in scope_table[curr_scope].type_list):
+        print(scope_table[curr_scope].type_list)
         errors.add_error('Type Error', p.lineno(1), 'Invalid type of identifier')
 
     if len(p)==5 or len(p)==3:
@@ -1423,9 +1439,16 @@ def p_basic_lit(p):
     | FloatLit
     | RuneLit
     | StringLit
-    | TrueFalseLit'''
-    # | IMAGINARY 
+    | TrueFalseLit
+    | ImaginaryLit''' 
     p[0] = p[1]
+
+def p_imaginary_lit(p):
+    '''ImaginaryLit : IMAGINARY'''
+    p[0] = Node('ImaginaryLit')
+    p[0].expr_type_list.append(["imaginary"])
+    p[0].expr_list.append(p[1])
+    p[0].ast=[p[1]]
 
 def p_true_false_lit(p):
     '''TrueFalseLit : TRUE

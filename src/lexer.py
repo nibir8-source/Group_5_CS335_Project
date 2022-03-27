@@ -12,8 +12,6 @@ keywords = {
     'struct'       :    'STRUCT',
     'goto'         :    'GOTO',
     'else'         :    'ELSE',
-    'map'          :    'MAP',
-    'fallthrough'  :    'FALLTHROUGH',
     'package'      :    'PACKAGE',
     'switch'       :    'SWITCH',
     'const'        :    'CONSTANT',
