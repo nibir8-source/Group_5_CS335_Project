@@ -452,10 +452,10 @@ def p_StructName(p):
     curr_struct = p[1]
     struct_off = 0
     if p[1] in scope_table[curr_scope].type_list:
-        errors.add_error('Redeclaration Error', p.lineno(1),
+        errors.add_error('Redeclaration Error', line_number.get()+1,
                          "Redeclaration of type " + p[1])
     if p[1] in scope_table[curr_scope].table:
-        errors.add_error('Redeclaration Error', p.lineno(1),
+        errors.add_error('Redeclaration Error', line_number.get()+1,
                          "Redeclaration of variable " + p[1])
     scope_table[curr_scope].insert(p[1], ["struct"])
 
@@ -500,15 +500,12 @@ def p_const_spec(p):
     elif len(p) == 5:
         p[0].ast = ["=", p[1].ast, [p[2]], p[4].ast]
         if len(p) == 5 and p[2] not in basic_types_list:
-            errors.add_error("Type Error", p.lineno(
-                2), "Invalid type for constant " + p[2])
+            errors.add_error("Type Error", line_number.get()+1, "Invalid type for constant " + p[2])
         if len(p[1].ident_list) != len(p[4].expr_list):
-            errors.add_error("Imbalaced assignment", p.lineno(
-                1), "Identifier and Expression list length is not equal")
+            errors.add_error("Imbalaced assignment", line_number.get()+1, "Identifier and Expression list length is not equal")
         for x in p[1].ident_list:
             if presence_of_identifier(x, 'Isredeclared') == True:
-                errors.add_error("Redeclaration error", p.lineno(
-                    1), "Redeclaration of variable " + x)
+                errors.add_error("Redeclaration error", line_number.get()+1, "Redeclaration of variable " + x)
             else:
                 var1 = create_temp(1)
                 scope_table[curr_scope].insert(x, [p[2]])
@@ -521,8 +518,7 @@ def p_const_spec(p):
 
         for i in range(0, len(p[1].ident_list)):
             if p[4].expr_type_list[i] != scope_table[curr_scope].table[p[1].ident_list[i]]["type"]:
-                errors.add_error("Type Error", p.lineno(
-                    1), "Type mismatch in assignment")
+                errors.add_error("Type Error", line_number.get()+1, "Type mismatch in assignment")
 
         for i in range(0, len(p[1].ident_list)):
             temp = [scope_table[curr_scope].table[p[1].ident_list[i]]["tmp"], "="]
@@ -533,12 +529,10 @@ def p_const_spec(p):
     elif(len(p) == 4):
         p[0].ast = ["=", p[1].ast, p[3].ast]
         if len(p[1].ident_list) != len(p[3].expr_list):
-            errors.add_error("Imbalaced assignment", p.lineno(
-                1), "Identifier and Expression list length is not equal")
+            errors.add_error("Imbalaced assignment", line_number.get()+1, "Identifier and Expression list length is not equal")
         for i in range(0, len(p[1].ident_list)):
             if presence_of_identifier(p[1].ident_list[i], 'Isredeclared') == True:
-                errors.add_error("Redeclaration error", p.lineno(
-                    1), "Redeclaration of variable " + p[1].ident_list)
+                errors.add_error("Redeclaration error", line_number.get()+1, "Redeclaration of variable " + p[1].ident_list)
             else:
                 var1 = create_temp(1)
                 scope_table[curr_scope].insert(
@@ -552,8 +546,7 @@ def p_const_spec(p):
                     p[1].ident_list[i], 'constant', True)
         for i in range(0, len(p[1].ident_list)):
             if p[3].expr_type_list[i] != scope_table[curr_scope].table[p[1].ident_list[i]]["type"]:
-                errors.add_error("Type Error", p.lineno(
-                    1), "Type mismatch in assignment")
+                errors.add_error("Type Error", line_number.get()+1, "Type mismatch in assignment")
         for i in range(0, len(p[1].ident_list)):
             temp = [scope_table[curr_scope].table[p[1].ident_list[i]]["tmp"], "="]
             if(p[3].data["dereflist"][i] == 1):
@@ -695,18 +688,16 @@ def p_var_spec(p):
     if (len(p) == 5):
         for i in range(0, len(p[4].expr_type_list)):
             if(not (p[4].expr_type_list[i][0] in basic_types_list or p[4].expr_type_list[i][0] == "pointer")):
-                errors.add_error('Type Error', p.lineno(1),
+                errors.add_error('Type Error', line_number.get()+1,
                                  'Invalid Assignemnt')
 
     if(isinstance(p[2], str) and p[2] != "=" and not p[2] in scope_table[curr_scope].type_list):
-        errors.add_error('Type Error', p.lineno(
-            1), 'Invalid type of identifier')
+        errors.add_error('Type Error', line_number.get()+1, 'Invalid type of identifier')
 
     if len(p) == 5 or len(p) == 3:
         for x in p[1].ident_list:
             if presence_of_identifier(x, 'Isredeclared') == True and x != "_":
-                errors.add_error('Redeclaration Error', p.lineno(
-                    1), 'Redeclaration of identifier:'+x)
+                errors.add_error('Redeclaration Error', line_number.get()+1, 'Redeclaration of identifier:'+x)
             else:
                 if(isinstance(p[2], str)):
                     var1 = create_temp(1)
@@ -727,12 +718,11 @@ def p_var_spec(p):
 
     if len(p) == 5:
         if len(p[1].ident_list) != len(p[4].expr_type_list):
-            errors.add_error('Assignment Error', p.lineno(1),
+            errors.add_error('Assignment Error', line_number.get()+1,
                              "Imbalanced assignment")
         for i in range(0, len(p[1].ident_list)):
             if(p[4].expr_type_list[i] != scope_table[curr_scope].table[p[1].ident_list[i]]["type"]):
-                errors.add_error('Type Error', p.lineno(
-                    1), "Mismatch of type for "+p[1].ident_list[i])
+                errors.add_error('Type Error', line_number.get()+1, "Mismatch of type for "+p[1].ident_list[i])
         # p[0] = Node('VarSpec')
         p[0].code = p[1].code+p[4].code
         for i in range(0, len(p[1].ident_list)):
@@ -745,18 +735,15 @@ def p_var_spec(p):
     if len(p) == 4:
         print("hello")
         if(len(p[1].ident_list) != len(p[3].expr_type_list)):
-            errors.add_error('Assignment Error', p.lineno(1),
+            errors.add_error('Assignment Error', line_number.get()+1,
                              "Imbalanced Assignment")
         for i in range(0, len(p[1].ident_list)):
             if len(p[3].expr_type_list[i]) > 1:
-                errors.add_error('Assignment Error', p.lineno(
-                    1), "Auto assignment of complex expressions not allowed")
+                errors.add_error('Assignment Error', line_number.get()+1, "Auto assignment of complex expressions not allowed")
             if not p[3].expr_type_list[i][0] in basic_types_list:
-                errors.add_error('Assignment Error', p.lineno(
-                    1), "Auto assignment of only basic types allowed")
+                errors.add_error('Assignment Error', line_number.get()+1, "Auto assignment of only basic types allowed")
             if presence_of_identifier(p[1].ident_list[i], 'Isredeclared') is True and p[1].ident_list[i] != "_":
-                errors.add_error('Redeclaration Error', p.lineno(
-                    1), 'Redeclaration of identifier: '+p[1].ident_list[i])
+                errors.add_error('Redeclaration Error', line_number.get()+1, 'Redeclaration of identifier: '+p[1].ident_list[i])
             var1 = create_temp(1)
             scope_table[curr_scope].insert(
                 p[1].ident_list[i], p[3].expr_type_list[i])
@@ -781,18 +768,15 @@ def p_short_var_decl(p):
     '''ShortVarDecl : IdentifierList DEFINE ExpressionList'''
 
     if(len(p[1].ident_list) != len(p[3].expr_type_list)):
-        errors.add_error('Assignment Error', p.lineno(1),
+        errors.add_error('Assignment Error', line_number.get()+1,
                          "Imbalanced Assignment")
     for i in range(0, len(p[1].ident_list)):
         if len(p[3].expr_type_list[i]) > 1:
-            errors.add_error('Assignment Error', p.lineno(
-                1), "Auto assignment of complex expressions not allowed")
+            errors.add_error('Assignment Error', line_number.get()+1, "Auto assignment of complex expressions not allowed")
         if not p[3].expr_type_list[i][0] in basic_types_list:
-            errors.add_error('Assignemnt Error', p.lineno(
-                1), "Auto assignment of only basic types allowed")
+            errors.add_error('Assignemnt Error', line_number.get()+1, "Auto assignment of only basic types allowed")
         if presence_of_identifier(p[1].ident_list[i], 'Isredeclared') is True and p[1].ident_list[i] != "_":
-            errors.add_error('Assignment Error', p.lineno(
-                1), 'Redeclaration of identifier:'+p[1].ident_list[i])
+            errors.add_error('Assignment Error', line_number.get()+1, 'Redeclaration of identifier:'+p[1].ident_list[i])
         var1 = create_temp(1)
         scope_table[curr_scope].insert(
             p[1].ident_list[i], p[3].expr_type_list[i])
@@ -838,7 +822,7 @@ def p_function_name(p):
     p[0].ast = [p[1]]
     global curr_func
     if presence_of_identifier(p[1], 'Isredeclared') == True:
-        errors.add_error("Redecleration", p.lineno(1), p[1]+" is redeclared")
+        errors.add_error("Redecleration", line_number.get()+1, p[1]+" is redeclared")
     scope_table[0].insert(p[1], ["func"])
     scope_table[0].update(p[1], "scope", curr_func_scope)
     p[0].code.append([p[1], ":"])
@@ -856,8 +840,7 @@ def p_type(p):
         p[0] = p[1]
     else:
         if isinstance(p[2], str) and not p[2] in scope_table[curr_scope].type_list:
-            errors.add_error('Type Error', p.lineno(
-                1), "Invalid type of identifier "+p[2])
+            errors.add_error('Type Error', line_number.get()+1, "Invalid type of identifier "+p[2])
         if isinstance(p[2], str):
             p[0] = Node('Type')
             p[0].ast = [p[2]]
@@ -882,8 +865,7 @@ def p_array_type(p):
                 | LEFT_BRACKET INT RIGHT_BRACKET IDENT'''
     # | LEFT_BRACKET Expression RIGHT_BRACKET IDENT PERIOD IDENT'''
     if isinstance(p[4], str) and not p[4] in scope_table[curr_scope].type_list:
-        errors.add_error('Type Error', p.lineno(
-            1), "This type hasn't been declared yet "+p[4])
+        errors.add_error('Type Error', line_number.get()+1, "This type hasn't been declared yet "+p[4])
     temp = int(p[2])
     p[0] = Node('ArrayType')
     if isinstance(p[4], str):
@@ -965,8 +947,7 @@ def p_field_decl(p):
         if(isinstance(p[2], str)):
             p[0].ast = ["FieldDecl", [p[1]], [p[2]]]
             if(p[1] in struct_sym_list):
-                errors.add_error('Redeclaration Error', p.lineno(
-                    1), "This identifier is already declared in this list")
+                errors.add_error('Redeclaration Error', line_number.get()+1, "This identifier is already declared in this list")
             struct_sym_list.append(p[1])
             scope_table[curr_scope].update(curr_struct, p[1], [p[2]])
             scope_table[curr_scope].update(
@@ -975,8 +956,7 @@ def p_field_decl(p):
         else:
             p[0].ast = ["FieldDecl", [p[1]], p[2].ast]
             if(p[1] in struct_sym_list):
-                errors.add_error('Redeclaration Error', p.lineno(
-                    1), "This identifier is already declared in this list")
+                errors.add_error('Redeclaration Error', line_number.get()+1, "This identifier is already declared in this list")
             struct_sym_list.append(p[1])
             scope_table[curr_scope].update(curr_struct, p[1], p[2].type_list)
             scope_table[curr_scope].update(
@@ -995,8 +975,7 @@ def p_field_decl(p):
             struct_off += scope_table[curr_scope].type_size_list[p[4]]
             for x in p[3].ident_list:
                 if(x in struct_sym_list):
-                    errors.add_error('Redeclaration Error', p.lineno(
-                        1), "This identifier is already declared in this list")
+                    errors.add_error('Redeclaration Error', line_number.get()+1, "This identifier is already declared in this list")
                 struct_sym_list.append(x)
                 scope_table[curr_scope].update(curr_struct, x, [p[4]])
                 scope_table[curr_scope].update(
@@ -1005,8 +984,7 @@ def p_field_decl(p):
         else:
             p[0].ast = ["FieldDecl", [p[1]], p[3].ast, p[4].ast]
             if(p[1] in struct_sym_list):
-                errors.add_error('Redeclaration Error', p.lineno(
-                    1), "This identifier is already declared in this list")
+                errors.add_error('Redeclaration Error', line_number.get()+1, "This identifier is already declared in this list")
             struct_sym_list.append(p[1])
             scope_table[curr_scope].update(curr_struct, p[1], p[4].type_list)
             scope_table[curr_scope].update(
@@ -1014,8 +992,7 @@ def p_field_decl(p):
             struct_off += p[4].data["typesize"]
             for x in p[3].ident_list:
                 if x in struct_sym_list:
-                    errors.add_error('Redeclaration Error', p.lineno(
-                        1), "This identifier is already declared in this list")
+                    errors.add_error('Redeclaration Error', line_number.get()+1, "This identifier is already declared in this list")
                 struct_sym_list.append(x)
                 scope_table[curr_scope].update(curr_struct, x, p[4].type_list)
                 scope_table[curr_scope].update(
@@ -1024,8 +1001,7 @@ def p_field_decl(p):
     elif len(p) == 5:
         p[0].ast = ["FieldDecl", [p[1]], "STRUCT", [p[3]], [p[4]]]
         if(p[4] != curr_struct):
-            errors.add_error('Struct Error', p.lineno(
-                1), "The identifier should be the current struct")
+            errors.add_error('Struct Error', line_number.get()+1, "The identifier should be the current struct")
         struct_sym_list.append(p[1])
         scope_table[curr_scope].update(
             curr_struct, p[1], ["pointer", curr_struct])
@@ -1034,15 +1010,13 @@ def p_field_decl(p):
     else:
         p[0].ast = ["FieldDecl", [p[1]], p[3].ast, "STRUCT", [p[5]], [p[6]]]
         if p[6] != curr_struct:
-            errors.add_error('Struct Error', p.lineno(
-                1), "The identifier should be the current struct")
+            errors.add_error('Struct Error', line_number.get()+1, "The identifier should be the current struct")
         struct_sym_list.append(p[1])
         scope_table[curr_scope].update(
             curr_struct, p[1], ["pointer", curr_struct])
         for x in p[3].ident_list:
             if(x in struct_sym_list):
-                errors.add_error('Redeclaration Error', p.lineno(
-                    1), "This identifier is already declared in this list")
+                errors.add_error('Redeclaration Error', line_number.get()+1, "This identifier is already declared in this list")
             struct_sym_list.append(x)
             scope_table[curr_scope].update(
                 curr_struct, x, ["pointer", curr_struct])
@@ -1071,8 +1045,7 @@ def p_pointer_type(p):
         | MULTIPLY IDENT'''
     # | MULTIPLY IDENT PERIOD IDENT'''
     if isinstance(p[2], str) and not p[2] in scope_table[curr_scope].type_list:
-        errors.add_error('Type Error', p.lineno(
-            1), "Invalid type of identifier "+p[2])
+        errors.add_error('Type Error', line_number.get()+1, "Invalid type of identifier "+p[2])
     p[0] = Node('PointerType')
 
     p[0].type_list.append("pointer")
@@ -1124,9 +1097,9 @@ def p_TypeList(p):
     | IDENT
     | Type"""
     if(isinstance(p[1], str) and not p[1] in scope_table[curr_scope].type_list):
-        errors.add_error(p.lineno(1), "Invalid return type")
+        errors.add_error(line_number.get()+1, "Invalid return type")
     if len(p) == 4 and isinstance(p[3], str) and not p[3] in scope_table[curr_scope].type_list:
-        errors.add_error(p.lineno(3), "Invalid return type")
+        errors.add_error(line_number.get()+1, "Invalid return type")
     p[0] = Node('TypeList')
     if(len(p) == 2):
         if(isinstance(p[1], str)):
@@ -1199,7 +1172,7 @@ def p_ParameterDecl(p):
     | IDENT IDENT
     | IDENT Type"""
     if isinstance(p[2], str) and not p[2] in scope_table[curr_scope].type_list:
-        errors.add_error(p.lineno(2), "Invalid type of identifier "+p[2])
+        errors.add_error(line_number.get()+1, "Invalid type of identifier "+p[2])
 
     p[0] = Node('ParameterDecl')
     flag = 0
@@ -1207,7 +1180,7 @@ def p_ParameterDecl(p):
         p[0].ident_list = p[1].ident_list
         for x in p[1].ident_list:
             if presence_of_identifier(x, 'Isredeclared') == True and x != "_":
-                errors.add_error(p.lineno(1), "Redeclaration of identifier "+x)
+                errors.add_error(line_number.get()+1, "Redeclaration of identifier "+x)
             else:
                 if(isinstance(p[2], str)):
                     p[0].ast = ["ParameterDecl", p[1].ast, [p[2]]]
@@ -1228,7 +1201,7 @@ def p_ParameterDecl(p):
                     p[0].expr_list.append(p[2].data["typesize"])
     else:
         if presence_of_identifier(p[1], 'Isredeclared') == True and p[1] != "_":
-            errors.add_error(p.lineno(1), "Redeclaration of identifier "+p[1])
+            errors.add_error(line_number.get()+1, "Redeclaration of identifier "+p[1])
         else:
             p[0].ident_list = [p[1]]
             if(isinstance(p[2], str)):
@@ -1335,12 +1308,11 @@ def p_expression(p):
         p[0] = Node('Expression')
         p[0].ast = [p[2], p[1].ast, p[3].ast]
         if len(p[1].expr_type_list) > 1 or len(p[3].expr_type_list) > 1:
-            errors.add_error("Operation Error", p.lineno(
-                1), "Can't apply binary operators to multiple values")
+            errors.add_error("Operation Error", line_number.get()+1, "Can't apply binary operators to multiple values")
         if check_operation(p[1].expr_type_list[0], p[2], p[3].expr_type_list[0]) is None:
             # print(check_operation(p[1].expr_type_list[0], p[2], p[3].expr_type_list[0]))
             # print(p[1].expr_type_list[0], p[2], p[3].expr_type_list[0])
-            errors.add_error("Operation Error", p.lineno(1),
+            errors.add_error("Operation Error", line_number.get()+1,
                              "Invalid types for operator")
         p[0].code = p[1].code+p[3].code
         if p[1].data.get("deref") is None:
@@ -1371,10 +1343,9 @@ def p_unary_expr(p):
         p[0] = Node('UnaryExp')
         p[0].ast = [p[1].ast, p[2].ast]
         if len(p[1].expr_type_list) > 1:
-            errors.add_error("Operation Error", p.lineno(
-                1), "Can't apply binary operators to multiple values")
+            errors.add_error("Operation Error", line_number.get()+1, "Can't apply binary operators to multiple values")
         if check_unary_operation(p[1].expr_type_list[0], p[2].expr_type_list[0]) is None:
-            errors.add_error("Operation Error", p.lineno(1),
+            errors.add_error("Operation Error", line_number.get()+1,
                              "Invalid types for operator")
         p[0].expr_type_list.append(check_unary_operation(
             p[1].expr_type_list[0], p[2].expr_type_list[0]))
@@ -1389,8 +1360,7 @@ def p_unary_expr(p):
             p[0].data["memory"] = 0
             if p[2].data.get("deref") is None:
                 if p[2].data["memory"] == 0:
-                    errors.add_error('Address Error', p.lineno(
-                        1), "Can't get address")
+                    errors.add_error('Address Error', line_number.get()+1, "Can't get address")
                 var1 = create_temp()
                 p[0].code.append([var1, "=", "&", p[2].expr_list[0]])
                 p[0].expr_list = [var1]
@@ -1438,8 +1408,7 @@ def p_primary_expr(p):
 
     elif len(p) == 2:
         if(presence_of_identifier(p[1], "declared_anywhere") == False):
-            errors.add_error("Undeclared Error", p.lineno(
-                1), "Variable "+p[1]+" is not declared")
+            errors.add_error("Undeclared Error", line_number.get()+1, "Variable "+p[1]+" is not declared")
         p[0] = Node('PrimaryExpr')
         p[0].ast = [p[1]]
         p[0].expr_type_list.append(scope_table[presence_of_identifier(
@@ -1468,8 +1437,7 @@ def p_primary_expr(p):
         temp = p[1].expr_type_list[0][0]
         if(scope_table[curr_scope].table.get(temp) != None and scope_table[curr_scope].table[temp]["type"] == ["struct"]):
             if(scope_table[curr_scope].table[temp].get(p[3]) == None):
-                errors.add_error("Struct Error", p.lineno(
-                    1), "No such attribute of given struct")
+                errors.add_error("Struct Error", line_number.get()+1, "No such attribute of given struct")
             p[0] = Node('PrimaryExpr')
             p[0].ast = [p[2], p[1].ast, [p[3]]]
             p[0].expr_type_list.append(
@@ -1483,16 +1451,14 @@ def p_primary_expr(p):
             p[0].data["deref"] = 1
             p[0].expr_list.append(var1)
         else:
-            errors.add_error("Error", p.lineno(
-                1), "The identifier is not declared or isn't a struct")
+            errors.add_error("Error", line_number.get()+1, "The identifier is not declared or isn't a struct")
 
     elif(len(p) == 4):
         p[0] = p[2]
 
     elif p[2].data.get("index") is not None:
         if p[1].expr_type_list[0][0][0:3] != "arr":
-            errors.add_error("Type Error", p.lineno(
-                1), "The type of this expression is not an array")
+            errors.add_error("Type Error", line_number.get()+1, "The type of this expression is not an array")
         p[0] = p[1]
         p[0].ast = ["PrimaryExpr", p[1].ast, p[2].ast]
         p[0].code += p[2].code
@@ -1518,11 +1484,9 @@ def p_primary_expr(p):
 
     elif p[2].data.get("arguments") is not None:
         if p[1].expr_type_list[0][0] != "func" or p[1].data.get("isID") is None:
-            errors.add_error("Error", p.lineno(
-                1), "The primary expression is not a function")
+            errors.add_error("Error", line_number.get()+1, "The primary expression is not a function")
         if(p[2].expr_type_list != scope_table[0].table[p[1].data["isID"]]["takes"]):
-            errors.add_error("Error", p.lineno(
-                1), "The arguments passed are not of the same type as the function")
+            errors.add_error("Error", line_number.get()+1, "The arguments passed are not of the same type as the function")
         p[0] = Node('PrimaryExpr')
         p[0].ast = ['PrimaryExpr', p[1].ast, p[2].ast]
         p[0].expr_type_list = scope_table[0].table[p[1].data["isID"]]['return_type']
@@ -1558,8 +1522,7 @@ def p_primary_expr(p):
 def p_index(p):
     '''Index : LEFT_BRACKET Expression RIGHT_BRACKET'''
     if p[2].expr_type_list != [["int"]]:
-        errors.add_error("Type Error", p.lineno(
-            1), "The index expression is not of type int")
+        errors.add_error("Type Error", line_number.get()+1, "The index expression is not of type int")
     # print("hello")
     p[0] = Node("Index")
     p[0] = p[2]
@@ -1780,10 +1743,10 @@ def p_inc_dec_stmt(p):
         p[0].ast = ["--", p[1].ast]
     if p[0].expr_type_list != [["int"]]:
         errors.add_error(
-            p.lineno(1), "Type Mismatch: Cannot increment/decrement non-integer value")
+            line_number.get()+1, "Type Mismatch: Cannot increment/decrement non-integer value")
     if p[1].data["memory"] == 0:
         errors.add_error(
-            p.lineno(1), "Cannot increment/decrement non-addressable value")
+            line_number.get()+1, "Cannot increment/decrement non-addressable value")
     if p[1].data.get("deref") == None:
         if p[2] == "++":
             p[0].code.append(
@@ -1812,17 +1775,15 @@ def p_assignment(p):
     for i in range(0, len(p[3].expr_type_list)):
         if(p[2].data["op"] == "="):
             if not (p[1].expr_type_list[i][0] in basic_types_list or p[1].expr_type_list[i][0] == "pointer"):
-                errors.add_error('TypeError', p.lineno(
-                    1), "Type Mismatch: Cannot assign non-addressable value to addressable value")
+                errors.add_error('TypeError', line_number.get()+1, "Type Mismatch: Cannot assign non-addressable value to addressable value")
         else:
             if(p[1].expr_type_list[i][0] not in basic_types_list):
-                errors.add_error('TypeError', p.lineno(1),
+                errors.add_error('TypeError', line_number.get()+1,
                                  "Invalid Assignment")
     if p[1].data["memory"] == 0:
-        errors.add_error('Type Error', p.lineno(
-            1), 'Assignment not allowed for this expression list')
+        errors.add_error('Type Error', line_number.get()+1, 'Assignment not allowed for this expression list')
     if len(p[1].expr_type_list) != len(p[3].expr_type_list):
-        errors.add_error('Type Error', p.lineno(1), 'Imbalanced assignment')
+        errors.add_error('Type Error', line_number.get()+1, 'Imbalanced assignment')
 
     for i in range(0, len(p[1].expr_type_list)):
         if p[1].expr_type_list[i] != p[3].expr_type_list[i]:
@@ -1835,7 +1796,7 @@ def p_assignment(p):
             temp = check_operation(p[1].expr_type_list[i], [
                                    p[2].expr_type_list[0][0][0:-1]], p[3].expr_type_list[i])
             if(temp == None):
-                errors.add_error('Type Error', p.lineno(1),
+                errors.add_error('Type Error', line_number.get()+1,
                                  "Invalid operation")
         if temp != None:
             p[2].expr_type_list[0] = [p[2].expr_type_list[0][0]+temp[0]]
@@ -1889,8 +1850,7 @@ def p_if_stmt(p):
 
     if len(p) == 6:
         if (p[3].expr_type_list[0][0] != "bool" and p[3].expr_type_list[0][0] != "int" and p[3].expr_type_list[0][0] != "float") or len(p[3].expr_type_list) > 1:
-            errors.add_error('Type Error', p.lineno(
-                1), "The type of expression in if is not (boolean/int/float)")
+            errors.add_error('Type Error', line_number.get()+1, "The type of expression in if is not (boolean/int/float)")
         p[0] = Node('IfStmt')
         p[0].ast = ["IF", p[3].ast, p[4].ast]
         p[0].code += p[3].code
@@ -1901,8 +1861,7 @@ def p_if_stmt(p):
 
     elif len(p) == 8:
         if p[5].expr_type_list[0][0] != "bool" or len(p[5].expr_type_list) > 1:
-            errors.add_error('Type Error', p.lineno(
-                1), "The type of expression in if is not boolean")
+            errors.add_error('Type Error', line_number.get()+1, "The type of expression in if is not boolean")
         p[0] = Node('IfStmt')
         p[0].ast = ["IF", p[3].ast, p[5].ast, p[6].ast]
         p[0].code += p[3].code
@@ -1915,8 +1874,7 @@ def p_if_stmt(p):
     elif len(p) == 10:
 
         if p[3].expr_type_list[0][0] != "bool" or len(p[3].expr_type_list) > 1:
-            errors.add_error('Type Error', p.lineno(
-                1), "The type of expression in if is not boolean")
+            errors.add_error('Type Error', line_number.get()+1, "The type of expression in if is not boolean")
         p[0] = Node('IfStmt')
         p[0].ast = ["IF", p[3].ast, p[4].ast, p[8].ast]
         p[0].code += p[3].code
@@ -1931,8 +1889,7 @@ def p_if_stmt(p):
 
     else:
         if p[5].expr_type_list[0][0] != "bool" or len(p[5].expr_type_list) > 1:
-            errors.add_error('Type Error', p.lineno(
-                1), "The type of expression in if is not boolean")
+            errors.add_error('Type Error', line_number.get()+1, "The type of expression in if is not boolean")
         p[0] = Node('IfStmt')
         p[0].ast = ["IF", p[3].ast, p[5].ast, p[6].ast, p[9].ast]
         p[0].code += p[3].code
@@ -1986,11 +1943,9 @@ def p_ExpressionName(p):
     p[0] = p[1]
     global switch_exp, curr_switch_type
     if len(p[1].expr_type_list) > 1:
-        errors.add_error('Type Error', p.lineno(
-            1), "The type of expression in switch is not a single type")
+        errors.add_error('Type Error', line_number.get()+1, "The type of expression in switch is not a single type")
     if p[1].expr_type_list[0][0] != "int" and p[1].expr_type_list[0][0] != "rune" and p[1].expr_type_list[0][0] != "bool":
-        errors.add_error('Type Error', p.lineno(
-            1), "The type of expression in switch is not an integer, rune or boolean")
+        errors.add_error('Type Error', line_number.get()+1, "The type of expression in switch is not an integer, rune or boolean")
     curr_switch_type = p[1].expr_type_list[0][0]
     switch_expr = p[0].expr_list[0]
     label1 = create_label(2)
@@ -2028,11 +1983,9 @@ def p_expr_case_clause(p):
         p[0].ast = ["CASE", p[3].ast, p[5].ast]
         for i in range(0, len(p[3].expr_type_list)):
             if p[3].expr_type_list[i][0] != "int" and p[3].expr_type_list[i][0] != "rune":
-                errors.add_error('Type Error', p.lineno(
-                    1), "The type of expression in switch is not an integer or rune")
+                errors.add_error('Type Error', line_number.get()+1, "The type of expression in switch is not an integer or rune")
             if curr_switch_type is not None and curr_switch_type != p[3].expr_type_list[i][0]:
-                errors.add_error('Type Error', p.lineno(
-                    1), "The type of expression in case does not match type of expression in switch")
+                errors.add_error('Type Error', line_number.get()+1, "The type of expression in case does not match type of expression in switch")
             var = create_temp()
             label = create_label()
             p[0].code.append([var, '=', switch_expr, '==', p[3].expr_list[i]])
@@ -2066,8 +2019,7 @@ def p_for_stmt(p):
     elif len(p) == 8:
         p[0].ast = ["FOR", p[4].ast, p[5].ast]
         if len(p[4].expr_type_list) > 1 or p[4].expr_type_list[0][0] != "bool":
-            errors.add_error('Type Error', p.lineno(
-                1), "The type of expression in for loop is not a boolean")
+            errors.add_error('Type Error', line_number.get()+1, "The type of expression in for loop is not a boolean")
         label1 = create_label()
         # print("hello")
         label2 = create_label()
@@ -2097,8 +2049,7 @@ def p_for_clause(p):
     p[0] = Node('ForClause')
     p[0].data["forclause"] = 1
     if len(p) == 6 and (len(p[3].expr_type_list) > 1 or p[3].expr_type_list[0][0] != "bool"):
-        errors.add_error('Type Error', p.lineno(
-            1), "The type of expression in for loop is not a boolean")
+        errors.add_error('Type Error', line_number.get()+1, "The type of expression in for loop is not a boolean")
     p[0].code = p[1].code
     p[0].code.append([start_for[-1], ":"])
     label1 = create_label()
@@ -2137,14 +2088,11 @@ def p_returnstmt(p):
     # print(curr_func)
     # print(scope_table[0])
     if len(p) == 2 and scope_table[0].table[curr_func]['return_type'] != [["void"]]:
-        errors.add_error('Type Error', p.lineno(
-            1), "Return statement without return value")
+        errors.add_error('Type Error', line_number.get()+1, "Return statement without return value")
     elif len(p) == 3 and scope_table[0].table[curr_func]['return_type'] != p[2].expr_type_list:
-        errors.add_error('Type Error', p.lineno(
-            1), "Return statement with wrong return value")
+        errors.add_error('Type Error', line_number.get()+1, "Return statement with wrong return value")
     elif curr_scope == 0:
-        errors.add_error('Scope Error', p.lineno(
-            1), "Return statement is not inside a function")
+        errors.add_error('Scope Error', line_number.get()+1, "Return statement is not inside a function")
     p[0] = Node('ReturnStmt')
 
     if len(p) == 2:
@@ -2160,8 +2108,7 @@ def p_break_stmt(p):
     '''BreakStmt : BREAK IDENT
                 | BREAK'''
     if open_for == 0 and open_switch == 0:
-        errors.add_error('Scope Error', p.lineno(
-            1), "Break statement can only exist inside a loop")
+        errors.add_error('Scope Error', line_number.get()+1, "Break statement can only exist inside a loop")
     p[0] = Node('BreakStmt')
     p[0].code.append(['goto', end_for[-1]])
     if len(p) == 2:
@@ -2175,8 +2122,7 @@ def p_continue_stmt(p):
     '''ContinueStmt : CONTINUE IDENT
                 | CONTINUE'''
     if open_for == 0 and open_switch == 0:
-        errors.add_error('Scope Error', p.lineno(
-            1), "Continue statement can only exist inside a loop")
+        errors.add_error('Scope Error', line_number.get()+1 "Continue statement can only exist inside a loop")
     p[0] = Node('ContinueStmt')
     p[0].code.append(['goto', start_for[-1]])
     if len(p) == 2:
@@ -2194,7 +2140,7 @@ def p_continue_stmt(p):
 
 def p_error(p):
     if p:
-        print("Syntax error at line no:", p.lineno, "at position", p.lexpos,
+        print("Syntax error at line no:", line_number.get()+1, "at position", p.lexpos,
               "in the code.   " "TOKEN VALUE=", p.value,  "TOKEN TYPE=", p.type)
         parser.errok()
     else:
