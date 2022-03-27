@@ -118,6 +118,7 @@ class Lexer:
         self.lexliterals = ''         # Literal characters that can be passed through
         self.lexmodule = None         # Module
         self.lineno = 1               # Current line number
+        self.prev_token = None        # Previous token
 
     def clone(self, object=None):
         c = copy.copy(self)
@@ -205,10 +206,30 @@ class Lexer:
         lexlen    = self.lexlen
         lexignore = self.lexignore
         lexdata   = self.lexdata
-
+        # if self.prev_token != None:
+        #     print(f'{lexpos} {self.prev_token.value} {self.prev_token.type} {self.prev_token.lineno}')
+#nibir
         while lexpos < lexlen:
             # This code provides some short-circuit code for whitespace, tabs, and other ignored characters
             if lexdata[lexpos] in lexignore:
+                if lexdata[lexpos] == '\n':
+                    if self.prev_token.type == "IDENT" or self.prev_token.type == "INT" or self.prev_token.type == "FLOAT" or self.prev_token.type == "STRING"\
+                    or self.prev_token.type == "RUNE" or self.prev_token.type == "IMAGINARY" or self.prev_token.type == "BREAK" or self.prev_token.type == "CONTINUE"\
+                    or self.prev_token.type == "RETURN" or self.prev_token.type == "INCREMENT" or self.prev_token.type == "DECREMENT" or self.prev_token.type == "RIGHT_PARENTHESIS"\
+                    or self.prev_token.type == "RIGHT_BRACKET" or self.prev_token.type == "RIGHT_BRACE":
+                        temp_data = ""
+                        for i in range(0, lexpos):
+                            temp_data += lexdata[i]
+                        temp_data += ';'
+                        for i in range(lexpos, lexlen):
+                            temp_data += lexdata[i]
+                        self.lexdata = temp_data
+                        lexdata = self.lexdata
+                        lexlen += 1
+                        self.lexlen += 1
+                        continue
+                    self.lineno += 1
+
                 lexpos += 1
                 continue
 
@@ -231,6 +252,7 @@ class Lexer:
                     # If no token type was set, it's an ignored token
                     if tok.type:
                         self.lexpos = m.end()
+                        self.prev_token = tok
                         return tok
                     else:
                         lexpos = m.end()
@@ -252,6 +274,7 @@ class Lexer:
                     lexpos    = self.lexpos         # This is here in case user has updated lexpos.
                     lexignore = self.lexignore      # This is here in case there was a state change
                     break
+                self.prev_token = newtok
                 return newtok
             else:
                 # No match, see if in literals
@@ -262,6 +285,7 @@ class Lexer:
                     tok.type = tok.value
                     tok.lexpos = lexpos
                     self.lexpos = lexpos + 1
+                    self.prev_token = tok
                     return tok
 
                 # No match. Call t_error() if defined.
@@ -281,6 +305,7 @@ class Lexer:
                     lexpos = self.lexpos
                     if not newtok:
                         continue
+                    self.prev_token = newtok
                     return newtok
 
                 self.lexpos = lexpos
@@ -296,6 +321,7 @@ class Lexer:
             tok.lexer = self
             self.lexpos = lexpos
             newtok = self.lexeoff(tok)
+            self.prev_token = newtok
             return newtok
 
         self.lexpos = lexpos + 1
