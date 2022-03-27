@@ -1,12 +1,16 @@
 package main;
 
 import "fmt";
-const a,b,c int = 10,20,30;
+import "hello";
+
 func main() {
-	// x := [5]int{10, 20, 30, 40, 50} ;
 	
+	var a,b int=10,20;
+	var x,y,z int=10,20,30;
+	a=b;
 	if(5>3){
 		l:=10;
 	};
+
 };
 

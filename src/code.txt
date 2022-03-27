@@ -1,12 +1,16 @@
  " f m t "
+ " h e l l o "
+ main :
  var_temp_no#0 = 10
  var_temp_no#1 = 20
- var_temp_no#2 = 30
- main :
- temp_no#3 = * 5
- temp_no#4 = * 3
- temp_no#5 = temp_no#3 >int temp_no#4
- ifnot temp_no#5 goto label_no#0
- var_temp_no#6 = 10
+ var_temp_no#2 = 10
+ var_temp_no#3 = 20
+ var_temp_no#4 = 30
+ var_temp_no#0 = var_temp_no#1
+ temp_no#5 = * 5
+ temp_no#6 = * 3
+ temp_no#7 = temp_no#5 >int temp_no#6
+ ifnot temp_no#7 goto label_no#0
+ var_temp_no#8 = 10
  label_no#0 : 
  return
