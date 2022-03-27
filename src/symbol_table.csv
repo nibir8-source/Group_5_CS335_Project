@@ -3,32 +3,155 @@ Table Number,0
 
 Parent,0,=,
 
-mulReturn,"{'type': ['func'], 'scope': 0, 'takes': [['string']], 'total_param_size': 100, 'param_size_list': [100], 'return_type': [['string'], ['string']], 'total_return_size': 200, 'return_size_list': [-108, -208]}"
 main,"{'type': ['func'], 'scope': 0, 'takes': [['void']], 'total_param_size': 0, 'return_type': [['void']], 'total_return_size': 0, 'return_size_list': []}"
 
 Table Number,1
 
 Parent,1,=,0
 
-mulReturn,{'type': ['func']}
-a,"{'type': ['string'], 'tmp': 'var_temp_no#0', 'offset': -8}"
-var_temp_no#0,{'type': 'a'}
-x,"{'type': ['string'], 'tmp': 'var_temp_no#1', 'offset': 0}"
+main,{'type': ['func']}
+flat_earthers_count,"{'type': ['int'], 'tmp': 'var_temp_no#0', 'offset': 0}"
+var_temp_no#0,{'type': 'flat_earthers_count'}
+x,"{'type': ['arr10', 'pointer', 'int'], 'tmp': 'var_temp_no#1', 'offset': 4}"
 var_temp_no#1,{'type': 'x'}
-y,"{'type': ['string'], 'tmp': 'var_temp_no#2', 'offset': 100}"
-var_temp_no#2,{'type': 'y'}
+Evil_Santa,"{'type': ['int'], 'tmp': 'var_temp_no#2', 'offset': 44}"
+var_temp_no#2,{'type': 'Evil_Santa'}
+temp_no#3,{'type': 'temp'}
+temp_no#4,{'type': 'temp'}
+temp_no#5,{'type': 'temp'}
+temp_no#6,{'type': 'temp'}
+temp_no#7,{'type': 'temp'}
+temp_no#8,{'type': 'temp'}
+temp_no#52,{'type': 'temp'}
+temp_no#66,{'type': 'temp'}
 
 Table Number,2
 
-Parent,2,=,0
+Parent,2,=,1
 
-mulReturn,{'type': ['func']}
 main,{'type': ['func']}
-a,"{'type': ['string'], 'tmp': 'var_temp_no#3', 'offset': 200}"
-var_temp_no#3,{'type': 'a'}
-b1,"{'type': ['string'], 'tmp': 'var_temp_no#4', 'offset': 300}"
-var_temp_no#4,{'type': 'b1'}
-c,"{'type': ['string'], 'tmp': 'var_temp_no#5', 'offset': 400}"
-var_temp_no#5,{'type': 'c'}
-temp_no#6,{'type': 'temp'}
-temp_no#7,{'type': 'temp'}
+temp_no#9,{'type': 'temp'}
+temp_no#10,{'type': 'temp'}
+temp_no#11,{'type': 'temp'}
+temp_no#12,{'type': 'temp'}
+temp_no#13,{'type': 'temp'}
+temp_no#14,{'type': 'temp'}
+temp_no#15,{'type': 'temp'}
+temp_no#16,{'type': 'temp'}
+temp_no#17,{'type': 'temp'}
+temp_no#18,{'type': 'temp'}
+temp_no#19,{'type': 'temp'}
+temp_no#20,{'type': 'temp'}
+temp_no#21,{'type': 'temp'}
+temp_no#22,{'type': 'temp'}
+temp_no#23,{'type': 'temp'}
+temp_no#24,{'type': 'temp'}
+temp_no#25,{'type': 'temp'}
+temp_no#26,{'type': 'temp'}
+temp_no#27,{'type': 'temp'}
+temp_no#28,{'type': 'temp'}
+temp_no#29,{'type': 'temp'}
+temp_no#30,{'type': 'temp'}
+temp_no#31,{'type': 'temp'}
+temp_no#32,{'type': 'temp'}
+temp_no#33,{'type': 'temp'}
+temp_no#34,{'type': 'temp'}
+temp_no#35,{'type': 'temp'}
+temp_no#36,{'type': 'temp'}
+temp_no#37,{'type': 'temp'}
+temp_no#51,{'type': 'temp'}
+
+Table Number,3
+
+Parent,3,=,2
+
+main,{'type': ['func']}
+
+Table Number,4
+
+Parent,4,=,3
+
+main,{'type': ['func']}
+y,"{'type': ['int'], 'tmp': 'var_temp_no#38', 'offset': 48}"
+var_temp_no#38,{'type': 'y'}
+temp_no#39,{'type': 'temp'}
+temp_no#40,{'type': 'temp'}
+temp_no#41,{'type': 'temp'}
+temp_no#42,{'type': 'temp'}
+
+Table Number,5
+
+Parent,5,=,4
+
+main,{'type': ['func']}
+temp_no#43,{'type': 'temp'}
+temp_no#44,{'type': 'temp'}
+temp_no#45,{'type': 'temp'}
+temp_no#46,{'type': 'temp'}
+temp_no#47,{'type': 'temp'}
+temp_no#48,{'type': 'temp'}
+temp_no#49,{'type': 'temp'}
+temp_no#50,{'type': 'temp'}
+
+Table Number,6
+
+Parent,6,=,4
+
+main,{'type': ['func']}
+
+Table Number,7
+
+Parent,7,=,1
+
+main,{'type': ['func']}
+z,"{'type': ['int'], 'tmp': 'var_temp_no#53', 'offset': 52}"
+var_temp_no#53,{'type': 'z'}
+
+Table Number,8
+
+Parent,8,=,7
+
+main,{'type': ['func']}
+temp_no#54,{'type': 'temp'}
+temp_no#55,{'type': 'temp'}
+temp_no#56,{'type': 'temp'}
+temp_no#57,{'type': 'temp'}
+temp_no#58,{'type': 'temp'}
+
+Table Number,9
+
+Parent,9,=,7
+
+main,{'type': ['func']}
+temp_no#59,{'type': 'temp'}
+temp_no#60,{'type': 'temp'}
+temp_no#61,{'type': 'temp'}
+temp_no#62,{'type': 'temp'}
+temp_no#63,{'type': 'temp'}
+temp_no#64,{'type': 'temp'}
+temp_no#65,{'type': 'temp'}
+
+Table Number,10
+
+Parent,10,=,7
+
+main,{'type': ['func']}
+
+Table Number,11
+
+Parent,11,=,1
+
+main,{'type': ['func']}
+
+Table Number,12
+
+Parent,12,=,11
+
+main,{'type': ['func']}
+i,"{'type': ['int'], 'tmp': 'var_temp_no#67', 'offset': 56}"
+var_temp_no#67,{'type': 'i'}
+temp_no#68,{'type': 'temp'}
+temp_no#69,{'type': 'temp'}
+temp_no#70,{'type': 'temp'}
+temp_no#71,{'type': 'temp'}
+temp_no#72,{'type': 'temp'}

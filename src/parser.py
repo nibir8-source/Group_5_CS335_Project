@@ -1258,11 +1258,11 @@ def p_ParaIdentList(p):
     p[0] = Node('ParaIdentList')
 
     if(isinstance(p[1], str)):
-        p[0].ast = ["ParaIdentList", [p[1]], [p[2]]]
+        p[0].ast = ["ParaIdentList", [p[1]], [p[3]]]
         p[0].ident_list.append(p[1])
         p[0].ident_list.append(p[3])
     else:
-        p[0].ast = ["ParaIdentList", p[1].ast, [p[2]]]
+        p[0].ast = ["ParaIdentList", p[1].ast, [p[3]]]
         p[0].ident_list = p[1].ident_list
         p[0].ident_list.append(p[3])
 
@@ -1494,6 +1494,7 @@ def p_primary_expr(p):
             errors.add_error("Type Error", p.lineno(
                 1), "The type of this expression is not an array")
         p[0] = p[1]
+        p[0].ast = ["PrimaryExpr", p[1].ast, p[2].ast]
         p[0].code += p[2].code
         p[0].expr_type_list[0] = p[0].expr_type_list[0][1:]
         p[0].data["memory"] = 1
@@ -1559,7 +1560,10 @@ def p_index(p):
     if p[2].expr_type_list != [["int"]]:
         errors.add_error("Type Error", p.lineno(
             1), "The index expression is not of type int")
+    # print("hello")
+    p[0] = Node("Index")
     p[0] = p[2]
+    p[0].ast = ["Index", p[2].ast]
     p[0].data["index"] = 1
 # def p_slice(p):
 #     '''Slice : LEFT_BRACKET Expression COLON Expression RIGHT_BRACKET
