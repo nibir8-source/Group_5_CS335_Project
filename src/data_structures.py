@@ -14,8 +14,10 @@ class SymTable:
     def __init__(self):
         self.parent = None
         self.table = {}
-        self.type_list = ['rune','bool','int','float','string','imaginary']
-        self.type_size_list = {'rune':1,'bool':4,'int':4,'float':4,'string':100, 'imaginary':20}
+        self.type_list = ['rune', 'bool', 'int',
+                          'float', 'string', 'imaginary']
+        self.type_size_list = {'rune': 1, 'bool': 4, 'int': 4,
+                               'float': 4, 'string': 100, 'imaginary': 20}
 
     def set_parent(self, parent):
         self.parent = parent
@@ -24,12 +26,13 @@ class SymTable:
         if(not self.table.get(ident)):
             self.table[ident] = {}
             self.table[ident]["type"] = attr
-    def search(self,ident):
+
+    def search(self, ident):
         return self.table.get(ident)
 
     def update(self, ident, key, value):
         if self.table.get(ident):
-            self.table[ident][key]=value
+            self.table[ident][key] = value
 
     def assign_parent(self, parent):
         self.parent = parent
@@ -52,5 +55,9 @@ class Errors:
 
     def print_all(self):
         for error in self.errors:
-            print_err = error['type'] + ': ' + error['msg'] + ' on line ' + str(error['lineno'])
+            print_err = error['type'] + ': ' + \
+                error['msg'] + ' on line ' + str(error['lineno'])
             print(print_err)
+
+# class Functions:
+#     def __init__(self):

@@ -67,27 +67,27 @@ file1.write("\n")
 counter = 0
 
 
-def writeGraph(someList):
+def writeGraph(Ast_list):
     global counter
     local = counter
     counter += 1
-    name = someList[0]
-    if(len(someList) > 1):
-        for innerList in someList[1:]:
-            if(len(innerList) > 0):
+    name = Ast_list[0]
+    if(len(Ast_list) > 1):
+        for node_list in Ast_list[1:]:
+            if(len(node_list) > 0):
                 file1.write(str(local))
                 file1.write("[label=\"")
                 file1.write(name)
                 file1.write("\" ] ;")
                 file1.write(str(counter))
                 file1.write("[label=\"")
-                if ((innerList[0][0]) == "\""):
-                    innerList[0] = innerList[0][1:-1]
-                file1.write(innerList[0])
+                if ((node_list[0][0]) == "\""):
+                    node_list[0] = node_list[0][1:-1]
+                file1.write(node_list[0])
                 file1.write("\" ] ;")
                 file1.write(str(local) + "->" + str(counter) + ";")
                 file1.write("\n")
-                writeGraph(innerList)
+                writeGraph(node_list)
 
 
 def open_scope():
@@ -745,6 +745,7 @@ def p_var_spec(p):
             p[0].code.append(temp)
 
     if len(p) == 4:
+        print("hello")
         if(len(p[1].ident_list) != len(p[3].expr_type_list)):
             errors.add_error('Assignment Error', p.lineno(1),
                              "Imbalanced Assignment")
@@ -761,6 +762,7 @@ def p_var_spec(p):
             var1 = create_temp(1)
             scope_table[curr_scope].insert(
                 p[1].ident_list[i], p[3].expr_type_list[i])
+
             scope_table[curr_scope].insert(var1, p[1].ident_list[i])
             scope_table[curr_scope].update(p[1].ident_list[i], "tmp", var1)
             scope_table[curr_scope].update(
@@ -768,13 +770,13 @@ def p_var_spec(p):
             offset_list[curr_func_scope] += scope_table[curr_scope].type_size_list[p[3].expr_type_list[i][0]]
             # p[0] = Node('VarSpec')
             p[0].code = p[1].code+p[3].code
-            for i in range(0, len(p[1].ident_list)):
-                temp = [
-                    scope_table[curr_scope].table[p[1].ident_list[i]]["tmp"], "="]
-                if(p[3].data["dereflist"][i] == 1):
-                    temp.append("*")
-                temp.append(p[3].expr_list[i])
-                p[0].code.append(temp)
+        for i in range(0, len(p[1].ident_list)):
+            temp = [
+                scope_table[curr_scope].table[p[1].ident_list[i]]["tmp"], "="]
+            if(p[3].data["dereflist"][i] == 1):
+                temp.append("*")
+            temp.append(p[3].expr_list[i])
+            p[0].code.append(temp)
 
 
 def p_short_var_decl(p):

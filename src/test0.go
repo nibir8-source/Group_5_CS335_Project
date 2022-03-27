@@ -1,16 +1,23 @@
 package main;
 
 import "fmt";
-import "hello";
+import "math";
+import "string";
 
-func main() {
+type Address struct {
+    Name    string;
+    city    string;
+    Pincode int;
+};
+func main(){
+	// all type of variable Decl
+	var a1 int;
+	var  a2,a3,a4 int =20,30,40;
+	var a5,a6 Address ;
+	var a7,a8  =1,2;
+
 	
-	var a int=10;
-	var x,y,z int=10,20,30;
-	// a=b;
-	if(5>3){
-		l:=10;
-	};
+	 
+
 
 };
-
