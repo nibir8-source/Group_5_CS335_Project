@@ -1361,7 +1361,6 @@ def p_unary_expr(p):
             errors.add_error("Operation Error", p.lineno(
                 1), "Can't apply binary operators to multiple values")
         if check_unary_operation(p[1].expr_type_list[0], p[2].expr_type_list[0]) is None:
-            print(2)
             errors.add_error("Operation Error", p.lineno(1),
                              "Invalid types for operator")
         p[0].expr_type_list.append(check_unary_operation(
