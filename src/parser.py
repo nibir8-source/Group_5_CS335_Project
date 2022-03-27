@@ -57,8 +57,7 @@ struct_off = 0
 curr_func_scope = 0
 offset_list = [0]
 struct_sym_list = []
-basic_types_list=["int","float","rune","string","bool","imaginary"]
-
+basic_types_list = ["int", "float", "rune", "string", "bool", "imaginary"]
 
 
 file1 = open("tree.txt", "w")  # write mode
@@ -172,8 +171,8 @@ def check_operation(expr_1, op, expr_2):
             if op == "|" or op == "^" or op == "<<" or op == ">>" or op == "%" or op == "&" or op == "&^":
                 return None
             return ["float"]
-        if (expr_1=="imaginary" and expr_2=="int") or (expr_1=="imaginary" and expr_2=="float") or (expr_1=="int" and expr_2=="imaginary") or (expr_1=="float" and expr_2=="imaginary"):
-            if op == ">" or op =="<" or op==">=" or op=="<=" or op == "|" or op == "^" or op == "<<" or op == ">>" or op == "%" or op == "&" or op=="&^":
+        if (expr_1 == "imaginary" and expr_2 == "int") or (expr_1 == "imaginary" and expr_2 == "float") or (expr_1 == "int" and expr_2 == "imaginary") or (expr_1 == "float" and expr_2 == "imaginary"):
+            if op == ">" or op == "<" or op == ">=" or op == "<=" or op == "|" or op == "^" or op == "<<" or op == ">>" or op == "%" or op == "&" or op == "&^":
                 return None
             if op == "==" or op == "!=":
                 return ["bool"]
@@ -210,7 +209,7 @@ def check_operation(expr_1, op, expr_2):
             return ["bool"]
         else:
             return None
-    
+
 
 def check_unary_operation(unop, exp1):
     unop = unop[0]
@@ -218,7 +217,7 @@ def check_unary_operation(unop, exp1):
         if(len(exp1) > 1):
             return None
         exp1 = exp1[0]
-        if exp1=="int" or exp1=="float" or exp1=="rune" or exp1=="imaginary":
+        if exp1 == "int" or exp1 == "float" or exp1 == "rune" or exp1 == "imaginary":
             return [exp1]
         else:
             return None
@@ -925,7 +924,14 @@ def p_field_decl_star(p):
     |'''
     p[0] = Node('FieldDeclStar')
     if len(p) > 1:
-        p[0].ast = ["FieldDeclStar", p[1].ast, p[2].ast]
+        if(len(p[1].ast) > 0 and len(p[2].ast) > 0):
+            p[0].ast = ['FieldDeclStar', p[1].ast, p[2].ast]
+        elif(len(p[1].ast) > 0):
+            p[0].ast = p[1].ast
+        elif(len(p[2].ast) > 0):
+            p[0].ast = p[2].ast
+        else:
+            p[0].ast = []
         p[0].code += p[1].code
         p[0].code += p[2].code
 
@@ -1289,7 +1295,14 @@ def p_statement_list(p):
     |'''
     p[0] = Node('StatementList')
     if len(p) > 1:
-        p[0].ast = ["StatementList", p[1].ast, p[2].ast]
+        if(len(p[1].ast) > 0 and len(p[2].ast) > 0):
+            p[0].ast = ['StatementList', p[1].ast, p[2].ast]
+        elif(len(p[1].ast) > 0):
+            p[0].ast = p[1].ast
+        elif(len(p[2].ast) > 0):
+            p[0].ast = p[2].ast
+        else:
+            p[0].ast = []
         p[0].code = p[1].code + p[2].code
 #############################
 
@@ -1615,15 +1628,17 @@ def p_basic_lit(p):
     | RuneLit
     | StringLit
     | TrueFalseLit
-    | ImaginaryLit''' 
+    | ImaginaryLit'''
     p[0] = p[1]
+
 
 def p_imaginary_lit(p):
     '''ImaginaryLit : IMAGINARY'''
     p[0] = Node('ImaginaryLit')
     p[0].expr_type_list.append(["imaginary"])
     p[0].expr_list.append(p[1])
-    p[0].ast=[p[1]]
+    p[0].ast = [p[1]]
+
 
 def p_true_false_lit(p):
     '''TrueFalseLit : TRUE
@@ -1980,7 +1995,14 @@ def p_expr_case_clause_star(p):
     | ExprCaseClause'''
     if len(p) > 2:
         p[0] = p[1]
-        p[0].ast = ["ExprCaseClauseStar", p[1].ast, p[2].ast]
+        if(len(p[1].ast) > 0 and len(p[2].ast) > 0):
+            p[0].ast = ['ExprCaseClauseStar', p[1].ast, p[2].ast]
+        elif(len(p[1].ast) > 0):
+            p[0].ast = p[1].ast
+        elif(len(p[2].ast) > 0):
+            p[0].ast = p[2].ast
+        else:
+            p[0].ast = []
         p[0].code += p[2].code
     else:
         p[0] = p[1]
