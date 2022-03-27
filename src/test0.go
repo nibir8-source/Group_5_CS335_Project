@@ -1,42 +1,59 @@
 package main
 
-import "fmt"
-
-type Vertex struct {
-	X int
-	Y int
+import "Fmt"
+import "String"
+import "Math"
+type Address struct {
+	name string 
+	street string
+	city string
+	state string
+	Pincode int
 }
-func main() {
-	var a int
-	// p=10
-	if true {
-	    for i:=0; i<=4; i++ {
-		    for j:=1; j<6; j+=2 {
-			    v:=5+4
-			    switch v {
-		    	    case 3: r:=4
-	        	    case 9: r:=100
-						for l:=1; l<=5; l+=1 {
-							r = r-1
-						}
-			        }
-		        }
-		    a=4
-		    a=a+3
 
-		    if a < 5 {
-    		    s:=5+6
-    	    } else {
-	    	    s:="whatthehell"
-    	    }
-	    }
-    } else {
-        for p:=3; p >=3; p++ {
-	        yash:="edgy"
-        }
-    }
-    ff:=5
-    for ff < 78 {
-    	a+=4.2
-    }
+func myFunc(x,y int) (string) {
+	if (x+y)==5 {
+		return "Equal condition satisfied"
+	} else {
+		return "Not satisfied"
+	}
+}
+
+
+func main(){
+
+	var our_add Address;
+	our_add.name="Nibir Baruah"
+
+	a,b,c:= 10,20,30
+	if(a>b){
+		s:="helloworld"
+		our_add.city=s
+
+	} else {
+		l:=100
+	}
+	today := 97979;
+    khnik := today<<3
+	switch khnik {
+	case today + 0:
+		var x,y int;
+		var z string;
+		x=2;y=3;
+		z=myFunc(x,y);
+	case today + 1:
+		var x,y int;
+		var z string;
+		x=1;y=6;
+	case today + 2:
+		is := "sfdf"
+	default:
+		is:="Too far away."
+	};
+
+
+
+
+
+
 }

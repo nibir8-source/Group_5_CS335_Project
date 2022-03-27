@@ -1,101 +1,71 @@
- " f m t "
+ " F m t "
+ " S t r i n g "
+ " M a t h "
+ myFunc :
+ temp_no#2 = * var_temp_no#0
+ temp_no#3 = * var_temp_no#1
+ temp_no#4 = temp_no#2 +int temp_no#3
+ temp_no#5 = * temp_no#4
+ temp_no#6 = * 5
+ temp_no#7 = temp_no#5 ==int temp_no#6
+ ifnot temp_no#7 goto label_no#0
+ return
+ goto label_no#1
+ label_no#0 : 
+ return
+ label_no#1 : 
+ return
  main :
- ifnot true goto label_no#24
- var_temp_no#1 = 0
- label_no#0 :
- label_no#2 :
- temp_no#2 = * var_temp_no#1
- temp_no#3 = * 4
- temp_no#4 = temp_no#2 <=int temp_no#3
- ifnot temp_no#4 goto label_no#3
- var_temp_no#5 = 1
- label_no#4 :
- label_no#6 :
- temp_no#6 = * var_temp_no#5
- temp_no#7 = * 6
- temp_no#8 = temp_no#6 <int temp_no#7
- ifnot temp_no#8 goto label_no#7
- temp_no#9 = * 5
- temp_no#10 = * 4
- temp_no#11 = temp_no#9 +int temp_no#10
- var_temp_no#12 = temp_no#11
- temp_no#14 =  == 3
- ifnot temp_no#14 goto label_no#11
- var_temp_no#13 = 4
- goto label_no#10
- label_no#11 : 
- goto label_no#10
- temp_no#23 =  == 9
- ifnot temp_no#23 goto label_no#16
- var_temp_no#15 = 100
- var_temp_no#16 = 1
- label_no#12 :
- label_no#14 :
- temp_no#17 = * var_temp_no#16
- temp_no#18 = * 5
- temp_no#19 = temp_no#17 <=int temp_no#18
- ifnot temp_no#19 goto label_no#15
- temp_no#20 = * var_temp_no#15
- temp_no#21 = * 1
- temp_no#22 = temp_no#20 -int temp_no#21
- var_temp_no#15 = temp_no#22
- var_temp_no#16 +=int 1
- goto label_no#14
- label_no#15 :
- label_no#13 :
- goto label_no#10
- label_no#16 : 
- goto label_no#10
- label_no#17 : 
- var_temp_no#5 +=int 2
+ temp_no#9 = & var_temp_no#8
+ temp_no#10 = temp_no#9 +int 0
+ * ['string'] = "Nibir Baruah"
+ var_temp_no#11 = 10
+ var_temp_no#12 = 20
+ var_temp_no#13 = 30
+ temp_no#14 = * var_temp_no#11
+ temp_no#15 = * var_temp_no#12
+ temp_no#16 = temp_no#14 >int temp_no#15
+ ifnot temp_no#16 goto label_no#2
+ var_temp_no#17 = "helloworld"
+ temp_no#18 = & var_temp_no#8
+ temp_no#19 = temp_no#18 +int 200
+ * ['string'] = var_temp_no#17
+ goto label_no#3
+ label_no#2 : 
+ var_temp_no#20 = 100
+ label_no#3 : 
+ var_temp_no#21 = 97979
+ temp_no#22 = * var_temp_no#21
+ temp_no#23 = * 3
+ temp_no#24 = temp_no#22 <<int temp_no#23
+ var_temp_no#25 = temp_no#24
+ temp_no#33 =  == temp_no#28
+ ifnot temp_no#33 goto label_no#7
+ var_temp_no#29 = 2
+ var_temp_no#30 = 3
+ startf myFunc
+ param var_temp_no#29
+ param var_temp_no#30
+ call myFunc
+ endf myFunc
+ temp_no#32 = retval_1
+ var_temp_no#31 = temp_no#32
  goto label_no#6
- label_no#7 :
- label_no#10 :
- var_temp_no#0 = 4
- temp_no#24 = * var_temp_no#0
- temp_no#25 = * 3
- temp_no#26 = temp_no#24 +int temp_no#25
- var_temp_no#0 = temp_no#26
- temp_no#27 = * var_temp_no#0
- temp_no#28 = * 5
- temp_no#29 = temp_no#27 <int temp_no#28
- ifnot temp_no#29 goto label_no#18
- temp_no#30 = * 5
- temp_no#31 = * 6
- temp_no#32 = temp_no#30 +int temp_no#31
- var_temp_no#33 = temp_no#32
- goto label_no#19
- label_no#18 : 
- var_temp_no#34 = "whatthehell"
- label_no#19 : 
- var_temp_no#1 = var_temp_no#1 +int 1
- goto label_no#2
- label_no#3 :
- label_no#8 :
- goto label_no#25
- label_no#24 : 
- var_temp_no#35 = 3
- label_no#20 :
- label_no#22 :
- temp_no#36 = * var_temp_no#35
- temp_no#37 = * 3
- temp_no#38 = temp_no#36 >=int temp_no#37
- ifnot temp_no#38 goto label_no#23
- var_temp_no#39 = "edgy"
- var_temp_no#35 = var_temp_no#35 +int 1
- goto label_no#22
- label_no#23 :
- label_no#21 :
- label_no#25 : 
- var_temp_no#40 = 5
- label_no#26 : 
- temp_no#41 = * var_temp_no#40
- temp_no#42 = * 78
- temp_no#43 = temp_no#41 <int temp_no#42
- label_no#29 : 
- ifnot temp_no#43 goto label_no#28
- var_temp_no#0 +=float 4.2
- goto label_no#29
- label_no#28 :
- label_no#27 :
+ label_no#7 : 
+ goto label_no#6
+ temp_no#40 =  == temp_no#36
+ ifnot temp_no#40 goto label_no#8
+ var_temp_no#37 = 1
+ var_temp_no#38 = 6
+ goto label_no#6
+ label_no#8 : 
+ goto label_no#6
+ temp_no#45 =  == temp_no#43
+ ifnot temp_no#45 goto label_no#9
+ var_temp_no#44 = "sfdf"
+ goto label_no#6
+ label_no#9 : 
+ goto label_no#6
+ var_temp_no#46 = "Too far away."
+ label_no#10 : 
  return
