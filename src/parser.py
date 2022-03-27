@@ -1,7 +1,7 @@
 import pprint
 import sys
 import ply.yacc as yacc
-from ply.lex import TOKEN
+from ply.lex import TOKEN, line_number
 import sys
 import lexer
 from lexer import *
@@ -1826,7 +1826,7 @@ def p_assignment(p):
 
     for i in range(0, len(p[1].expr_type_list)):
         if p[1].expr_type_list[i] != p[3].expr_type_list[i]:
-            errors.add_error('Type Error', p.lineno(1), "Mismatch of type for " +
+            errors.add_error('Type Error', line_number.get()+1, "Mismatch of type for " +
                              str(p[1].expr_type_list[i])+" and " + str(p[3].expr_type_list[i]))
     p[0].code += p[1].code + p[3].code
     for i in range(0, len(p[1].expr_type_list)):

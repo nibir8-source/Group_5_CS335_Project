@@ -59,5 +59,13 @@ class Errors:
                 error['msg'] + ' on line ' + str(error['lineno'])
             print(print_err)
 
-# class Functions:
-#     def __init__(self):
+
+class LineCount:
+    def __init__(self):
+        self.lineno = 0
+
+    def add(self, count):
+        self.lineno += count
+
+    def get(self):
+        return self.lineno

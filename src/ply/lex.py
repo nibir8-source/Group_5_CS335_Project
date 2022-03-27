@@ -39,6 +39,8 @@ import types
 import copy
 import os
 import inspect
+from data_structures import LineCount
+line_number = LineCount()
 
 # This tuple contains acceptable string types
 StringTypes = (str, bytes)
@@ -220,11 +222,13 @@ class Lexer:
             # This code provides some short-circuit code for whitespace, tabs, and other ignored characters
             if lexdata[lexpos] in lexignore:
                 if lexdata[lexpos] == '\n':
+                    line_number.add(1)
                     if self.prev_token.type == "IDENT" or self.prev_token.type == "INT" or self.prev_token.type == "FLOAT" or self.prev_token.type == "STRING"\
                             or self.prev_token.type == "RUNE" or self.prev_token.type == "IMAGINARY" or self.prev_token.type == "BREAK" or self.prev_token.type == "CONTINUE"\
                             or self.prev_token.type == "RETURN" or self.prev_token.type == "INCREMENT" or self.prev_token.type == "DECREMENT" or self.prev_token.type == "RIGHT_PARENTHESIS"\
                             or self.prev_token.type == "RIGHT_BRACKET" or self.prev_token.type == "RIGHT_BRACE":
                         temp_data = ""
+                        line_number.add(-1)
                         for i in range(0, lexpos):
                             temp_data += lexdata[i]
                         temp_data += ';'

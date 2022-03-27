@@ -1,110 +1,101 @@
  " f m t "
  main :
- var_temp_no#0 = 0
- var_temp_no#0 = 0
- var_temp_no#2 = 666
- temp_no#3 = * 2
- temp_no#4 = * 2
- temp_no#5 = temp_no#3 /int temp_no#4
- temp_no#6 = * 2
- temp_no#7 = * temp_no#5
- temp_no#8 = temp_no#6 +int temp_no#7
- temp_no#52 =  == temp_no#35
- ifnot temp_no#52 goto label_no#14
- temp_no#36 = 0
- temp_no#36 = temp_no#36 *int 4
- temp_no#36 = temp_no#36 +int var_temp_no#1
- temp_no#37 = * temp_no#36
- temp_no#51 =  == 1
- ifnot temp_no#51 goto label_no#12
- var_temp_no#38 = 0
+ ifnot true goto label_no#24
+ var_temp_no#1 = 0
+ label_no#0 :
+ label_no#2 :
+ temp_no#2 = * var_temp_no#1
+ temp_no#3 = * 4
+ temp_no#4 = temp_no#2 <=int temp_no#3
+ ifnot temp_no#4 goto label_no#3
+ var_temp_no#5 = 1
+ label_no#4 :
  label_no#6 :
- label_no#8 :
- temp_no#39 = var_temp_no#38
- temp_no#39 = temp_no#39 *int 4
- temp_no#39 = temp_no#39 +int var_temp_no#1
- temp_no#40 = * temp_no#39
- temp_no#41 = * var_temp_no#38
- temp_no#42 = temp_no#41 <int temp_no#40
- ifnot temp_no#42 goto label_no#9
- temp_no#43 = * var_temp_no#38
- temp_no#44 = * 10
- temp_no#45 = temp_no#43 <int temp_no#44
- ifnot temp_no#45 goto label_no#10
- temp_no#46 = var_temp_no#38
- temp_no#46 = temp_no#46 *int 4
- temp_no#46 = temp_no#46 +int var_temp_no#1
- temp_no#47 = * temp_no#46
- temp_no#48 = & var_temp_no#38
- temp_no#49 = * temp_no#48
- temp_no#50 = * temp_no#49
- * temp_no#47 = temp_no#50
- goto label_no#11
- label_no#10 : 
- goto label_no#7
+ temp_no#6 = * var_temp_no#5
+ temp_no#7 = * 6
+ temp_no#8 = temp_no#6 <int temp_no#7
+ ifnot temp_no#8 goto label_no#7
+ temp_no#9 = * 5
+ temp_no#10 = * 4
+ temp_no#11 = temp_no#9 +int temp_no#10
+ var_temp_no#12 = temp_no#11
+ temp_no#14 =  == 3
+ ifnot temp_no#14 goto label_no#11
+ var_temp_no#13 = 4
+ goto label_no#10
  label_no#11 : 
- var_temp_no#38 = var_temp_no#38 +int 1
- goto label_no#8
- label_no#9 :
+ goto label_no#10
+ temp_no#23 =  == 9
+ ifnot temp_no#23 goto label_no#16
+ var_temp_no#15 = 100
+ var_temp_no#16 = 1
+ label_no#12 :
+ label_no#14 :
+ temp_no#17 = * var_temp_no#16
+ temp_no#18 = * 5
+ temp_no#19 = temp_no#17 <=int temp_no#18
+ ifnot temp_no#19 goto label_no#15
+ temp_no#20 = * var_temp_no#15
+ temp_no#21 = * 1
+ temp_no#22 = temp_no#20 -int temp_no#21
+ var_temp_no#15 = temp_no#22
+ var_temp_no#16 +=int 1
+ goto label_no#14
+ label_no#15 :
+ label_no#13 :
+ goto label_no#10
+ label_no#16 : 
+ goto label_no#10
+ label_no#17 : 
+ var_temp_no#5 +=int 2
+ goto label_no#6
  label_no#7 :
- goto label_no#5
- label_no#12 : 
- goto label_no#5
- label_no#13 : 
- goto label_no#5
- label_no#14 : 
- goto label_no#5
- temp_no#66 =  == 3
- ifnot temp_no#66 goto label_no#21
- var_temp_no#53 = 0
- label_no#15 : 
- temp_no#54 = * var_temp_no#53
- temp_no#55 = * 10
- temp_no#56 = temp_no#54 <int temp_no#55
+ label_no#10 :
+ var_temp_no#0 = 4
+ temp_no#24 = * var_temp_no#0
+ temp_no#25 = * 3
+ temp_no#26 = temp_no#24 +int temp_no#25
+ var_temp_no#0 = temp_no#26
+ temp_no#27 = * var_temp_no#0
+ temp_no#28 = * 5
+ temp_no#29 = temp_no#27 <int temp_no#28
+ ifnot temp_no#29 goto label_no#18
+ temp_no#30 = * 5
+ temp_no#31 = * 6
+ temp_no#32 = temp_no#30 +int temp_no#31
+ var_temp_no#33 = temp_no#32
+ goto label_no#19
  label_no#18 : 
- ifnot temp_no#56 goto label_no#17
- temp_no#57 = var_temp_no#53
- temp_no#57 = temp_no#57 *int 4
- temp_no#57 = temp_no#57 +int var_temp_no#1
- temp_no#58 = & var_temp_no#53
- * ['pointer', 'int'] = temp_no#58
- var_temp_no#53 = var_temp_no#53 +int 1
- goto label_no#18
- label_no#17 :
- label_no#16 :
- temp_no#59 = * var_temp_no#53
- temp_no#60 = * 1
- temp_no#61 = temp_no#59 -int temp_no#60
- temp_no#62 = temp_no#61
- temp_no#62 = temp_no#62 *int 4
- temp_no#62 = temp_no#62 +int var_temp_no#1
- temp_no#63 = * temp_no#62
- temp_no#64 = * var_temp_no#53
- temp_no#65 = temp_no#63 !=int temp_no#64
- ifnot temp_no#65 goto label_no#19
- goto label_no#5
- goto label_no#20
+ var_temp_no#34 = "whatthehell"
  label_no#19 : 
- var_temp_no#0 +=int 1
- label_no#20 : 
- goto label_no#5
- label_no#21 : 
- goto label_no#5
- var_temp_no#67 = 0
+ var_temp_no#1 = var_temp_no#1 +int 1
+ goto label_no#2
+ label_no#3 :
+ label_no#8 :
+ goto label_no#25
+ label_no#24 : 
+ var_temp_no#35 = 3
+ label_no#20 :
  label_no#22 :
- label_no#24 :
- temp_no#68 = * var_temp_no#67
- temp_no#69 = * 10
- temp_no#70 = temp_no#68 <int temp_no#69
- ifnot temp_no#70 goto label_no#25
- temp_no#71 = var_temp_no#67
- temp_no#71 = temp_no#71 *int 4
- temp_no#71 = temp_no#71 +int var_temp_no#1
- temp_no#72 = & var_temp_no#2
- * ['pointer', 'int'] = temp_no#72
- var_temp_no#67 = var_temp_no#67 +int 1
- goto label_no#24
- label_no#25 :
+ temp_no#36 = * var_temp_no#35
+ temp_no#37 = * 3
+ temp_no#38 = temp_no#36 >=int temp_no#37
+ ifnot temp_no#38 goto label_no#23
+ var_temp_no#39 = "edgy"
+ var_temp_no#35 = var_temp_no#35 +int 1
+ goto label_no#22
  label_no#23 :
+ label_no#21 :
+ label_no#25 : 
+ var_temp_no#40 = 5
  label_no#26 : 
+ temp_no#41 = * var_temp_no#40
+ temp_no#42 = * 78
+ temp_no#43 = temp_no#41 <int temp_no#42
+ label_no#29 : 
+ ifnot temp_no#43 goto label_no#28
+ var_temp_no#0 +=float 4.2
+ goto label_no#29
+ label_no#28 :
+ label_no#27 :
  return

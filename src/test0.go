@@ -1,35 +1,42 @@
 package main
+
 import "fmt"
+
+type Vertex struct {
+	X int
+	Y int
+}
 func main() {
-	flat_earthers_count:=0
-	flat_earthers_count=0
-	var x [10]*int
-	Evil_Santa:=666
-	switch(2+2/2) {
-		case 3*6*4/2+3*6/8-2-2*6: 
-			switch(*(x[0])) {
-				case 1: for y:=0;y < *(x[y]);y++ {
-							if(y<10) {
-								*(x[y])=*(&y)
-							} else {
-								break;
-							}
-						}		
-		    }
-		case 3:
-			var z int=0
-			for z<10 {
-				x[z]=&z
-				z++
-			}
-			if(*x[z-1]!=z) {
-				break		
-			} else {
-				flat_earthers_count+=1
-			}
-		default:
-			for i:=0;i<10;i++ {
-				x[i]=&Evil_Santa
-			}
-	}
+	var a int
+	// p=10
+	if true {
+	    for i:=0; i<=4; i++ {
+		    for j:=1; j<6; j+=2 {
+			    v:=5+4
+			    switch v {
+		    	    case 3: r:=4
+	        	    case 9: r:=100
+						for l:=1; l<=5; l+=1 {
+							r = r-1
+						}
+			        }
+		        }
+		    a=4
+		    a=a+3
+
+		    if a < 5 {
+    		    s:=5+6
+    	    } else {
+	    	    s:="whatthehell"
+    	    }
+	    }
+    } else {
+        for p:=3; p >=3; p++ {
+	        yash:="edgy"
+        }
+    }
+    ff:=5
+    for ff < 78 {
+    	a+=4.2
+    }
 }
