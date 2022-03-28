@@ -382,8 +382,8 @@ def p_const_spec(p):
             errors.add_error("Type Error", line_number.get()+1,
                              "Invalid type for constant " + p[2])
         if len(p[1].ident_list) != len(p[4].expr_list):
-            errors.add_error("Imbalaced assignment", line_number.get(
-            )+1, "Identifier and Expression list length is not equal")
+            errors.add_error("Assignment Error", line_number.get(
+            )+1, "Imbalaced assignment")
         for x in p[1].ident_list:
             if checker.check_ident(scope_table, curr_scope, scope_list, x, 'redeclaration') == True:
                 errors.add_error("Redeclaration error", line_number.get(
@@ -1198,16 +1198,15 @@ def p_primary_expr(p):
                              1, "Variable "+p[1]+" is not declared")
         p[0] = Node('PrimaryExpr')
         p[0].ast = [p[1]]
-        p[0].expr_type_list.append(scope_table[checker.check_ident(
-            scope_table, curr_scope, scope_list, p[1], "check_declaration")].table[p[1]]["type"])
+        p[0].expr_type_list.append(scope_table[checker.check_ident(scope_table, curr_scope, scope_list, p[1], "check_declaration") - 1].table[p[1]]["type"])
         p[0].data["memory"] = 1
         p[0].data["isID"] = p[1]
         x = checker.check_ident(scope_table, curr_scope,
-                                scope_list, p[1], 'check_declaration')
+                                scope_list, p[1], 'check_declaration') - 1
         temp1 = scope_table[x].table[p[1]]["type"]
         if(temp1 != ["func"]):
             p[0].expr_list = [scope_table[checker.check_ident(
-                scope_table, curr_scope, scope_list, p[1], 'check_declaration')].table[p[1]]["tmp"]]
+                scope_table, curr_scope, scope_list, p[1], 'check_declaration') - 1].table[p[1]]["tmp"]]
         else:
             p[0].expr_list = ["func"]
         if scope_table[x].table.get(temp1[0]) != None:
@@ -1448,7 +1447,7 @@ def p_assignment(p):
         errors.add_error('Type Error', line_number.get()+1,
                          'Assignment not allowed for this expression list')
     if len(p[1].expr_type_list) != len(p[3].expr_type_list):
-        errors.add_error('Type Error', line_number.get() +
+        errors.add_error('Assignment Error', line_number.get() +
                          1, 'Imbalanced assignment')
 
     for i in range(0, len(p[1].expr_type_list)):
