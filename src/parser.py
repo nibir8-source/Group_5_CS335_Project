@@ -590,7 +590,7 @@ def p_var_spec(p):
             temp.append(p[4].expr_list[i])
 
     if len(p) == 4:
-        print("hello")
+
         if(len(p[1].ident_list) != len(p[3].expr_type_list)):
             errors.add_error('Assignment Error', line_number.get()+1,
                              "Imbalanced Assignment")
@@ -654,14 +654,17 @@ def p_short_var_decl(p):
         temp.append(p[3].expr_list[i])
     p[0].expr_type_list = []
 
+
 def p_open_base(p):
     '''OpenBase : '''
     global curr_func_scope, scope_number
     curr_func_scope = scope_number + 1
 
+
 def p_close_base(p):
     '''CloseBase : '''
     scope_table[curr_scope].insert("total_size", offset_list[curr_func_scope])
+
 
 def p_function_decl(p):
     '''FunctionDecl : FUNCTION OpenBase FunctionName OpenScope Signature Block CloseBase CloseScope 
@@ -837,7 +840,8 @@ def p_field_decl(p):
         struct_sym_list.append(p[1])
         scope_table[curr_scope].update(
             curr_struct, p[1], ["pointer", curr_struct])
-        scope_table[curr_scope].update(curr_struct, "offset "+p[1], struct_offset)
+        scope_table[curr_scope].update(
+            curr_struct, "offset "+p[1], struct_offset)
         struct_offset += 4
     else:
         p[0].ast = ["FieldDecl", [p[1]], p[3].ast, "STRUCT", [p[5]], [p[6]]]
@@ -1298,10 +1302,10 @@ def p_Arguments(p):
               | LEFT_PARENTHESIS ExpressionList RIGHT_PARENTHESIS
               | LEFT_PARENTHESIS ExpressionList COMMA RIGHT_PARENTHESIS"""
     if len(p) == 3:
-        p[0] = Node()
+        p[0] = Node("Arguments")
         p[0].data["arguments"] = 1
         p[0].expr_type_list.append(["void"])
-        p[0].ast = p[1].ast
+        p[0].ast = []
     else:
         # print("hello")
         p[0] = p[2]
@@ -1452,8 +1456,9 @@ def p_assignment(p):
 
     for i in range(0, len(p[1].expr_type_list)):
         if p[1].expr_type_list[i] != p[3].expr_type_list[i]:
-            errors.add_error('Type Error', line_number.get()+1, "Mismatch of type for " +
-                             str(p[1].expr_type_list[i])+" and " + str(p[3].expr_type_list[i]))
+            if not (p[1].expr_type_list[i] == ["float"] and p[3].expr_type_list[i] == ["int"]):
+                errors.add_error('Type Error', line_number.get()+1, "Mismatch of type for " +
+                                 str(p[1].expr_type_list[i])+" and " + str(p[3].expr_type_list[i]))
     for i in range(0, len(p[1].expr_type_list)):
         temp = None
         if p[2].expr_type_list[0][0] != "=":
