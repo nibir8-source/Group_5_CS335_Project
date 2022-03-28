@@ -119,6 +119,7 @@ def close_scope():
     curr_scope = scope_list[-2]
     scope_list.pop()
 
+
 def create_label(p=None):
     global label_count
     label = "label_no:" + str(label_count)
@@ -413,7 +414,7 @@ def p_const_spec(p):
             errors.add_error("Imbalaced assignment", line_number.get(
             )+1, "Identifier and Expression list length is not equal")
         for i in range(0, len(p[1].ident_list)):
-            if checker.check_ident( scope_table, curr_scope, scope_list, p[1].ident_list[i], 'redeclaration') == True:
+            if checker.check_ident(scope_table, curr_scope, scope_list, p[1].ident_list[i], 'redeclaration') == True:
                 errors.add_error("Redeclaration error", line_number.get(
                 )+1, "Redeclaration of variable " + p[1].ident_list)
             else:
@@ -577,8 +578,11 @@ def p_var_spec(p):
                              "Imbalanced assignment")
         for i in range(0, len(p[1].ident_list)):
             if(p[4].expr_type_list[i] != scope_table[curr_scope].table[p[1].ident_list[i]]["type"]):
-                errors.add_error('Type Error', line_number.get(
-                )+1, "Mismatch of type for "+p[1].ident_list[i])
+                if not ((p[4].expr_type_list[i] == ['int'] and scope_table[curr_scope].table[p[1].ident_list[i]]["type"] == ["float"])):
+                    # print(p[4].expr_type_list[i],
+                    #       scope_table[curr_scope].table[p[1].ident_list[i]]["type"], p[4].expr_type_list[i] == 'int')
+                    errors.add_error('Type Error', line_number.get(
+                    )+1, "Mismatch of type for "+p[1].ident_list[i])
         for i in range(0, len(p[1].ident_list)):
             temp = [scope_table[curr_scope].table[p[1].ident_list[i]]["tmp"], "="]
             if(p[4].data["dereflist"][i] == 1):
@@ -732,6 +736,7 @@ def p_array_type(p):
         p[0].type_list.append("arr"+p[2])
         p[0].type_list += p[4].type_list
         p[0].data["typesize"] = temp*p[4].data["typesize"]
+
 
 def p_struct_type(p):
     '''StructType : STRUCT OpenStruct LEFT_BRACE FieldDeclStar RIGHT_BRACE CloseStruct'''
@@ -1193,13 +1198,16 @@ def p_primary_expr(p):
                              1, "Variable "+p[1]+" is not declared")
         p[0] = Node('PrimaryExpr')
         p[0].ast = [p[1]]
-        p[0].expr_type_list.append(scope_table[checker.check_ident(scope_table, curr_scope, scope_list, p[1], "check_declaration")].table[p[1]]["type"])
+        p[0].expr_type_list.append(scope_table[checker.check_ident(
+            scope_table, curr_scope, scope_list, p[1], "check_declaration")].table[p[1]]["type"])
         p[0].data["memory"] = 1
         p[0].data["isID"] = p[1]
-        x = checker.check_ident(scope_table, curr_scope, scope_list, p[1], 'check_declaration')
+        x = checker.check_ident(scope_table, curr_scope,
+                                scope_list, p[1], 'check_declaration')
         temp1 = scope_table[x].table[p[1]]["type"]
         if(temp1 != ["func"]):
-            p[0].expr_list = [scope_table[checker.check_ident(scope_table, curr_scope, scope_list, p[1], 'check_declaration')].table[p[1]]["tmp"]]
+            p[0].expr_list = [scope_table[checker.check_ident(
+                scope_table, curr_scope, scope_list, p[1], 'check_declaration')].table[p[1]]["tmp"]]
         else:
             p[0].expr_list = ["func"]
         if scope_table[x].table.get(temp1[0]) != None:
@@ -1369,6 +1377,8 @@ def p_string_lit(p):
     p[0].ast = [p[1]]
 
 # ----------------------------------------------------------
+
+
 def p_statement(p):
     '''Statement : Declaration 
     | SimpleStmt 
@@ -1449,7 +1459,7 @@ def p_assignment(p):
         temp = None
         if p[2].expr_type_list[0][0] != "=":
             temp = checker.check_operation(p[1].expr_type_list[i], [
-                                   p[2].expr_type_list[0][0][0:-1]], p[3].expr_type_list[i])
+                p[2].expr_type_list[0][0][0:-1]], p[3].expr_type_list[i])
             if(temp == None):
                 errors.add_error('Type Error', line_number.get()+1,
                                  "Invalid operation")
