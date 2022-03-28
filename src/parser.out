@@ -49,7 +49,7 @@ Rule 43    VarDecl -> VARIABLE LEFT_PARENTHESIS VarSpecStar RIGHT_PARENTHESIS
 Rule 44    VarSpecStar -> VarSpec SEMICOLON VarSpecStar
 Rule 45    VarSpecStar -> <empty>
 Rule 46    VarSpec -> IdentifierList Type
-Rule 47    VarSpec -> IdentifierList Type ASSIGNMENT Expression
+Rule 47    VarSpec -> IdentifierList Type ASSIGNMENT ExpressionList
 Rule 48    VarSpec -> IdentifierList IDENT ASSIGNMENT ExpressionList
 Rule 49    VarSpec -> IdentifierList IDENT
 Rule 50    VarSpec -> IdentifierList ASSIGNMENT ExpressionList
@@ -301,8 +301,8 @@ ContinueStmt         : 153
 Declaration          : 14 149
 ExprCaseClause       : 189 190
 ExprCaseClauseStar   : 184 185 186 187 189
-Expression           : 39 40 41 47 97 97 98 98 99 99 100 100 101 101 102 102 103 103 104 104 105 105 106 106 107 107 108 108 109 109 110 110 111 111 112 112 113 113 114 114 115 115 126 131 158 163 164 178 179 180 181 182 183 188 194 196
-ExpressionList       : 35 36 40 41 48 50 51 133 134 165 165 191 198
+Expression           : 39 40 41 97 97 98 98 99 99 100 100 101 101 102 102 103 103 104 104 105 105 106 106 107 107 108 108 109 109 110 110 111 111 112 112 113 113 114 114 115 115 126 131 158 163 164 178 179 180 181 182 183 188 194 196
+ExpressionList       : 35 36 40 41 47 48 50 51 133 134 165 165 191 198
 ExpressionName       : 186 187
 FieldDecl            : 65
 FieldDeclStar        : 64 65
@@ -571,7 +571,7 @@ state 19
     (42) VarDecl -> VARIABLE . VarSpec
     (43) VarDecl -> VARIABLE . LEFT_PARENTHESIS VarSpecStar RIGHT_PARENTHESIS
     (46) VarSpec -> . IdentifierList Type
-    (47) VarSpec -> . IdentifierList Type ASSIGNMENT Expression
+    (47) VarSpec -> . IdentifierList Type ASSIGNMENT ExpressionList
     (48) VarSpec -> . IdentifierList IDENT ASSIGNMENT ExpressionList
     (49) VarSpec -> . IdentifierList IDENT
     (50) VarSpec -> . IdentifierList ASSIGNMENT ExpressionList
@@ -743,7 +743,7 @@ state 36
     (44) VarSpecStar -> . VarSpec SEMICOLON VarSpecStar
     (45) VarSpecStar -> .
     (46) VarSpec -> . IdentifierList Type
-    (47) VarSpec -> . IdentifierList Type ASSIGNMENT Expression
+    (47) VarSpec -> . IdentifierList Type ASSIGNMENT ExpressionList
     (48) VarSpec -> . IdentifierList IDENT ASSIGNMENT ExpressionList
     (49) VarSpec -> . IdentifierList IDENT
     (50) VarSpec -> . IdentifierList ASSIGNMENT ExpressionList
@@ -760,7 +760,7 @@ state 36
 state 37
 
     (46) VarSpec -> IdentifierList . Type
-    (47) VarSpec -> IdentifierList . Type ASSIGNMENT Expression
+    (47) VarSpec -> IdentifierList . Type ASSIGNMENT ExpressionList
     (48) VarSpec -> IdentifierList . IDENT ASSIGNMENT ExpressionList
     (49) VarSpec -> IdentifierList . IDENT
     (50) VarSpec -> IdentifierList . ASSIGNMENT ExpressionList
@@ -987,7 +987,7 @@ state 50
 state 51
 
     (46) VarSpec -> IdentifierList Type .
-    (47) VarSpec -> IdentifierList Type . ASSIGNMENT Expression
+    (47) VarSpec -> IdentifierList Type . ASSIGNMENT ExpressionList
 
     SEMICOLON       reduce using rule 46 (VarSpec -> IdentifierList Type .)
     ASSIGNMENT      shift and go to state 100
@@ -2669,7 +2669,7 @@ state 99
     (44) VarSpecStar -> . VarSpec SEMICOLON VarSpecStar
     (45) VarSpecStar -> .
     (46) VarSpec -> . IdentifierList Type
-    (47) VarSpec -> . IdentifierList Type ASSIGNMENT Expression
+    (47) VarSpec -> . IdentifierList Type ASSIGNMENT ExpressionList
     (48) VarSpec -> . IdentifierList IDENT ASSIGNMENT ExpressionList
     (49) VarSpec -> . IdentifierList IDENT
     (50) VarSpec -> . IdentifierList ASSIGNMENT ExpressionList
@@ -2685,7 +2685,10 @@ state 99
 
 state 100
 
-    (47) VarSpec -> IdentifierList Type ASSIGNMENT . Expression
+    (47) VarSpec -> IdentifierList Type ASSIGNMENT . ExpressionList
+    (39) ExpressionList -> . Expression
+    (40) ExpressionList -> . ExpressionList COMMA Expression
+    (41) ExpressionList -> . LEFT_BRACKET Expression RIGHT_BRACKET IDENT LEFT_BRACE ExpressionList RIGHT_BRACE
     (96) Expression -> . UnaryExpr
     (97) Expression -> . Expression LOGICAL_OR Expression
     (98) Expression -> . Expression LOGICAL_AND Expression
@@ -2736,6 +2739,7 @@ state 100
     (144) TrueFalseLit -> . FALSE
     (142) ImaginaryLit -> . IMAGINARY
 
+    LEFT_BRACKET    shift and go to state 67
     IDENT           shift and go to state 68
     LEFT_PARENTHESIS shift and go to state 77
     ADD             shift and go to state 70
@@ -2753,7 +2757,8 @@ state 100
     FALSE           shift and go to state 93
     IMAGINARY       shift and go to state 94
 
-    Expression                     shift and go to state 144
+    ExpressionList                 shift and go to state 144
+    Expression                     shift and go to state 66
     UnaryExpr                      shift and go to state 69
     PrimaryExpr                    shift and go to state 75
     unary_op                       shift and go to state 76
@@ -5073,47 +5078,11 @@ state 143
 
 state 144
 
-    (47) VarSpec -> IdentifierList Type ASSIGNMENT Expression .
-    (97) Expression -> Expression . LOGICAL_OR Expression
-    (98) Expression -> Expression . LOGICAL_AND Expression
-    (99) Expression -> Expression . EQUAL Expression
-    (100) Expression -> Expression . NOT_EQUAL Expression
-    (101) Expression -> Expression . LESS_THAN Expression
-    (102) Expression -> Expression . LESS_THAN_EQUAL Expression
-    (103) Expression -> Expression . GREATER_THAN Expression
-    (104) Expression -> Expression . GREATER_THAN_EQUAL Expression
-    (105) Expression -> Expression . ADD Expression
-    (106) Expression -> Expression . SUBTRACT Expression
-    (107) Expression -> Expression . OR Expression
-    (108) Expression -> Expression . XOR Expression
-    (109) Expression -> Expression . MULTIPLY Expression
-    (110) Expression -> Expression . QUOTIENT Expression
-    (111) Expression -> Expression . REMAINDER Expression
-    (112) Expression -> Expression . SHIFT_LEFT Expression
-    (113) Expression -> Expression . SHIFT_RIGHT Expression
-    (114) Expression -> Expression . AND Expression
-    (115) Expression -> Expression . AND_NOT Expression
+    (47) VarSpec -> IdentifierList Type ASSIGNMENT ExpressionList .
+    (40) ExpressionList -> ExpressionList . COMMA Expression
 
-    SEMICOLON       reduce using rule 47 (VarSpec -> IdentifierList Type ASSIGNMENT Expression .)
-    LOGICAL_OR      shift and go to state 114
-    LOGICAL_AND     shift and go to state 115
-    EQUAL           shift and go to state 116
-    NOT_EQUAL       shift and go to state 117
-    LESS_THAN       shift and go to state 118
-    LESS_THAN_EQUAL shift and go to state 119
-    GREATER_THAN    shift and go to state 120
-    GREATER_THAN_EQUAL shift and go to state 121
-    ADD             shift and go to state 122
-    SUBTRACT        shift and go to state 123
-    OR              shift and go to state 124
-    XOR             shift and go to state 125
-    MULTIPLY        shift and go to state 126
-    QUOTIENT        shift and go to state 127
-    REMAINDER       shift and go to state 128
-    SHIFT_LEFT      shift and go to state 129
-    SHIFT_RIGHT     shift and go to state 130
-    AND             shift and go to state 131
-    AND_NOT         shift and go to state 132
+    SEMICOLON       reduce using rule 47 (VarSpec -> IdentifierList Type ASSIGNMENT ExpressionList .)
+    COMMA           shift and go to state 113
 
 
 state 145

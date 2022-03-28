@@ -1303,10 +1303,10 @@ def p_Arguments(p):
               | LEFT_PARENTHESIS ExpressionList RIGHT_PARENTHESIS
               | LEFT_PARENTHESIS ExpressionList COMMA RIGHT_PARENTHESIS"""
     if len(p) == 3:
-        p[0] = Node()
+        p[0] = Node("Arguments")
         p[0].data["arguments"] = 1
         p[0].expr_type_list.append(["void"])
-        p[0].ast = p[1].ast
+        p[0].ast = []
     else:
         # print("hello")
         p[0] = p[2]
@@ -1457,8 +1457,9 @@ def p_assignment(p):
 
     for i in range(0, len(p[1].expr_type_list)):
         if p[1].expr_type_list[i] != p[3].expr_type_list[i]:
-            errors.add_error('Type Error', line_number.get()+1, "Mismatch of type for " +
-                             str(p[1].expr_type_list[i])+" and " + str(p[3].expr_type_list[i]))
+            if not (p[1].expr_type_list[i] == ["float"] and p[3].expr_type_list[i] == ["int"]):
+                errors.add_error('Type Error', line_number.get()+1, "Mismatch of type for " +
+                                 str(p[1].expr_type_list[i])+" and " + str(p[3].expr_type_list[i]))
     for i in range(0, len(p[1].expr_type_list)):
         temp = None
         if p[2].expr_type_list[0][0] != "=":
