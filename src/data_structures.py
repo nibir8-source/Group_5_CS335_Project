@@ -79,10 +79,10 @@ class check_functions:
             else:
                 return False
 
-        if (purpose == 'check_declaration'):
+        if purpose == 'check_declaration':
             for x in scope_list[::-1]:
                 if(scope_table[x].search(ident) != None):
-                    return x
+                    return x + 1
             return False
 
     def check_unary_operation(self, unop, exp1):

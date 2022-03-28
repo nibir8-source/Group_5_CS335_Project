@@ -126,7 +126,8 @@ class Lexer:
         self.lexliterals = ''         # Literal characters that can be passed through
         self.lexmodule = None         # Module
         self.lineno = 1               # Current line number
-        self.prev_token = None        # Previous token
+        self.prev_token = LexToken()        # Previous token
+        self.prev_token.type = ""
 
     def clone(self, object=None):
         c = copy.copy(self)
