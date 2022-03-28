@@ -1,0 +1,69 @@
+
+Table Number,0
+
+Parent,0,=,
+
+Address,"{'type': ['struct'], 'name': ['string'], 'offset name': 0, 'street': ['string'], 'offset street': 100, 'city': ['string'], 'offset city': 200, 'state': ['string'], 'offset state': 300, 'Pincode': ['int'], 'offset Pincode': 400}"
+c1,"{'type': ['int'], 'tmp': 'var_temp_no:0', 'offset': 0, 'constant': True}"
+var_temp_no:0,{'type': 'c1'}
+c2,"{'type': ['int'], 'tmp': 'var_temp_no:1', 'offset': 4, 'constant': True}"
+var_temp_no:1,{'type': 'c2'}
+c3,"{'type': ['int'], 'tmp': 'var_temp_no:2', 'offset': 8, 'constant': True}"
+var_temp_no:2,{'type': 'c3'}
+v1,"{'type': ['float'], 'tmp': 'var_temp_no:3', 'offset': 12}"
+var_temp_no:3,{'type': 'v1'}
+v2,"{'type': ['float'], 'tmp': 'var_temp_no:4', 'offset': 16}"
+var_temp_no:4,{'type': 'v2'}
+v3,"{'type': ['float'], 'tmp': 'var_temp_no:5', 'offset': 20}"
+var_temp_no:5,{'type': 'v3'}
+main,"{'type': ['func'], 'scope': 1, 'accepts': [['void']], 'total_param_size': 0, 'return_type': [['void']], 'total_return_size': 0, 'return_size_list': []}"
+
+Table Number,1
+
+Parent,1,=,0
+
+main,{'type': ['func']}
+Address,"{'type': ['struct'], 'name': ['string'], 'offset name': 0, 'street': ['string'], 'offset street': 100, 'city': ['string'], 'offset city': 200, 'state': ['string'], 'offset state': 300, 'Pincode': ['int'], 'offset Pincode': 400}"
+temp_no:6,{'type': 'temp'}
+temp_no:7,{'type': 'temp'}
+temp_no:8,{'type': 'temp'}
+a1,"{'type': ['int'], 'tmp': 'var_temp_no:9', 'offset': 0}"
+var_temp_no:9,{'type': 'a1'}
+a2,"{'type': ['int'], 'tmp': 'var_temp_no:10', 'offset': 4}"
+var_temp_no:10,{'type': 'a2'}
+a3,"{'type': ['int'], 'tmp': 'var_temp_no:11', 'offset': 8}"
+var_temp_no:11,{'type': 'a3'}
+a4,"{'type': ['int'], 'tmp': 'var_temp_no:12', 'offset': 12}"
+var_temp_no:12,{'type': 'a4'}
+a5,"{'type': ['int'], 'tmp': 'var_temp_no:13', 'offset': 16}"
+var_temp_no:13,{'type': 'a5'}
+a6,"{'type': ['int'], 'tmp': 'var_temp_no:14', 'offset': 20}"
+var_temp_no:14,{'type': 'a6'}
+a7,"{'type': ['int'], 'tmp': 'var_temp_no:15', 'offset': 24}"
+var_temp_no:15,{'type': 'a7'}
+a8,"{'type': ['int'], 'tmp': 'var_temp_no:16', 'offset': 28}"
+var_temp_no:16,{'type': 'a8'}
+a10,"{'type': ['string'], 'tmp': 'var_temp_no:17', 'offset': 32, 'constant': True}"
+var_temp_no:17,{'type': 'a10'}
+a11,"{'type': ['string'], 'tmp': 'var_temp_no:18', 'offset': 132, 'constant': True}"
+var_temp_no:18,{'type': 'a11'}
+a12,"{'type': ['int'], 'tmp': 'var_temp_no:19', 'offset': 232, 'constant': True}"
+var_temp_no:19,{'type': 'a12'}
+a13,"{'type': ['int'], 'tmp': 'var_temp_no:20', 'offset': 236, 'constant': True}"
+var_temp_no:20,{'type': 'a13'}
+l,"{'type': ['int'], 'tmp': 'var_temp_no:21', 'offset': 240}"
+var_temp_no:21,{'type': 'l'}
+p,"{'type': ['int'], 'tmp': 'var_temp_no:22', 'offset': 244}"
+var_temp_no:22,{'type': 'p'}
+q,"{'type': ['int'], 'tmp': 'var_temp_no:23', 'offset': 248}"
+var_temp_no:23,{'type': 'q'}
+r,"{'type': ['string'], 'tmp': 'var_temp_no:24', 'offset': 252}"
+var_temp_no:24,{'type': 'r'}
+myarr,"{'type': ['arr10', 'string'], 'tmp': 'var_temp_no:25', 'offset': 352}"
+var_temp_no:25,{'type': 'myarr'}
+x,"{'type': ['int'], 'tmp': 'var_temp_no:26', 'offset': 1352}"
+var_temp_no:26,{'type': 'x'}
+s,"{'type': ['pointer', 'int'], 'tmp': 'var_temp_no:27', 'offset': 1356}"
+var_temp_no:27,{'type': 's'}
+temp_no:28,{'type': 'temp'}
+total_size,{'type': 1360}
