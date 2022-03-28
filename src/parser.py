@@ -55,7 +55,7 @@ curr_switch_type = 0
 temp_count = 0
 switch_expr = ""
 curr_struct = 0
-struct_off = 0
+struct_offset = 0
 curr_func_scope = 0
 offset_list = [0]
 struct_sym_list = []
@@ -100,7 +100,7 @@ def open_scope():
     scope_number += 1
     curr_scope = scope_number
     scope_list.append(curr_scope)
-    offset_list.append(4)
+    offset_list.append(0)
     scope_table[curr_scope] = SymTable()
     scope_table[curr_scope].assign_parent(prev_scope)
     scope_table[curr_scope].type_list = scope_table[prev_scope].type_list
@@ -124,9 +124,7 @@ def create_label(p=None):
     global label_count
     label = "label_no:" + str(label_count)
     label_count += 1
-    # print("helno")
     if ((not p is None) and (p == 1)):
-        # print("in all")
         start_for.append(label)
     if not p is None and p == 2:
         end_for.append(label)
@@ -325,15 +323,15 @@ def p_struct_decl(p):
     """StructDecl : TYPE StructName StructType"""
     p[0] = Node('StructDecl')
     scope_table[curr_scope].type_list.append(curr_struct)
-    scope_table[curr_scope].type_size_list[curr_struct] = struct_off
+    scope_table[curr_scope].type_size_list[curr_struct] = struct_offset
 
 
 def p_struct_name(p):
     """StructName : IDENT"""
     p[0] = Node('StructName')
-    global curr_struct, struct_off
+    global curr_struct, struct_offset
     curr_struct = p[1]
-    struct_off = 0
+    struct_offset = 0
     if p[1] in scope_table[curr_scope].type_list:
         errors.add_error('Redeclaration Error', line_number.get()+1,
                          "Redeclaration of type " + p[1])
@@ -656,16 +654,24 @@ def p_short_var_decl(p):
         temp.append(p[3].expr_list[i])
     p[0].expr_type_list = []
 
+def p_open_base(p):
+    '''OpenBase : '''
+    global curr_func_scope, scope_number
+    curr_func_scope = scope_number + 1
+
+def p_close_base(p):
+    '''CloseBase : '''
+    scope_table[curr_scope].insert("total_size", offset_list[curr_func_scope])
 
 def p_function_decl(p):
-    '''FunctionDecl : FUNCTION FunctionName OpenScope Signature Block CloseScope
-                    | FUNCTION FunctionName OpenScope Signature CloseScope'''
+    '''FunctionDecl : FUNCTION OpenBase FunctionName OpenScope Signature Block CloseBase CloseScope 
+                    | FUNCTION OpenBase FunctionName OpenScope Signature CloseBase CloseScope'''
 
     p[0] = Node('FunctionDecl')
-    if(len(p) == 6):
-        p[0].ast = ["FUNCTION", p[2].ast, p[4].ast]
+    if(len(p) == 8):
+        p[0].ast = ["FUNCTION", p[3].ast, p[5].ast]
     else:
-        p[0].ast = ["FUNCTION", p[2].ast, p[4].ast, p[5].ast]
+        p[0].ast = ["FUNCTION", p[3].ast, p[5].ast, p[6].ast]
 
 
 def p_function_name(p):
@@ -762,7 +768,7 @@ def p_field_decl(p):
               | IDENT STRUCT MULTIPLY IDENT
               | IDENT COMMA IdentifierList STRUCT MULTIPLY IDENT"""
     p[0] = Node('FieldDecl')
-    global struct_off
+    global struct_offset
     if len(p) == 3:
         if(isinstance(p[2], str)):
             p[0].ast = ["FieldDecl", [p[1]], [p[2]]]
@@ -772,8 +778,8 @@ def p_field_decl(p):
             struct_sym_list.append(p[1])
             scope_table[curr_scope].update(curr_struct, p[1], [p[2]])
             scope_table[curr_scope].update(
-                curr_struct, "offset "+p[1], struct_off)
-            struct_off += scope_table[curr_scope].type_size_list[p[2]]
+                curr_struct, "offset "+p[1], struct_offset)
+            struct_offset += scope_table[curr_scope].type_size_list[p[2]]
         else:
             p[0].ast = ["FieldDecl", [p[1]], p[2].ast]
             if(p[1] in struct_sym_list):
@@ -782,8 +788,8 @@ def p_field_decl(p):
             struct_sym_list.append(p[1])
             scope_table[curr_scope].update(curr_struct, p[1], p[2].type_list)
             scope_table[curr_scope].update(
-                curr_struct, "offset "+p[1], struct_off)
-            struct_off += p[2].data["typesize"]
+                curr_struct, "offset "+p[1], struct_offset)
+            struct_offset += p[2].data["typesize"]
     elif len(p) == 5 and not isinstance(p[3], str):
         if isinstance(p[4], str):
             p[0].ast = ["FieldDecl", [p[1]], p[3].ast, [p[4]]]
@@ -793,8 +799,8 @@ def p_field_decl(p):
             struct_sym_list.append(p[1])
             scope_table[curr_scope].update(curr_struct, p[1], [p[4]])
             scope_table[curr_scope].update(
-                curr_struct, "offset "+p[1], struct_off)
-            struct_off += scope_table[curr_scope].type_size_list[p[4]]
+                curr_struct, "offset "+p[1], struct_offset)
+            struct_offset += scope_table[curr_scope].type_size_list[p[4]]
             for x in p[3].ident_list:
                 if(x in struct_sym_list):
                     errors.add_error('Redeclaration Error', line_number.get(
@@ -802,8 +808,8 @@ def p_field_decl(p):
                 struct_sym_list.append(x)
                 scope_table[curr_scope].update(curr_struct, x, [p[4]])
                 scope_table[curr_scope].update(
-                    curr_struct, "offset "+x, struct_off)
-                struct_off += scope_table[curr_scope].type_size_list[p[4]]
+                    curr_struct, "offset "+x, struct_offset)
+                struct_offset += scope_table[curr_scope].type_size_list[p[4]]
         else:
             p[0].ast = ["FieldDecl", [p[1]], p[3].ast, p[4].ast]
             if(p[1] in struct_sym_list):
@@ -813,7 +819,7 @@ def p_field_decl(p):
             scope_table[curr_scope].update(curr_struct, p[1], p[4].type_list)
             scope_table[curr_scope].update(
                 curr_struct, "offset "+p[1], structOff)
-            struct_off += p[4].data["typesize"]
+            struct_offset += p[4].data["typesize"]
             for x in p[3].ident_list:
                 if x in struct_sym_list:
                     errors.add_error('Redeclaration Error', line_number.get(
@@ -821,7 +827,7 @@ def p_field_decl(p):
                 struct_sym_list.append(x)
                 scope_table[curr_scope].update(curr_struct, x, p[4].type_list)
                 scope_table[curr_scope].update(
-                    curr_struct, "offset "+x, struct_off)
+                    curr_struct, "offset "+x, struct_offset)
                 structOff += p[4].data["typesize"]
     elif len(p) == 5:
         p[0].ast = ["FieldDecl", [p[1]], "STRUCT", [p[3]], [p[4]]]
@@ -831,8 +837,8 @@ def p_field_decl(p):
         struct_sym_list.append(p[1])
         scope_table[curr_scope].update(
             curr_struct, p[1], ["pointer", curr_struct])
-        scope_table[curr_scope].update(curr_struct, "offset "+p[1], struct_off)
-        struct_off += 4
+        scope_table[curr_scope].update(curr_struct, "offset "+p[1], struct_offset)
+        struct_offset += 4
     else:
         p[0].ast = ["FieldDecl", [p[1]], p[3].ast, "STRUCT", [p[5]], [p[6]]]
         if p[6] != curr_struct:
@@ -849,8 +855,8 @@ def p_field_decl(p):
             scope_table[curr_scope].update(
                 curr_struct, x, ["pointer", curr_struct])
             scope_table[curr_scope].update(
-                curr_struct, "offset "+x, struct_off)
-            struct_off += 4
+                curr_struct, "offset "+x, struct_offset)
+            struct_offset += 4
 
 
 def p_pointer_type(p):
@@ -941,11 +947,11 @@ def p_parameters(p):
                 | LEFT_PARENTHESIS ParameterList COMMA RIGHT_PARENTHESIS'''
     p[0] = Node('Paramters')
     if(len(p) == 3):
-        scope_table[0].update(curr_func, "takes", [["void"]])
+        scope_table[0].update(curr_func, "accepts", [["void"]])
         scope_table[0].update(curr_func, "total_param_size", 0)
     else:
         p[0].ast = p[2].ast
-        scope_table[0].update(curr_func, "takes", p[2].expr_type_list)
+        scope_table[0].update(curr_func, "accepts", p[2].expr_type_list)
         arg_offset = -8
         param_sum = 0
         param_list = []
@@ -1225,8 +1231,6 @@ def p_primary_expr(p):
                 scope_table[curr_scope].table[temp][p[3]])
             p[0].data["memory"] = 1
             var1 = create_temp()
-            off = scope_table[curr_scope].table[p[1].expr_type_list[0]
-                                                [0]]["offset "+p[3]]
             p[0].data["deref"] = 1
             p[0].expr_list.append(var1)
         else:
@@ -1262,7 +1266,7 @@ def p_primary_expr(p):
         if p[1].expr_type_list[0][0] != "func" or p[1].data.get("isID") is None:
             errors.add_error("Error", line_number.get()+1,
                              "The primary expression is not a function")
-        if(p[2].expr_type_list != scope_table[0].table[p[1].data["isID"]]["takes"]):
+        if(p[2].expr_type_list != scope_table[0].table[p[1].data["isID"]]["accepts"]):
             errors.add_error("Error", line_number.get(
             )+1, "The arguments passed are not of the same type as the function")
         p[0] = Node('PrimaryExpr')
