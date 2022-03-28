@@ -3,27 +3,30 @@ Table Number,0
 
 Parent,0,=,
 
-pair,"{'type': ['struct'], 'x': ['int'], 'offset x': 0, 'y': ['int'], 'offset y': 4, 'z': ['pointer', 'pair'], 'offset z': 8}"
-Vertex,"{'type': ['struct'], 's': ['int'], 'offset s': 0, 't': ['int'], 'offset t': 4, 'u': ['pointer', 'Vertex'], 'offset u': 8}"
-our_func,"{'type': ['func'], 'scope': 1, 'accepts': [['Vertex'], ['int']], 'total_param_size': 16, 'param_size_list': [12, 4], 'return_type': [['int']], 'total_return_size': 4, 'return_size_list': [-24]}"
+x,"{'type': ['int'], 'tmp': 'var_temp_no:0', 'offset': 0}"
+var_temp_no:0,{'type': 'x'}
+y,"{'type': ['int'], 'tmp': 'var_temp_no:1', 'offset': 4}"
+var_temp_no:1,{'type': 'y'}
+Vertex,"{'type': ['struct'], 'Latitutde': ['float'], 'offset Latitutde': 0, 'Longitude': ['float'], 'offset Longitude': 4, 'ac': ['pointer', 'Vertex'], 'offset ac': 8}"
+calc,"{'type': ['func'], 'scope': 1, 'accepts': [['int'], ['int'], ['float']], 'total_param_size': 12, 'param_size_list': [4, 4, 4], 'return_type': [['void']], 'total_return_size': 0, 'return_size_list': []}"
 main,"{'type': ['func'], 'scope': 2, 'accepts': [['void']], 'total_param_size': 0, 'return_type': [['void']], 'total_return_size': 0, 'return_size_list': []}"
 
 Table Number,1
 
 Parent,1,=,0
 
-our_func,{'type': ['func']}
-pair,"{'type': ['struct'], 'x': ['int'], 'offset x': 0, 'y': ['int'], 'offset y': 4, 'z': ['pointer', 'pair'], 'offset z': 8}"
-Vertex,"{'type': ['struct'], 's': ['int'], 'offset s': 0, 't': ['int'], 'offset t': 4, 'u': ['pointer', 'Vertex'], 'offset u': 8}"
-a,"{'type': ['Vertex'], 'tmp': 'var_temp_no:0', 'offset': -12}"
-var_temp_no:0,{'type': 'a'}
-b,"{'type': ['int'], 'tmp': 'var_temp_no:1', 'offset': -8}"
-var_temp_no:1,{'type': 'b'}
-temp_no:2,{'type': 'temp'}
-temp_no:3,{'type': 'temp'}
-temp_no:4,{'type': 'temp'}
-temp_no:5,{'type': 'temp'}
-temp_no:6,{'type': 'temp'}
+calc,{'type': ['func']}
+Vertex,"{'type': ['struct'], 'Latitutde': ['float'], 'offset Latitutde': 0, 'Longitude': ['float'], 'offset Longitude': 4, 'ac': ['pointer', 'Vertex'], 'offset ac': 8}"
+x,"{'type': ['int'], 'tmp': 'var_temp_no:2', 'offset': -16}"
+var_temp_no:2,{'type': 'x'}
+y,"{'type': ['int'], 'tmp': 'var_temp_no:3', 'offset': -12}"
+var_temp_no:3,{'type': 'y'}
+z,"{'type': ['float'], 'tmp': 'var_temp_no:4', 'offset': -8}"
+var_temp_no:4,{'type': 'z'}
+a,"{'type': ['int'], 'tmp': 'var_temp_no:5', 'offset': 0}"
+var_temp_no:5,{'type': 'a'}
+b,"{'type': ['float'], 'tmp': 'var_temp_no:6', 'offset': 4}"
+var_temp_no:6,{'type': 'b'}
 temp_no:7,{'type': 'temp'}
 temp_no:8,{'type': 'temp'}
 temp_no:9,{'type': 'temp'}
@@ -38,70 +41,27 @@ temp_no:17,{'type': 'temp'}
 temp_no:18,{'type': 'temp'}
 temp_no:19,{'type': 'temp'}
 temp_no:20,{'type': 'temp'}
-total_size,{'type': 0}
-
-Table Number,2
-
-Parent,2,=,0
-
-our_func,{'type': ['func']}
-main,{'type': ['func']}
-pair,"{'type': ['struct'], 'x': ['int'], 'offset x': 0, 'y': ['int'], 'offset y': 4, 'z': ['pointer', 'pair'], 'offset z': 8}"
-Vertex,"{'type': ['struct'], 's': ['int'], 'offset s': 0, 't': ['int'], 'offset t': 4, 'u': ['pointer', 'Vertex'], 'offset u': 8}"
-a,"{'type': ['arr10', 'pair'], 'tmp': 'var_temp_no:21', 'offset': 0}"
-var_temp_no:21,{'type': 'a'}
-var1,"{'type': ['Vertex'], 'tmp': 'var_temp_no:70', 'offset': 124}"
-var_temp_no:70,{'type': 'var1'}
-var2,"{'type': ['Vertex'], 'tmp': 'var_temp_no:71', 'offset': 136}"
-var_temp_no:71,{'type': 'var2'}
-b,"{'type': ['pointer', 'int'], 'tmp': 'var_temp_no:72', 'offset': 148}"
-var_temp_no:72,{'type': 'b'}
-temp_no:73,{'type': 'temp'}
-temp_no:74,{'type': 'temp'}
-temp_no:75,{'type': 'temp'}
-temp_no:76,{'type': 'temp'}
-temp_no:77,{'type': 'temp'}
-temp_no:78,{'type': 'temp'}
-temp_no:79,{'type': 'temp'}
-temp_no:80,{'type': 'temp'}
-temp_no:81,{'type': 'temp'}
-temp_no:82,{'type': 'temp'}
-temp_no:83,{'type': 'temp'}
-temp_no:84,{'type': 'temp'}
-temp_no:85,{'type': 'temp'}
-temp_no:86,{'type': 'temp'}
-f,"{'type': ['int'], 'tmp': 'var_temp_no:87', 'offset': 152}"
-var_temp_no:87,{'type': 'f'}
-total_size,{'type': 156}
-
-Table Number,3
-
-Parent,3,=,2
-
-our_func,{'type': ['func']}
-main,{'type': ['func']}
-pair,"{'type': ['struct'], 'x': ['int'], 'offset x': 0, 'y': ['int'], 'offset y': 4, 'z': ['pointer', 'pair'], 'offset z': 8}"
-Vertex,"{'type': ['struct'], 's': ['int'], 'offset s': 0, 't': ['int'], 'offset t': 4, 'u': ['pointer', 'Vertex'], 'offset u': 8}"
-i,"{'type': ['int'], 'tmp': 'var_temp_no:22', 'offset': 120}"
-var_temp_no:22,{'type': 'i'}
+temp_no:21,{'type': 'temp'}
+temp_no:22,{'type': 'temp'}
 temp_no:23,{'type': 'temp'}
 temp_no:24,{'type': 'temp'}
 temp_no:25,{'type': 'temp'}
-
-Table Number,4
-
-Parent,4,=,3
-
-our_func,{'type': ['func']}
-main,{'type': ['func']}
-pair,"{'type': ['struct'], 'x': ['int'], 'offset x': 0, 'y': ['int'], 'offset y': 4, 'z': ['pointer', 'pair'], 'offset z': 8}"
-Vertex,"{'type': ['struct'], 's': ['int'], 'offset s': 0, 't': ['int'], 'offset t': 4, 'u': ['pointer', 'Vertex'], 'offset u': 8}"
 temp_no:26,{'type': 'temp'}
 temp_no:27,{'type': 'temp'}
 temp_no:28,{'type': 'temp'}
 temp_no:29,{'type': 'temp'}
 temp_no:30,{'type': 'temp'}
-temp_no:31,{'type': 'temp'}
+total_size,{'type': 8}
+
+Table Number,2
+
+Parent,2,=,0
+
+calc,{'type': ['func']}
+main,{'type': ['func']}
+Vertex,"{'type': ['struct'], 'Latitutde': ['float'], 'offset Latitutde': 0, 'Longitude': ['float'], 'offset Longitude': 4, 'ac': ['pointer', 'Vertex'], 'offset ac': 8}"
+vertex,"{'type': ['Vertex'], 'tmp': 'var_temp_no:31', 'offset': 0}"
+var_temp_no:31,{'type': 'vertex'}
 temp_no:32,{'type': 'temp'}
 temp_no:33,{'type': 'temp'}
 temp_no:34,{'type': 'temp'}
@@ -109,52 +69,4 @@ temp_no:35,{'type': 'temp'}
 temp_no:36,{'type': 'temp'}
 temp_no:37,{'type': 'temp'}
 temp_no:38,{'type': 'temp'}
-temp_no:39,{'type': 'temp'}
-temp_no:40,{'type': 'temp'}
-temp_no:41,{'type': 'temp'}
-temp_no:42,{'type': 'temp'}
-temp_no:43,{'type': 'temp'}
-temp_no:44,{'type': 'temp'}
-temp_no:45,{'type': 'temp'}
-temp_no:46,{'type': 'temp'}
-temp_no:47,{'type': 'temp'}
-temp_no:48,{'type': 'temp'}
-temp_no:49,{'type': 'temp'}
-temp_no:50,{'type': 'temp'}
-temp_no:51,{'type': 'temp'}
-temp_no:52,{'type': 'temp'}
-temp_no:53,{'type': 'temp'}
-
-Table Number,5
-
-Parent,5,=,3
-
-our_func,{'type': ['func']}
-main,{'type': ['func']}
-pair,"{'type': ['struct'], 'x': ['int'], 'offset x': 0, 'y': ['int'], 'offset y': 4, 'z': ['pointer', 'pair'], 'offset z': 8}"
-Vertex,"{'type': ['struct'], 's': ['int'], 'offset s': 0, 't': ['int'], 'offset t': 4, 'u': ['pointer', 'Vertex'], 'offset u': 8}"
-temp_no:54,{'type': 'temp'}
-temp_no:55,{'type': 'temp'}
-temp_no:56,{'type': 'temp'}
-temp_no:57,{'type': 'temp'}
-temp_no:58,{'type': 'temp'}
-temp_no:59,{'type': 'temp'}
-temp_no:60,{'type': 'temp'}
-
-Table Number,6
-
-Parent,6,=,3
-
-our_func,{'type': ['func']}
-main,{'type': ['func']}
-pair,"{'type': ['struct'], 'x': ['int'], 'offset x': 0, 'y': ['int'], 'offset y': 4, 'z': ['pointer', 'pair'], 'offset z': 8}"
-Vertex,"{'type': ['struct'], 's': ['int'], 'offset s': 0, 't': ['int'], 'offset t': 4, 'u': ['pointer', 'Vertex'], 'offset u': 8}"
-temp_no:61,{'type': 'temp'}
-temp_no:62,{'type': 'temp'}
-temp_no:63,{'type': 'temp'}
-temp_no:64,{'type': 'temp'}
-temp_no:65,{'type': 'temp'}
-temp_no:66,{'type': 'temp'}
-temp_no:67,{'type': 'temp'}
-temp_no:68,{'type': 'temp'}
-temp_no:69,{'type': 'temp'}
+total_size,{'type': 12}

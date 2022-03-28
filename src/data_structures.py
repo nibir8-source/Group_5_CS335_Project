@@ -16,8 +16,8 @@ class SymTable:
         self.table = {}
         self.type_list = ['rune', 'bool', 'int',
                           'float', 'string', 'imaginary']
-        self.type_size_list = {'rune': 1, 'bool': 1, 'int': 4,
-                               'float': 4, 'string': 200, 'imaginary': 10}
+        self.type_size_list = {'rune': 1, 'bool': 4, 'int': 4,
+                               'float': 4, 'string': 100, 'imaginary': 20}
 
     def set_parent(self, parent):
         self.parent = parent
@@ -70,6 +70,7 @@ class LineCount:
     def get(self):
         return self.lineno
 
+
 class check_functions:
     def check_ident(self, scope_table, curr_scope, scope_list, ident, purpose):
         if purpose == "redeclaration":
@@ -83,6 +84,7 @@ class check_functions:
                 if(scope_table[x].search(ident) != None):
                     return x
             return False
+
     def check_unary_operation(self, unop, exp1):
         unop = unop[0]
         if unop == "+" or unop == "-":
@@ -114,7 +116,7 @@ class check_functions:
             exp2 = ["pointer"]
             exp1 = exp2+exp1
             return exp1
-    
+
     def check_operation(self, expr_1, op, expr_2):
         if len(expr_1) > 1 or len(expr_2) > 1:
             return None
