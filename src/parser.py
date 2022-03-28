@@ -8,6 +8,7 @@ from lexer import *
 from data_structures import SymTable
 from data_structures import Node
 from data_structures import Errors
+from data_structures import check_functions
 import csv
 
 precedence = (
@@ -37,6 +38,7 @@ precedence = (
      'SHIFT_LEFT', 'SHIFT_RIGHT', 'AND', 'AND_NOT')
 )
 
+checker = check_functions()
 curr_scope = 0
 scope_number = 0
 scope_list = [0]
@@ -117,21 +119,6 @@ def close_scope():
     curr_scope = scope_list[-2]
     scope_list.pop()
 
-
-def presence_of_identifier(ident, purpose):
-    if purpose == "Isredeclared":
-        if scope_table[curr_scope].search(ident) != None:
-            return True
-        else:
-            return False
-
-    if (purpose == 'declared_anywhere'):
-        for x in scope_list[::-1]:
-            if(scope_table[x].search(ident) != None):
-                return x
-        return False
-
-
 def create_label(p=None):
     global label_count
     label = "label_no#" + str(label_count)
@@ -155,93 +142,6 @@ def create_temp(p=None):
         temp = "var_temp_no#" + str(temp_count)
         temp_count += 1
     return temp
-
-
-def check_operation(expr_1, op, expr_2):
-    if len(expr_1) > 1 or len(expr_2) > 1:
-        return None
-    if len(op) == 1:
-        op = op[0]
-    expr_1 = expr_1[0]
-    expr_2 = expr_2[0]
-    if expr_1 != expr_2:
-        if(expr_1 == "int" and expr_2 == "float") or (expr_1 == "float" and expr_2 == "int"):
-            if op == ">" or op == "<" or op == "==" or op == ">=" or op == "<=" or op == "!=":
-                return ["bool"]
-            if op == "|" or op == "^" or op == "<<" or op == ">>" or op == "%" or op == "&" or op == "&^":
-                return None
-            return ["float"]
-        if (expr_1 == "imaginary" and expr_2 == "int") or (expr_1 == "imaginary" and expr_2 == "float") or (expr_1 == "int" and expr_2 == "imaginary") or (expr_1 == "float" and expr_2 == "imaginary"):
-            if op == ">" or op == "<" or op == ">=" or op == "<=" or op == "|" or op == "^" or op == "<<" or op == ">>" or op == "%" or op == "&" or op == "&^":
-                return None
-            if op == "==" or op == "!=":
-                return ["bool"]
-            return ["imaginary"]
-
-        return None
-    if op == "||" or op == "&&":
-        if(expr_1 == "bool"):
-            # print(expr_1,op,expr_2)
-            return [expr_1]
-        else:
-            return None
-    if expr_1 == "int" or expr_1 == "rune":
-        if op == ">" or op == "<" or op == "==" or op == ">=" or op == "<=" or op == "!=":
-            return ["bool"]
-        return [expr_1]
-    if expr_1 == "float":
-        if op == ">" or op == "<" or op == "==" or op == ">=" or op == "<=" or op == "==" or op == "!=":
-            return ["bool"]
-        if op == "|" or op == "^" or op == "<<" or op == ">>" or op == "%" or op == "&" or op == "&^":
-            return None
-        else:
-            return [expr_1]
-    if expr_1 == "string":
-        if op == "+":
-            return [expr_1]
-        else:
-            return None
-
-    if expr_1 == "imaginary":
-        if op == "+" or op == "-" or op == "*" or op == "/":
-            return [expr_1]
-        elif op == "!=" or op == "==":
-            return ["bool"]
-        else:
-            return None
-
-
-def check_unary_operation(unop, exp1):
-    unop = unop[0]
-    if unop == "+" or unop == "-":
-        if(len(exp1) > 1):
-            return None
-        exp1 = exp1[0]
-        if exp1 == "int" or exp1 == "float" or exp1 == "rune" or exp1 == "imaginary":
-            return [exp1]
-        else:
-            return None
-    if unop == "!":
-        if len(exp1) > 1:
-            return None
-        if exp1 == ["bool"]:
-            return exp1
-        else:
-            return None
-    if unop == "^":
-        if len(exp1) > 1 or exp1[0] != "int":
-            return None
-        else:
-            return exp1
-    if unop == "*":
-        if exp1[0] != "pointer":
-            return None
-        exp1 = exp1[1:]
-        return exp1
-    if unop == "&":
-        exp2 = ["pointer"]
-        exp1 = exp2+exp1
-        return exp1
 
 # ----------------------------------------------------------------------------------------
 
@@ -410,8 +310,8 @@ def p_import_spec_semicolon_star(p):
 
 def p_import_spec(p):
     '''ImportSpec : PERIOD ImportPath
-                    | IDENT ImportPath
-                    | ImportPath'''
+    | IDENT ImportPath
+    | ImportPath'''
     p[0] = Node('ImportSpec')
     if(len(p) > 2):
         p[0] = p[2]
@@ -438,14 +338,14 @@ def p_declaration(p):
     # print("hell", p[0].ast)
 
 
-def p_StructDecl(p):
+def p_struct_decl(p):
     """StructDecl : TYPE StructName StructType"""
     p[0] = Node('StructDecl')
     scope_table[curr_scope].type_list.append(curr_struct)
     scope_table[curr_scope].type_size_list[curr_struct] = struct_off
 
 
-def p_StructName(p):
+def p_struct_name(p):
     """StructName : IDENT"""
     p[0] = Node('StructName')
     global curr_struct, struct_off
@@ -506,7 +406,7 @@ def p_const_spec(p):
             errors.add_error("Imbalaced assignment", line_number.get(
             )+1, "Identifier and Expression list length is not equal")
         for x in p[1].ident_list:
-            if presence_of_identifier(x, 'Isredeclared') == True:
+            if checker.check_ident(scope_table, curr_scope, scope_list, x, 'redeclaration') == True:
                 errors.add_error("Redeclaration error", line_number.get(
                 )+1, "Redeclaration of variable " + x)
             else:
@@ -536,7 +436,7 @@ def p_const_spec(p):
             errors.add_error("Imbalaced assignment", line_number.get(
             )+1, "Identifier and Expression list length is not equal")
         for i in range(0, len(p[1].ident_list)):
-            if presence_of_identifier(p[1].ident_list[i], 'Isredeclared') == True:
+            if checker.check_ident( scope_table, curr_scope, scope_list, p[1].ident_list[i], 'redeclaration') == True:
                 errors.add_error("Redeclaration error", line_number.get(
                 )+1, "Redeclaration of variable " + p[1].ident_list)
             else:
@@ -620,32 +520,6 @@ def p_expression_list(p):
         else:
             p[0].data["memory"] = 0
 
-# def p_type_decl(p):
-#     '''TypeDecl : TYPE TypeDef
-#                 | TYPE LEFT_PARENTHESIS TypeDefStar RIGHT_PARENTHESIS'''
-#     if len(p)==3:
-#         p[0]=['TypeDecl', [p[1]], p[2]]
-#     else:
-#         p[0]=['TypeDecl', [p[1]], p[3]]
-
-# def p_type_spec_star(p):
-#     '''TypeDefStar : TypeDef SEMICOLON TypeDefStar
-#     |'''
-#     if len(p) == 1:
-#         p[0] = []
-#     else:
-#         p[0] = ['TypeDefStar', p[1], p[2]]
-# def p_type_def(p):
-#     '''TypeDef : IDENT Type
-#     | IDENT IDENT PERIOD IDENT
-#     | IDENT IDENT'''
-#     if len(p)==5:
-#         p[0] = ['TypeDef', [p[1]], [p[2]], [p[3]], [p[4]]]
-#     elif isinstance(p[2], str):
-#         p[0] = ['TypeDef', [p[1]], [p[2]]]
-#     else:
-#         p[0] = ['TypeDef', [p[1]], p[2]]
-
 
 def p_var_decl(p):
     '''VarDecl : VARIABLE VarSpec
@@ -704,7 +578,7 @@ def p_var_spec(p):
 
     if len(p) == 5 or len(p) == 3:
         for x in p[1].ident_list:
-            if presence_of_identifier(x, 'Isredeclared') == True and x != "_":
+            if checker.check_ident(scope_table, curr_scope, scope_list, x, 'redeclaration') == True and x != "_":
                 errors.add_error('Redeclaration Error', line_number.get(
                 )+1, 'Redeclaration of identifier:'+x)
             else:
@@ -754,7 +628,7 @@ def p_var_spec(p):
             if not p[3].expr_type_list[i][0] in basic_types_list:
                 errors.add_error('Assignment Error', line_number.get(
                 )+1, "Auto assignment of only basic types allowed")
-            if presence_of_identifier(p[1].ident_list[i], 'Isredeclared') is True and p[1].ident_list[i] != "_":
+            if checker.check_ident(scope_table, curr_scope, scope_list, p[1].ident_list[i], 'redeclaration') is True and p[1].ident_list[i] != "_":
                 errors.add_error('Redeclaration Error', line_number.get(
                 )+1, 'Redeclaration of identifier: '+p[1].ident_list[i])
             var1 = create_temp(1)
@@ -790,7 +664,7 @@ def p_short_var_decl(p):
         if not p[3].expr_type_list[i][0] in basic_types_list:
             errors.add_error('Assignemnt Error', line_number.get(
             )+1, "Auto assignment of only basic types allowed")
-        if presence_of_identifier(p[1].ident_list[i], 'Isredeclared') is True and p[1].ident_list[i] != "_":
+        if checker.check_ident(scope_table, curr_scope, scope_list, p[1].ident_list[i], 'redeclaration') is True and p[1].ident_list[i] != "_":
             errors.add_error('Assignment Error', line_number.get(
             )+1, 'Redeclaration of identifier:'+p[1].ident_list[i])
         var1 = create_temp(1)
@@ -837,7 +711,7 @@ def p_function_name(p):
     p[0] = Node('FunctionName')
     p[0].ast = [p[1]]
     global curr_func
-    if presence_of_identifier(p[1], 'Isredeclared') == True:
+    if checker.check_ident(scope_table, curr_scope, scope_list, p[1], 'redeclaration') == True:
         errors.add_error("Redecleration", line_number.get() +
                          1, p[1]+" is redeclared")
     scope_table[0].insert(p[1], ["func"])
@@ -846,7 +720,6 @@ def p_function_name(p):
     curr_func = p[1]
 
 # --------------------- TYPES -------------------------------------
-# Removed IDENT PERIOD IDENT
 
 
 def p_type(p):
@@ -871,10 +744,6 @@ def p_type(p):
 def p_type_lit(p):
     '''TypeLit : ArrayType 
     | PointerType '''
-    # | StructType
-    # | FunctionType
-    # | SliceType
-    # | MapType
     p[0] = p[1]
 
 
@@ -897,20 +766,6 @@ def p_array_type(p):
         p[0].type_list.append("arr"+p[2])
         p[0].type_list += p[4].type_list
         p[0].data["typesize"] = temp*p[4].data["typesize"]
-
-
-# def p_slice_type(p):
-#     '''SliceType : LEFT_BRACKET RIGHT_BRACKET Type
-#     | LEFT_BRACKET RIGHT_BRACKET IDENT PERIOD IDENT
-#     | LEFT_BRACKET RIGHT_BRACKET IDENT'''
-#     p[0] = ['SliceType']
-#     for idx in range(1,len(p)):
-#         if p[idx] == '[' or p[idx] == ']':
-#             continue
-#         if isinstance(p[idx],str):
-#             p[0].append([p[idx]])
-#         else:
-#             p[0].append(p[idx])
 
 def p_struct_type(p):
     '''StructType : STRUCT OpenStruct LEFT_BRACE FieldDeclStar RIGHT_BRACE CloseStruct'''
@@ -935,22 +790,6 @@ def p_field_decl_star(p):
             p[0].ast = []
         p[0].code += p[1].code
         p[0].code += p[2].code
-
-# def p_field_decl(p):
-#     '''FieldDecl : IdentifierList Type Tag
-#     | IdentifierList IDENT Tag
-#     | IdentifierList IDENT PERIOD IDENT Tag
-#     | IdentifierList Type
-#     | IdentifierList IDENT
-#     | IdentifierList IDENT PERIOD IDENT
-#     | EmbeddedField Tag
-#     | EmbeddedField'''
-#     p[0] = ['FieldDecl']
-#     for idx in range(1,len(p)):
-#         if isinstance(p[idx],str):
-#             p[0].append([p[idx]])
-#         else:
-#             p[0].append(p[idx])
 
 
 def p_field_decl(p):
@@ -1051,26 +890,10 @@ def p_field_decl(p):
                 curr_struct, "offset "+x, struct_off)
             struct_off += 4
 
-# def p_embedded_field(p):
-#     '''EmbeddedField : MULTIPLY IDENT
-#     | MULTIPLY IDENT PERIOD IDENT
-#     | IDENT
-#     | IDENT PERIOD IDENT'''
-#     if len(p) == 2:
-#         p[0] = [p[1]]
-#     else:
-#         p[0] = ['EmbeddedField']
-#         for index in range(1,len(p)):
-#             p[0].append([p[index]])
-# def p_tag(p):
-#     '''Tag : STRING'''
-#     p[0] = [p[1]]
-
 
 def p_pointer_type(p):
     '''PointerType : MULTIPLY Type
         | MULTIPLY IDENT'''
-    # | MULTIPLY IDENT PERIOD IDENT'''
     if isinstance(p[2], str) and not p[2] in scope_table[curr_scope].type_list:
         errors.add_error('Type Error', line_number.get()+1,
                          "Invalid type of identifier "+p[2])
@@ -1085,9 +908,6 @@ def p_pointer_type(p):
         p[0].ast = ["*", p[2].ast]
         p[0].type_list += p[2].type_list
         p[0].data["typesize"] = 4
-# def p_function_type(p):
-#     '''FunctionType : FUNCTION Signature'''
-#     p[0] = ['FunctionType', [p[0]], p[1]]
 
 
 def p_signature(p):
@@ -1208,7 +1028,7 @@ def p_ParameterDecl(p):
     if not isinstance(p[1], str):
         p[0].ident_list = p[1].ident_list
         for x in p[1].ident_list:
-            if presence_of_identifier(x, 'Isredeclared') == True and x != "_":
+            if checker.check_ident(scope_table, curr_scope, scope_list, x, 'redeclaration') == True and x != "_":
                 errors.add_error(line_number.get()+1,
                                  "Redeclaration of identifier "+x)
             else:
@@ -1230,7 +1050,7 @@ def p_ParameterDecl(p):
                     p[0].expr_type_list.append(p[2].type_list)
                     p[0].expr_list.append(p[2].data["typesize"])
     else:
-        if presence_of_identifier(p[1], 'Isredeclared') == True and p[1] != "_":
+        if checker.check_ident(scope_table, curr_scope, scope_list, p[1], 'redeclaration') == True and p[1] != "_":
             errors.add_error(line_number.get()+1,
                              "Redeclaration of identifier "+p[1])
         else:
@@ -1271,22 +1091,6 @@ def p_ParaIdentList(p):
         p[0].ident_list.append(p[3])
 
 # --------------------------------------------------------------------
-# def p_MapType(p):
-#     '''MapType : MAP LEFT_BRACKET Type RIGHT_BRACKET Type
-#     | MAP LEFT_BRACKET Type RIGHT_BRACKET IDENT
-#     | MAP LEFT_BRACKET Type RIGHT_BRACKET IDENT PERIOD IDENT
-#     | MAP LEFT_BRACKET IDENT RIGHT_BRACKET Type
-#     | MAP LEFT_BRACKET IDENT RIGHT_BRACKET IDENT
-#     | MAP LEFT_BRACKET IDENT RIGHT_BRACKET IDENT PERIOD IDENT
-#     | MAP LEFT_BRACKET IDENT PERIOD IDENT RIGHT_BRACKET Type
-#     | MAP LEFT_BRACKET IDENT PERIOD IDENT RIGHT_BRACKET IDENT
-#     | MAP LEFT_BRACKET IDENT PERIOD IDENT RIGHT_BRACKET IDENT PERIOD IDENT'''
-#     p[0]=['MapType']
-#     for index in range(1,len(p)):
-#       if(isinstance(p[index],str) and p[index]!="[" and p[index]!="]" and p[index]!="map"):
-#         p[0].append([p[index]])
-#       elif(p[index]!="[" and p[index]!="]" and p[index]!="map"):
-#         p[0].append(p[index])
 
 
 def p_block(p):
@@ -1341,7 +1145,7 @@ def p_expression(p):
         if len(p[1].expr_type_list) > 1 or len(p[3].expr_type_list) > 1:
             errors.add_error("Operation Error", line_number.get(
             )+1, "Can't apply binary operators to multiple values")
-        if check_operation(p[1].expr_type_list[0], p[2], p[3].expr_type_list[0]) is None:
+        if checker.check_operation(p[1].expr_type_list[0], p[2], p[3].expr_type_list[0]) is None:
             # print(check_operation(p[1].expr_type_list[0], p[2], p[3].expr_type_list[0]))
             # print(p[1].expr_type_list[0], p[2], p[3].expr_type_list[0])
             errors.add_error("Operation Error", line_number.get()+1,
@@ -1357,7 +1161,7 @@ def p_expression(p):
             p[0].code.append([var2, "=", "*", p[3].expr_list[0]])
         else:
             var2 = p[3].expr_list[0]
-        p[0].expr_type_list.append(check_operation(
+        p[0].expr_type_list.append(checker.check_operation(
             p[1].expr_type_list[0], [p[2]], p[3].expr_type_list[0]))
         p[0].data["memory"] = 0
         var3 = create_temp()
@@ -1377,10 +1181,10 @@ def p_unary_expr(p):
         if len(p[1].expr_type_list) > 1:
             errors.add_error("Operation Error", line_number.get(
             )+1, "Can't apply binary operators to multiple values")
-        if check_unary_operation(p[1].expr_type_list[0], p[2].expr_type_list[0]) is None:
+        if checker.check_unary_operation(p[1].expr_type_list[0], p[2].expr_type_list[0]) is None:
             errors.add_error("Operation Error", line_number.get()+1,
                              "Invalid types for operator")
-        p[0].expr_type_list.append(check_unary_operation(
+        p[0].expr_type_list.append(checker.check_unary_operation(
             p[1].expr_type_list[0], p[2].expr_type_list[0]))
         p[0].code = p[2].code
         if p[1].expr_type_list[0][0] == "*":
@@ -1432,36 +1236,31 @@ def p_primary_expr(p):
     | PrimaryExpr Index
     | PrimaryExpr PERIOD IDENT 
     | PrimaryExpr Arguments'''
-    # | PrimaryExpr Slice
-    # | PrimaryExpr Selector
-    # | IDENT PERIOD IDENT
     if len(p) == 2 and not isinstance(p[1], str):
         p[0] = p[1]
         p[0].data["memory"] = 0
         p[0].expr_list = p[1].expr_list
 
     elif len(p) == 2:
-        if(presence_of_identifier(p[1], "declared_anywhere") == False):
+        if checker.check_ident(scope_table, curr_scope, scope_list, p[1], "check_declaration") == False:
             errors.add_error("Undeclared Error", line_number.get() +
                              1, "Variable "+p[1]+" is not declared")
         p[0] = Node('PrimaryExpr')
         p[0].ast = [p[1]]
-        p[0].expr_type_list.append(scope_table[presence_of_identifier(
-            p[1], "declared_anywhere")].table[p[1]]["type"])
+        p[0].expr_type_list.append(scope_table[checker.check_ident(scope_table, curr_scope, scope_list, p[1], "check_declaration")].table[p[1]]["type"])
         p[0].data["memory"] = 1
         p[0].data["isID"] = p[1]
-        x = presence_of_identifier(p[1], 'declared_anywhere')
+        x = checker.check_ident(scope_table, curr_scope, scope_list, p[1], 'check_declaration')
         temp1 = scope_table[x].table[p[1]]["type"]
         if(temp1 != ["func"]):
-            p[0].expr_list = [scope_table[presence_of_identifier(
-                p[1], 'declared_anywhere')].table[p[1]]["tmp"]]
+            p[0].expr_list = [scope_table[checker.check_ident(scope_table, curr_scope, scope_list, p[1], 'check_declaration')].table[p[1]]["tmp"]]
         else:
             p[0].expr_list = ["func"]
         if scope_table[x].table.get(temp1[0]) != None:
             if(scope_table[x].table[temp1[0]]["type"] == ["struct"]):
                 var1 = create_temp()
-                p[0].code.append([var1, "=", "&", scope_table[presence_of_identifier(
-                    p[1], 'declared_anywhere')].table[p[1]]["tmp"]])
+                p[0].code.append([var1, "=", "&", scope_table[checker.check_ident(scope_table, curr_scope, scope_list, 
+                    p[1], 'check_declaration')].table[p[1]]["tmp"]])
                 p[0].data["deref"] = 1
                 p[0].expr_list = [var1]
         elif temp1[0][0:3] == "arr" or temp1[0] == "pointer":
@@ -1554,10 +1353,6 @@ def p_primary_expr(p):
         for i in range(0, len(p[0].expr_list)):
             p[0].code.append([p[0].expr_list[i], "=", "retval_"+str(i+1)])
 
-# def p_selector(p):
-#     '''Selector : PERIOD IDENT'''
-#     p[0] = ['Selector', [p[1]], [p[2]]]
-
 
 def p_index(p):
     '''Index : LEFT_BRACKET Expression RIGHT_BRACKET'''
@@ -1569,43 +1364,6 @@ def p_index(p):
     p[0] = p[2]
     p[0].ast = ["Index", p[2].ast]
     p[0].data["index"] = 1
-# def p_slice(p):
-#     '''Slice : LEFT_BRACKET Expression COLON Expression RIGHT_BRACKET
-#     | LEFT_BRACKET Expression COLON RIGHT_BRACKET
-#     | LEFT_BRACKET COLON Expression RIGHT_BRACKET
-#     | LEFT_BRACKET COLON RIGHT_BRACKET
-#     | LEFT_BRACKET Expression COLON Expression COLON Expression RIGHT_BRACKET
-#     | LEFT_BRACKET COLON Expression COLON Expression RIGHT_BRACKET'''
-#     p[0] = ['Slice']
-#     for idx in range(1,len(p)):
-#         if p[idx] == '[' or p[idx] == ']' or p[idx] == ':':
-#             continue
-#         if isinstance(p[idx],str):
-#             p[0].append([p[idx]])
-#         else:
-#             p[0].append(p[idx])
-# def p_arguments(p):
-#     '''Arguments : LEFT_PARENTHESIS RIGHT_PARENTHESIS
-#               | LEFT_PARENTHESIS ExpressionList RIGHT_PARENTHESIS
-#               | LEFT_PARENTHESIS ExpressionList COMMA RIGHT_PARENTHESIS
-#               | LEFT_PARENTHESIS Type RIGHT_PARENTHESIS
-#               | LEFT_PARENTHESIS Type COMMA RIGHT_PARENTHESIS
-#               | LEFT_PARENTHESIS Type COMMA ExpressionList RIGHT_PARENTHESIS
-#               | LEFT_PARENTHESIS Type COMMA ExpressionList COMMA RIGHT_PARENTHESIS
-#               | LEFT_PARENTHESIS IDENT RIGHT_PARENTHESIS
-#               | LEFT_PARENTHESIS IDENT COMMA RIGHT_PARENTHESIS
-#               | LEFT_PARENTHESIS IDENT COMMA ExpressionList RIGHT_PARENTHESIS
-#               | LEFT_PARENTHESIS IDENT COMMA ExpressionList COMMA RIGHT_PARENTHESIS
-#               | LEFT_PARENTHESIS IDENT PERIOD IDENT RIGHT_PARENTHESIS
-#               | LEFT_PARENTHESIS IDENT PERIOD IDENT COMMA RIGHT_PARENTHESIS
-#               | LEFT_PARENTHESIS IDENT PERIOD IDENT COMMA ExpressionList RIGHT_PARENTHESIS
-#               | LEFT_PARENTHESIS IDENT PERIOD IDENT COMMA ExpressionList COMMA RIGHT_PARENTHESIS'''
-#     p[0] = ['Arguments']
-#     for idx in range(1,len(p)):
-#         if isinstance(p[idx],str) and p[idx]!="(" and p[idx]!=")" and p[idx] != ",":
-#             p[0].append([p[idx]])
-#         elif p[idx]!="(" and p[idx]!=")" and p[idx] != ",":
-#             p[0].append(p[idx])
 
 
 def p_Arguments(p):
@@ -1690,57 +1448,6 @@ def p_string_lit(p):
     p[0].expr_list.append(p[1])
     p[0].ast = [p[1]]
 
-
-# def p_composite_lit(p):
-#     '''CompositeLit : StructType LiteralValue
-#                 | ArrayType LiteralValue
-#                 | SliceType LiteralValue
-#                 | MapType LiteralValue
-#                 | IDENT LiteralValue
-#                 | IDENT PERIOD IDENT LiteralValue'''
-#     p[0] = ['CompositeLit']
-#     for idx in range(1,len(p)):
-#         if isinstance(p[idx],str) and p[idx]!="[" and p[idx]!="]" and p[idx]!=",":
-#             p[0].append([p[idx]])
-#         elif p[idx]!="[" and p[idx]!="]" and p[idx]!=",":
-#             p[0].append(p[idx])
-# def p_literal_value(p):
-#     '''LiteralValue : LEFT_BRACE RIGHT_BRACE
-#                     | LEFT_BRACE ElementList RIGHT_BRACE
-#                     | LEFT_BRACE ElementList COMMA RIGHT_BRACE'''
-#     if len(p) == 3:
-#         p[0] = []
-#     else:
-#         p[0] = p[2]
-# def p_element_list(p):
-#     '''ElementList : KeyedElement
-#     | ElementList COMMA KeyedElement'''
-#     if len(p) == 2:
-#         p[0] = p[1]
-#     else:
-#         p[0] = ['ElementList', p[1], p[3]]
-# def p_keyed_element(p):
-#     '''KeyedElement : Element
-#                     | IDENT COLON Element
-#                     | Expression COLON Element
-#                     | LiteralValue COLON Element'''
-#     if len(p) == 2:
-#         p[0] = p[1]
-#     else:
-#         p[0] = ['KeyedElement']
-#         for idx in range(1,len(p)):
-#             if(isinstance(p[idx],str)):
-#                 p[0].append([p[idx]])
-#             else:
-#                 p[0].append(p[idx])
-# def p_element(p):
-#     '''Element : Expression
-#     | LiteralValue'''
-#     p[0] = p[1]
-# def p_function_lit(p):
-#     '''FunctionLit : FUNCTION Signature Block'''
-#     p[0] = ['FunctionLit', p[2], p[3]]
-
 # ----------------------------------------------------------
 def p_statement(p):
     '''Statement : Declaration 
@@ -1768,10 +1475,6 @@ def p_simple_stmt(p):
         p[0] = p[1]
     else:
         p[0] = Node('SimpleStmt')
-
-# def p_labeled_stmt(p):
-#     '''LabeledStmt : IDENT COLON Statement '''
-#     p[0] = ['LabeledStmt', [p[1]], [p[2]], p[3]]
 
 
 def p_inc_dec_stmt(p):
@@ -1837,7 +1540,7 @@ def p_assignment(p):
     for i in range(0, len(p[1].expr_type_list)):
         temp = None
         if p[2].expr_type_list[0][0] != "=":
-            temp = check_operation(p[1].expr_type_list[i], [
+            temp = checker.check_operation(p[1].expr_type_list[i], [
                                    p[2].expr_type_list[0][0][0:-1]], p[3].expr_type_list[i])
             if(temp == None):
                 errors.add_error('Type Error', line_number.get()+1,
@@ -1952,11 +1655,6 @@ def p_if_stmt(p):
         p[0].code.append([label2, ': '])
 
 
-# def p_switch_stmt(p):
-#     '''SwitchStmt : ExprSwitchStmt'''
-#     # ''' | TypeSwitchStmt'''
-#     p[0] = p[1]
-
 def p_expr_switch_stmt(p):
     '''SwitchStmt : SWITCH LEFT_BRACE OpenSwitch ExprCaseClauseStar CloseSwitch RIGHT_BRACE
     | SWITCH SimpleStmt SEMICOLON LEFT_BRACE OpenSwitch ExprCaseClauseStar CloseSwitch RIGHT_BRACE
@@ -2018,8 +1716,6 @@ def p_expr_case_clause_star(p):
     else:
         p[0] = p[1]
 
-# Changed grammar after parser
-
 
 def p_expr_case_clause(p):
     '''ExprCaseClause : OpenScope CASE ExpressionList COLON StatementList CloseScope
@@ -2052,7 +1748,6 @@ def p_for_stmt(p):
     '''ForStmt : FOR OpenScope OpenFor ForClause Block CloseFor CloseScope
     | FOR OpenScope OpenFor Expression Block CloseFor CloseScope
     | FOR OpenScope OpenFor Block CloseFor CloseScope'''
-    # | FOR OpenScope OpenFor RangeClause Block CloseFor CloseScope'''
 
     global start_for, end_for
     p[0] = Node("ForStmt")
@@ -2062,11 +1757,6 @@ def p_for_stmt(p):
         p[0].code = p[4].code
         p[0].code += p[5].code
         p[0].code += p[4].data["for_label_pass"]
-
-    # elif len(p) == 8 and p[4].data.get("rangeclause") is not None:
-    #     p[0].code = p[4].code
-    #     p[0].code += p[5].code
-    #     p[0].code += p[4].data["for_label_pass"]
 
     elif len(p) == 8:
         p[0].ast = ["FOR", p[4].ast, p[5].ast]
@@ -2123,17 +1813,6 @@ def p_for_clause(p):
         p[0].data["for_label_pass"] += p[4].code
         p[0].data["for_label_pass"].append(["goto", label1])
 
-# def p_range_clause(p):
-#     '''RangeClause : RANGE Expression
-#     | IdentifierList DEFINE RANGE Expression
-#     | ExpressionList ASSIGNMENT RANGE Expression'''
-#     p[0] = ['RangeClause']
-#     for idx in range(1,len(p)):
-#         if isinstance(p[idx],str) and p[idx]!=";":
-#             p[0].append([p[idx]])
-#         elif p[idx]!=";":
-#             p[0].append(p[idx])
-
 
 def p_returnstmt(p):
     '''ReturnStmt : RETURN ExpressionList
@@ -2188,13 +1867,6 @@ def p_continue_stmt(p):
         p[0].ast = ["Continue"]
     else:
         p[0].ast = ["Continue", [p[2]]]
-
-# def p_goto_stmt(p):
-#     '''GotoStmt : GOTO IDENT'''
-#     p[0] = ['GotoStmt', [p[1]], [p[2]]]
-# def p_fallthrough_stmt(p):
-#     '''FallthroughStmt : FALLTHROUGH'''
-#     p[0] = [p[1]]
 
 
 def p_error(p):
