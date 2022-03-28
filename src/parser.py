@@ -521,7 +521,7 @@ def p_var_spec_star(p):
 
 def p_var_spec(p):
     '''VarSpec : IdentifierList Type 
-                | IdentifierList Type ASSIGNMENT Expression
+                | IdentifierList Type ASSIGNMENT ExpressionList
                 | IdentifierList IDENT ASSIGNMENT ExpressionList
                 | IdentifierList IDENT
                 | IdentifierList ASSIGNMENT ExpressionList'''
@@ -538,7 +538,7 @@ def p_var_spec(p):
     else:
         p[0].ast = ["VarSpec Assignment", p[1].ast, p[2].ast, p[4].ast]
 
-    if (len(p) == 5):
+    if len(p) == 5:
         for i in range(0, len(p[4].expr_type_list)):
             if(not (p[4].expr_type_list[i][0] in basic_types_list or p[4].expr_type_list[i][0] == "pointer")):
                 errors.add_error('Type Error', line_number.get()+1,
