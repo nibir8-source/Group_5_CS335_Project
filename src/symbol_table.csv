@@ -3,55 +3,57 @@ Table Number,0
 
 Parent,0,=,
 
-main,"{'type': ['func'], 'scope': 0, 'takes': [['void']], 'total_param_size': 0, 'return_type': [['void']], 'total_return_size': 0, 'return_size_list': []}"
+factorial_calc,"{'type': ['func'], 'scope': 1, 'accepts': [['int']], 'total_param_size': 4, 'param_size_list': [4], 'return_type': [['int']], 'total_return_size': 4, 'return_size_list': [-12]}"
+main,"{'type': ['func'], 'scope': 4, 'accepts': [['void']], 'total_param_size': 0, 'return_type': [['void']], 'total_return_size': 0, 'return_size_list': []}"
 
 Table Number,1
 
 Parent,1,=,0
 
-main,{'type': ['func']}
-a,"{'type': ['int'], 'tmp': 'var_temp_no:0', 'offset': 0}"
-var_temp_no:0,{'type': 'a'}
-b,"{'type': ['int'], 'tmp': 'var_temp_no:1', 'offset': 4}"
-var_temp_no:1,{'type': 'b'}
+factorial_calc,{'type': ['func']}
+number,"{'type': ['int'], 'tmp': 'var_temp_no:0', 'offset': -8}"
+var_temp_no:0,{'type': 'number'}
+temp_no:14,{'type': 'temp'}
+temp_no:15,{'type': 'temp'}
+temp_no:16,{'type': 'temp'}
+temp_no:17,{'type': 'temp'}
+temp_no:18,{'type': 'temp'}
+temp_no:19,{'type': 'temp'}
+temp_no:20,{'type': 'temp'}
+total_size,{'type': 0}
 
 Table Number,2
 
 Parent,2,=,1
 
-main,{'type': ['func']}
+factorial_calc,{'type': ['func']}
+temp_no:1,{'type': 'temp'}
 temp_no:2,{'type': 'temp'}
 temp_no:3,{'type': 'temp'}
 temp_no:4,{'type': 'temp'}
-c,"{'type': ['int'], 'tmp': 'var_temp_no:5', 'offset': 8}"
-var_temp_no:5,{'type': 'c'}
-
-Table Number,3
-
-Parent,3,=,2
-
-main,{'type': ['func']}
+temp_no:5,{'type': 'temp'}
 temp_no:6,{'type': 'temp'}
 temp_no:7,{'type': 'temp'}
 temp_no:8,{'type': 'temp'}
-m,"{'type': ['int'], 'tmp': 'var_temp_no:9', 'offset': 12}"
-var_temp_no:9,{'type': 'm'}
+temp_no:9,{'type': 'temp'}
 
-Table Number,4
+Table Number,3
 
-Parent,4,=,3
+Parent,3,=,1
 
-main,{'type': ['func']}
+factorial_calc,{'type': ['func']}
 temp_no:10,{'type': 'temp'}
 temp_no:11,{'type': 'temp'}
 temp_no:12,{'type': 'temp'}
-z,"{'type': ['int'], 'tmp': 'var_temp_no:13', 'offset': 16}"
-var_temp_no:13,{'type': 'z'}
+temp_no:13,{'type': 'temp'}
 
-Table Number,5
+Table Number,4
 
-Parent,5,=,2
+Parent,4,=,0
 
+factorial_calc,{'type': ['func']}
 main,{'type': ['func']}
-m,"{'type': ['int'], 'tmp': 'var_temp_no:14', 'offset': 20}"
-var_temp_no:14,{'type': 'm'}
+temp_no:21,{'type': 'temp'}
+l,"{'type': ['int'], 'tmp': 'var_temp_no:22', 'offset': 0}"
+var_temp_no:22,{'type': 'l'}
+total_size,{'type': 4}
