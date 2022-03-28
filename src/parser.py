@@ -1,4 +1,3 @@
-from ast import arg
 import pprint
 import sys
 import ply.yacc as yacc
@@ -61,7 +60,6 @@ curr_func_scope = 0
 offset_list = [0]
 struct_sym_list = []
 basic_types_list = ["int", "float", "rune", "string", "bool", "imaginary"]
-global_flag = 0
 
 
 file1 = open("tree.txt", "w")  # write mode
@@ -95,16 +93,14 @@ def writeGraph(Ast_list):
 
 
 def open_scope():
-    global curr_scope, scope_list, scope_number, global_flag
+    global curr_scope
+    global scope_list
+    global scope_number
     prev_scope = curr_scope
     scope_number += 1
     curr_scope = scope_number
     scope_list.append(curr_scope)
-    # print(offset_list)
-    if global_flag == 0:
-        offset_list.append(0)
-    else:
-        global_flag = 0
+    offset_list.append(0)
     scope_table[curr_scope] = SymTable()
     scope_table[curr_scope].assign_parent(prev_scope)
     scope_table[curr_scope].type_list = scope_table[prev_scope].type_list
@@ -127,9 +123,7 @@ def create_label(p=None):
     global label_count
     label = "label_no:" + str(label_count)
     label_count += 1
-    # print("helno")
     if ((not p is None) and (p == 1)):
-        # print("in all")
         start_for.append(label)
     if not p is None and p == 2:
         end_for.append(label)
@@ -946,7 +940,6 @@ def p_parameters(p):
     '''Parameters : LEFT_PARENTHESIS RIGHT_PARENTHESIS
                 | LEFT_PARENTHESIS ParameterList RIGHT_PARENTHESIS
                 | LEFT_PARENTHESIS ParameterList COMMA RIGHT_PARENTHESIS'''
-    global global_flag
     p[0] = Node('Paramters')
     if(len(p) == 3):
         scope_table[0].update(curr_func, "accepts", [["void"]])
@@ -954,18 +947,16 @@ def p_parameters(p):
     else:
         p[0].ast = p[2].ast
         scope_table[0].update(curr_func, "accepts", p[2].expr_type_list)
-        global_flag = 1
-        arg_offset = 0
+        arg_offset = -8
         param_sum = 0
         param_list = []
         n = len(p[2].ident_list)
         for i in range(0, n):
             scope_table[curr_scope].update(
-                p[2].ident_list[i], "offset", arg_offset)
+                p[2].ident_list[n-i-1], "offset", arg_offset)
             param_list.append(p[2].expr_list[i])
-            arg_offset += p[2].expr_list[i]
+            arg_offset -= p[2].expr_list[n-i-1]
             param_sum += p[2].expr_list[i]
-        offset_list.append(arg_offset)
         scope_table[0].update(curr_func, "total_param_size", param_sum)
         scope_table[0].update(curr_func, "param_size_list", param_list)
 

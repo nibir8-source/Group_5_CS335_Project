@@ -16,8 +16,8 @@ class SymTable:
         self.table = {}
         self.type_list = ['rune', 'bool', 'int',
                           'float', 'string', 'imaginary']
-        self.type_size_list = {'rune': 1, 'bool': 4, 'int': 4,
-                               'float': 4, 'string': 100, 'imaginary': 20}
+        self.type_size_list = {'rune': 1, 'bool': 1, 'int': 4,
+                               'float': 4, 'string': 200, 'imaginary': 10}
 
     def set_parent(self, parent):
         self.parent = parent
