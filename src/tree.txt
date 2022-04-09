@@ -1,0 +1,36 @@
+digraph graphname {
+0[label="SourceFile" ] ;1[label="main" ] ;0->1;
+0[label="SourceFile" ] ;2[label="ImportDeclStar" ] ;0->2;
+2[label="ImportDeclStar" ] ;3[label="math" ] ;2->3;
+2[label="ImportDeclStar" ] ;4[label="string" ] ;2->4;
+0[label="SourceFile" ] ;5[label="TopLevelDeclStar" ] ;0->5;
+5[label="TopLevelDeclStar" ] ;6[label="FUNCTION" ] ;5->6;
+6[label="FUNCTION" ] ;7[label="sum" ] ;6->7;
+6[label="FUNCTION" ] ;8[label="Parameters" ] ;6->8;
+8[label="Parameters" ] ;9[label="ParameterDecl" ] ;8->9;
+9[label="ParameterDecl" ] ;10[label="ParaIdentList" ] ;9->10;
+10[label="ParaIdentList" ] ;11[label="p" ] ;10->11;
+10[label="ParaIdentList" ] ;12[label="q" ] ;10->12;
+9[label="ParameterDecl" ] ;13[label="int" ] ;9->13;
+8[label="Parameters" ] ;14[label="Result" ] ;8->14;
+14[label="Result" ] ;15[label="int" ] ;14->15;
+6[label="FUNCTION" ] ;16[label="StatementList" ] ;6->16;
+16[label="StatementList" ] ;17[label="VarSpec Assignment" ] ;16->17;
+17[label="VarSpec Assignment" ] ;18[label="s" ] ;17->18;
+17[label="VarSpec Assignment" ] ;19[label="int" ] ;17->19;
+17[label="VarSpec Assignment" ] ;20[label="+" ] ;17->20;
+20[label="+" ] ;21[label="p" ] ;20->21;
+20[label="+" ] ;22[label="q" ] ;20->22;
+16[label="StatementList" ] ;23[label="return" ] ;16->23;
+23[label="return" ] ;24[label="s" ] ;23->24;
+5[label="TopLevelDeclStar" ] ;25[label="FUNCTION" ] ;5->25;
+25[label="FUNCTION" ] ;26[label="main" ] ;25->26;
+25[label="FUNCTION" ] ;27[label="Parameters" ] ;25->27;
+25[label="FUNCTION" ] ;28[label="StatementList" ] ;25->28;
+28[label="StatementList" ] ;29[label="VarSpec" ] ;28->29;
+29[label="VarSpec" ] ;30[label="l" ] ;29->30;
+29[label="VarSpec" ] ;31[label="int" ] ;29->31;
+28[label="StatementList" ] ;32[label="/=" ] ;28->32;
+32[label="/=" ] ;33[label="l" ] ;32->33;
+32[label="/=" ] ;34[label="10" ] ;32->34;
+}

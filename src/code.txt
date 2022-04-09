@@ -1,0 +1,13 @@
+ " m a t h "
+ " s t r i n g "
+ sum :
+ temp_no:2 = * var_temp_no:0
+ temp_no:3 = * var_temp_no:1
+ temp_no:4 = temp_no:2 +int temp_no:3
+ var_temp_no:5 = temp_no:4
+ sum return var_temp_no:5 0
+ return
+ return
+ main :
+ var_temp_no:6 /=int 10
+ return
