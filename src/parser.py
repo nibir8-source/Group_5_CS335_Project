@@ -1714,7 +1714,7 @@ def p_expr_switch_stmt(p):
 def p_ExpressionName(p):
     """ExpressionName : Expression"""
     p[0] = p[1]
-    global switch_exp, curr_switch_type
+    global switch_expr, curr_switch_type
     if len(p[1].expr_type_list) > 1:
         errors.add_error('Type Error', line_number.get()+1,
                          "The type of expression in switch is not a single type")
@@ -1745,8 +1745,9 @@ def p_expr_case_clause_star(p):
 
 
 def p_expr_case_clause(p):
-    '''ExprCaseClause : OpenScope CASE ExpressionList COLON StatementList CloseScope
+    '''ExprCaseClause : OpenScope CASE Expression COLON StatementList CloseScope
     | DEFAULT COLON OpenScope StatementList CloseScope'''
+    global switch_expr
     if len(p) == 6:
         p[0] = Node('DefClause')
         p[0].ast = ["DEFAULT", p[4].ast]
@@ -1754,20 +1755,21 @@ def p_expr_case_clause(p):
     else:
         p[0] = Node('ExprCaseClause')
         p[0].ast = ["CASE", p[3].ast, p[5].ast]
-        for i in range(0, len(p[3].expr_type_list)):
-            if p[3].expr_type_list[i][0] != "int" and p[3].expr_type_list[i][0] != "rune":
-                errors.add_error('Type Error', line_number.get(
-                )+1, "The type of expression in switch is not an integer or rune")
-            if curr_switch_type is not None and curr_switch_type != p[3].expr_type_list[i][0]:
-                errors.add_error('Type Error', line_number.get(
-                )+1, "The type of expression in case does not match type of expression in switch")
-            var = create_temp()
-            label = create_label()
-            p[0].code.append([var, '=', switch_expr, '==', p[3].expr_list[i]])
-            p[0].code.append(['ifnot', var, 'goto', label])
-            p[0].code += p[5].code
-            p[0].code.append(['goto', end_for[-1]])
-            p[0].code.append([label, ': '])
+
+        if p[3].expr_type_list[0][0] != "int" and p[3].expr_type_list[0][0] != "rune":
+            errors.add_error('Type Error', line_number.get(
+            )+1, "The type of expression in switch is not an integer or rune")
+        if curr_switch_type is not None and curr_switch_type != p[3].expr_type_list[0][0]:
+            errors.add_error('Type Error', line_number.get(
+            )+1, "The type of expression in case does not match type of expression in switch")
+        var = create_temp()
+        label = create_label()
+        p[0].code = p[3].code
+        p[0].code.append([var, '=', switch_expr, '==', p[3].expr_list[0]])
+        p[0].code.append(['ifnot', var, 'goto', label])
+        p[0].code += p[5].code
+        p[0].code.append(['goto', end_for[-1]])
+        p[0].code.append([label, ': '])
         p[0].code.append(['goto', end_for[-1]])
 
 
@@ -1864,7 +1866,7 @@ def p_returnstmt(p):
     p[0] = Node('ReturnStmt')
 
     if len(p) == 2:
-        # p[0].code = [["return"]]
+        p[0].code = [["return"]]
         p[0].ast = ["return"]
         p[0].data["hasReturnStmt"] = 1
     else:
@@ -1878,7 +1880,7 @@ def p_returnstmt(p):
                 p[0].code.append(["return", var1])
             else:
                 p[0].code.append(["return", p[2].expr_list[i]])
-        # p[0].code.append(["return"])
+        p[0].code.append(["return"])
 
 
 # ---------------------------------

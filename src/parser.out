@@ -193,7 +193,7 @@ Rule 187   SwitchStmt -> SWITCH ExpressionName LEFT_BRACE OpenSwitch ExprCaseCla
 Rule 188   ExpressionName -> Expression
 Rule 189   ExprCaseClauseStar -> ExprCaseClauseStar ExprCaseClause
 Rule 190   ExprCaseClauseStar -> ExprCaseClause
-Rule 191   ExprCaseClause -> OpenScope CASE ExpressionList COLON StatementList CloseScope
+Rule 191   ExprCaseClause -> OpenScope CASE Expression COLON StatementList CloseScope
 Rule 192   ExprCaseClause -> DEFAULT COLON OpenScope StatementList CloseScope
 Rule 193   ForStmt -> FOR OpenScope OpenFor ForClause Block CloseFor CloseScope
 Rule 194   ForStmt -> FOR OpenScope OpenFor Expression Block CloseFor CloseScope
@@ -301,8 +301,8 @@ ContinueStmt         : 153
 Declaration          : 14 149
 ExprCaseClause       : 189 190
 ExprCaseClauseStar   : 184 185 186 187 189
-Expression           : 39 40 41 97 97 98 98 99 99 100 100 101 101 102 102 103 103 104 104 105 105 106 106 107 107 108 108 109 109 110 110 111 111 112 112 113 113 114 114 115 115 126 131 158 163 164 178 179 180 181 182 183 188 194 196
-ExpressionList       : 35 36 40 41 47 48 50 51 133 134 165 165 191 198
+Expression           : 39 40 41 97 97 98 98 99 99 100 100 101 101 102 102 103 103 104 104 105 105 106 106 107 107 108 108 109 109 110 110 111 111 112 112 113 113 114 114 115 115 126 131 158 163 164 178 179 180 181 182 183 188 191 194 196
+ExpressionList       : 35 36 40 41 47 48 50 51 133 134 165 165 198
 ExpressionName       : 186 187
 FieldDecl            : 65
 FieldDeclStar        : 64 65
@@ -1255,7 +1255,6 @@ state 66
     RIGHT_PARENTHESIS reduce using rule 39 (ExpressionList -> Expression .)
     RIGHT_BRACE     reduce using rule 39 (ExpressionList -> Expression .)
     LEFT_BRACE      reduce using rule 39 (ExpressionList -> Expression .)
-    COLON           reduce using rule 39 (ExpressionList -> Expression .)
     LOGICAL_OR      shift and go to state 114
     LOGICAL_AND     shift and go to state 115
     EQUAL           shift and go to state 116
@@ -1404,9 +1403,9 @@ state 68
     ASSIGNMENT      reduce using rule 125 (PrimaryExpr -> IDENT .)
     RIGHT_BRACE     reduce using rule 125 (PrimaryExpr -> IDENT .)
     LEFT_BRACE      reduce using rule 125 (PrimaryExpr -> IDENT .)
-    COLON           reduce using rule 125 (PrimaryExpr -> IDENT .)
     INCREMENT       reduce using rule 125 (PrimaryExpr -> IDENT .)
     DECREMENT       reduce using rule 125 (PrimaryExpr -> IDENT .)
+    COLON           reduce using rule 125 (PrimaryExpr -> IDENT .)
 
 
 state 69
@@ -1450,9 +1449,9 @@ state 69
     ASSIGNMENT      reduce using rule 96 (Expression -> UnaryExpr .)
     RIGHT_BRACE     reduce using rule 96 (Expression -> UnaryExpr .)
     LEFT_BRACE      reduce using rule 96 (Expression -> UnaryExpr .)
-    COLON           reduce using rule 96 (Expression -> UnaryExpr .)
     INCREMENT       reduce using rule 96 (Expression -> UnaryExpr .)
     DECREMENT       reduce using rule 96 (Expression -> UnaryExpr .)
+    COLON           reduce using rule 96 (Expression -> UnaryExpr .)
 
 
 state 70
@@ -1613,9 +1612,9 @@ state 75
     ASSIGNMENT      reduce using rule 116 (UnaryExpr -> PrimaryExpr .)
     RIGHT_BRACE     reduce using rule 116 (UnaryExpr -> PrimaryExpr .)
     LEFT_BRACE      reduce using rule 116 (UnaryExpr -> PrimaryExpr .)
-    COLON           reduce using rule 116 (UnaryExpr -> PrimaryExpr .)
     INCREMENT       reduce using rule 116 (UnaryExpr -> PrimaryExpr .)
     DECREMENT       reduce using rule 116 (UnaryExpr -> PrimaryExpr .)
+    COLON           reduce using rule 116 (UnaryExpr -> PrimaryExpr .)
     PERIOD          shift and go to state 135
     LEFT_BRACKET    shift and go to state 137
     LEFT_PARENTHESIS shift and go to state 138
@@ -1812,9 +1811,9 @@ state 78
     ASSIGNMENT      reduce using rule 127 (PrimaryExpr -> Literal .)
     RIGHT_BRACE     reduce using rule 127 (PrimaryExpr -> Literal .)
     LEFT_BRACE      reduce using rule 127 (PrimaryExpr -> Literal .)
-    COLON           reduce using rule 127 (PrimaryExpr -> Literal .)
     INCREMENT       reduce using rule 127 (PrimaryExpr -> Literal .)
     DECREMENT       reduce using rule 127 (PrimaryExpr -> Literal .)
+    COLON           reduce using rule 127 (PrimaryExpr -> Literal .)
 
 
 state 79
@@ -1905,9 +1904,9 @@ state 81
     ASSIGNMENT      reduce using rule 135 (Literal -> BasicLit .)
     RIGHT_BRACE     reduce using rule 135 (Literal -> BasicLit .)
     LEFT_BRACE      reduce using rule 135 (Literal -> BasicLit .)
-    COLON           reduce using rule 135 (Literal -> BasicLit .)
     INCREMENT       reduce using rule 135 (Literal -> BasicLit .)
     DECREMENT       reduce using rule 135 (Literal -> BasicLit .)
+    COLON           reduce using rule 135 (Literal -> BasicLit .)
 
 
 state 82
@@ -1954,9 +1953,9 @@ state 82
     ASSIGNMENT      reduce using rule 136 (BasicLit -> IntLit .)
     RIGHT_BRACE     reduce using rule 136 (BasicLit -> IntLit .)
     LEFT_BRACE      reduce using rule 136 (BasicLit -> IntLit .)
-    COLON           reduce using rule 136 (BasicLit -> IntLit .)
     INCREMENT       reduce using rule 136 (BasicLit -> IntLit .)
     DECREMENT       reduce using rule 136 (BasicLit -> IntLit .)
+    COLON           reduce using rule 136 (BasicLit -> IntLit .)
 
 
 state 83
@@ -2003,9 +2002,9 @@ state 83
     ASSIGNMENT      reduce using rule 137 (BasicLit -> FloatLit .)
     RIGHT_BRACE     reduce using rule 137 (BasicLit -> FloatLit .)
     LEFT_BRACE      reduce using rule 137 (BasicLit -> FloatLit .)
-    COLON           reduce using rule 137 (BasicLit -> FloatLit .)
     INCREMENT       reduce using rule 137 (BasicLit -> FloatLit .)
     DECREMENT       reduce using rule 137 (BasicLit -> FloatLit .)
+    COLON           reduce using rule 137 (BasicLit -> FloatLit .)
 
 
 state 84
@@ -2052,9 +2051,9 @@ state 84
     ASSIGNMENT      reduce using rule 138 (BasicLit -> RuneLit .)
     RIGHT_BRACE     reduce using rule 138 (BasicLit -> RuneLit .)
     LEFT_BRACE      reduce using rule 138 (BasicLit -> RuneLit .)
-    COLON           reduce using rule 138 (BasicLit -> RuneLit .)
     INCREMENT       reduce using rule 138 (BasicLit -> RuneLit .)
     DECREMENT       reduce using rule 138 (BasicLit -> RuneLit .)
+    COLON           reduce using rule 138 (BasicLit -> RuneLit .)
 
 
 state 85
@@ -2101,9 +2100,9 @@ state 85
     ASSIGNMENT      reduce using rule 139 (BasicLit -> StringLit .)
     RIGHT_BRACE     reduce using rule 139 (BasicLit -> StringLit .)
     LEFT_BRACE      reduce using rule 139 (BasicLit -> StringLit .)
-    COLON           reduce using rule 139 (BasicLit -> StringLit .)
     INCREMENT       reduce using rule 139 (BasicLit -> StringLit .)
     DECREMENT       reduce using rule 139 (BasicLit -> StringLit .)
+    COLON           reduce using rule 139 (BasicLit -> StringLit .)
 
 
 state 86
@@ -2150,9 +2149,9 @@ state 86
     ASSIGNMENT      reduce using rule 140 (BasicLit -> TrueFalseLit .)
     RIGHT_BRACE     reduce using rule 140 (BasicLit -> TrueFalseLit .)
     LEFT_BRACE      reduce using rule 140 (BasicLit -> TrueFalseLit .)
-    COLON           reduce using rule 140 (BasicLit -> TrueFalseLit .)
     INCREMENT       reduce using rule 140 (BasicLit -> TrueFalseLit .)
     DECREMENT       reduce using rule 140 (BasicLit -> TrueFalseLit .)
+    COLON           reduce using rule 140 (BasicLit -> TrueFalseLit .)
 
 
 state 87
@@ -2199,9 +2198,9 @@ state 87
     ASSIGNMENT      reduce using rule 141 (BasicLit -> ImaginaryLit .)
     RIGHT_BRACE     reduce using rule 141 (BasicLit -> ImaginaryLit .)
     LEFT_BRACE      reduce using rule 141 (BasicLit -> ImaginaryLit .)
-    COLON           reduce using rule 141 (BasicLit -> ImaginaryLit .)
     INCREMENT       reduce using rule 141 (BasicLit -> ImaginaryLit .)
     DECREMENT       reduce using rule 141 (BasicLit -> ImaginaryLit .)
+    COLON           reduce using rule 141 (BasicLit -> ImaginaryLit .)
 
 
 state 88
@@ -2248,9 +2247,9 @@ state 88
     ASSIGNMENT      reduce using rule 145 (IntLit -> INT .)
     RIGHT_BRACE     reduce using rule 145 (IntLit -> INT .)
     LEFT_BRACE      reduce using rule 145 (IntLit -> INT .)
-    COLON           reduce using rule 145 (IntLit -> INT .)
     INCREMENT       reduce using rule 145 (IntLit -> INT .)
     DECREMENT       reduce using rule 145 (IntLit -> INT .)
+    COLON           reduce using rule 145 (IntLit -> INT .)
 
 
 state 89
@@ -2297,9 +2296,9 @@ state 89
     ASSIGNMENT      reduce using rule 146 (FloatLit -> FLOAT .)
     RIGHT_BRACE     reduce using rule 146 (FloatLit -> FLOAT .)
     LEFT_BRACE      reduce using rule 146 (FloatLit -> FLOAT .)
-    COLON           reduce using rule 146 (FloatLit -> FLOAT .)
     INCREMENT       reduce using rule 146 (FloatLit -> FLOAT .)
     DECREMENT       reduce using rule 146 (FloatLit -> FLOAT .)
+    COLON           reduce using rule 146 (FloatLit -> FLOAT .)
 
 
 state 90
@@ -2346,9 +2345,9 @@ state 90
     ASSIGNMENT      reduce using rule 147 (RuneLit -> RUNE .)
     RIGHT_BRACE     reduce using rule 147 (RuneLit -> RUNE .)
     LEFT_BRACE      reduce using rule 147 (RuneLit -> RUNE .)
-    COLON           reduce using rule 147 (RuneLit -> RUNE .)
     INCREMENT       reduce using rule 147 (RuneLit -> RUNE .)
     DECREMENT       reduce using rule 147 (RuneLit -> RUNE .)
+    COLON           reduce using rule 147 (RuneLit -> RUNE .)
 
 
 state 91
@@ -2395,9 +2394,9 @@ state 91
     ASSIGNMENT      reduce using rule 148 (StringLit -> STRING .)
     RIGHT_BRACE     reduce using rule 148 (StringLit -> STRING .)
     LEFT_BRACE      reduce using rule 148 (StringLit -> STRING .)
-    COLON           reduce using rule 148 (StringLit -> STRING .)
     INCREMENT       reduce using rule 148 (StringLit -> STRING .)
     DECREMENT       reduce using rule 148 (StringLit -> STRING .)
+    COLON           reduce using rule 148 (StringLit -> STRING .)
 
 
 state 92
@@ -2444,9 +2443,9 @@ state 92
     ASSIGNMENT      reduce using rule 143 (TrueFalseLit -> TRUE .)
     RIGHT_BRACE     reduce using rule 143 (TrueFalseLit -> TRUE .)
     LEFT_BRACE      reduce using rule 143 (TrueFalseLit -> TRUE .)
-    COLON           reduce using rule 143 (TrueFalseLit -> TRUE .)
     INCREMENT       reduce using rule 143 (TrueFalseLit -> TRUE .)
     DECREMENT       reduce using rule 143 (TrueFalseLit -> TRUE .)
+    COLON           reduce using rule 143 (TrueFalseLit -> TRUE .)
 
 
 state 93
@@ -2493,9 +2492,9 @@ state 93
     ASSIGNMENT      reduce using rule 144 (TrueFalseLit -> FALSE .)
     RIGHT_BRACE     reduce using rule 144 (TrueFalseLit -> FALSE .)
     LEFT_BRACE      reduce using rule 144 (TrueFalseLit -> FALSE .)
-    COLON           reduce using rule 144 (TrueFalseLit -> FALSE .)
     INCREMENT       reduce using rule 144 (TrueFalseLit -> FALSE .)
     DECREMENT       reduce using rule 144 (TrueFalseLit -> FALSE .)
+    COLON           reduce using rule 144 (TrueFalseLit -> FALSE .)
 
 
 state 94
@@ -2542,9 +2541,9 @@ state 94
     ASSIGNMENT      reduce using rule 142 (ImaginaryLit -> IMAGINARY .)
     RIGHT_BRACE     reduce using rule 142 (ImaginaryLit -> IMAGINARY .)
     LEFT_BRACE      reduce using rule 142 (ImaginaryLit -> IMAGINARY .)
-    COLON           reduce using rule 142 (ImaginaryLit -> IMAGINARY .)
     INCREMENT       reduce using rule 142 (ImaginaryLit -> IMAGINARY .)
     DECREMENT       reduce using rule 142 (ImaginaryLit -> IMAGINARY .)
+    COLON           reduce using rule 142 (ImaginaryLit -> IMAGINARY .)
 
 
 state 95
@@ -4723,9 +4722,9 @@ state 134
     ASSIGNMENT      reduce using rule 128 (PrimaryExpr -> PrimaryExpr Index .)
     RIGHT_BRACE     reduce using rule 128 (PrimaryExpr -> PrimaryExpr Index .)
     LEFT_BRACE      reduce using rule 128 (PrimaryExpr -> PrimaryExpr Index .)
-    COLON           reduce using rule 128 (PrimaryExpr -> PrimaryExpr Index .)
     INCREMENT       reduce using rule 128 (PrimaryExpr -> PrimaryExpr Index .)
     DECREMENT       reduce using rule 128 (PrimaryExpr -> PrimaryExpr Index .)
+    COLON           reduce using rule 128 (PrimaryExpr -> PrimaryExpr Index .)
 
 
 state 135
@@ -4779,9 +4778,9 @@ state 136
     ASSIGNMENT      reduce using rule 130 (PrimaryExpr -> PrimaryExpr Arguments .)
     RIGHT_BRACE     reduce using rule 130 (PrimaryExpr -> PrimaryExpr Arguments .)
     LEFT_BRACE      reduce using rule 130 (PrimaryExpr -> PrimaryExpr Arguments .)
-    COLON           reduce using rule 130 (PrimaryExpr -> PrimaryExpr Arguments .)
     INCREMENT       reduce using rule 130 (PrimaryExpr -> PrimaryExpr Arguments .)
     DECREMENT       reduce using rule 130 (PrimaryExpr -> PrimaryExpr Arguments .)
+    COLON           reduce using rule 130 (PrimaryExpr -> PrimaryExpr Arguments .)
 
 
 state 137
@@ -4999,9 +4998,9 @@ state 139
     ASSIGNMENT      reduce using rule 117 (UnaryExpr -> unary_op UnaryExpr .)
     RIGHT_BRACE     reduce using rule 117 (UnaryExpr -> unary_op UnaryExpr .)
     LEFT_BRACE      reduce using rule 117 (UnaryExpr -> unary_op UnaryExpr .)
-    COLON           reduce using rule 117 (UnaryExpr -> unary_op UnaryExpr .)
     INCREMENT       reduce using rule 117 (UnaryExpr -> unary_op UnaryExpr .)
     DECREMENT       reduce using rule 117 (UnaryExpr -> unary_op UnaryExpr .)
+    COLON           reduce using rule 117 (UnaryExpr -> unary_op UnaryExpr .)
 
 
 state 140
@@ -5349,7 +5348,6 @@ state 159
     ASSIGNMENT      reduce using rule 40 (ExpressionList -> ExpressionList COMMA Expression .)
     RIGHT_BRACE     reduce using rule 40 (ExpressionList -> ExpressionList COMMA Expression .)
     LEFT_BRACE      reduce using rule 40 (ExpressionList -> ExpressionList COMMA Expression .)
-    COLON           reduce using rule 40 (ExpressionList -> ExpressionList COMMA Expression .)
     LOGICAL_OR      shift and go to state 114
     LOGICAL_AND     shift and go to state 115
     EQUAL           shift and go to state 116
@@ -5413,9 +5411,9 @@ state 160
     ASSIGNMENT      reduce using rule 97 (Expression -> Expression LOGICAL_OR Expression .)
     RIGHT_BRACE     reduce using rule 97 (Expression -> Expression LOGICAL_OR Expression .)
     LEFT_BRACE      reduce using rule 97 (Expression -> Expression LOGICAL_OR Expression .)
-    COLON           reduce using rule 97 (Expression -> Expression LOGICAL_OR Expression .)
     INCREMENT       reduce using rule 97 (Expression -> Expression LOGICAL_OR Expression .)
     DECREMENT       reduce using rule 97 (Expression -> Expression LOGICAL_OR Expression .)
+    COLON           reduce using rule 97 (Expression -> Expression LOGICAL_OR Expression .)
     LOGICAL_AND     shift and go to state 115
     EQUAL           shift and go to state 116
     NOT_EQUAL       shift and go to state 117
@@ -5499,9 +5497,9 @@ state 161
     ASSIGNMENT      reduce using rule 98 (Expression -> Expression LOGICAL_AND Expression .)
     RIGHT_BRACE     reduce using rule 98 (Expression -> Expression LOGICAL_AND Expression .)
     LEFT_BRACE      reduce using rule 98 (Expression -> Expression LOGICAL_AND Expression .)
-    COLON           reduce using rule 98 (Expression -> Expression LOGICAL_AND Expression .)
     INCREMENT       reduce using rule 98 (Expression -> Expression LOGICAL_AND Expression .)
     DECREMENT       reduce using rule 98 (Expression -> Expression LOGICAL_AND Expression .)
+    COLON           reduce using rule 98 (Expression -> Expression LOGICAL_AND Expression .)
     EQUAL           shift and go to state 116
     NOT_EQUAL       shift and go to state 117
     LESS_THAN       shift and go to state 118
@@ -5590,9 +5588,9 @@ state 162
     ASSIGNMENT      reduce using rule 99 (Expression -> Expression EQUAL Expression .)
     RIGHT_BRACE     reduce using rule 99 (Expression -> Expression EQUAL Expression .)
     LEFT_BRACE      reduce using rule 99 (Expression -> Expression EQUAL Expression .)
-    COLON           reduce using rule 99 (Expression -> Expression EQUAL Expression .)
     INCREMENT       reduce using rule 99 (Expression -> Expression EQUAL Expression .)
     DECREMENT       reduce using rule 99 (Expression -> Expression EQUAL Expression .)
+    COLON           reduce using rule 99 (Expression -> Expression EQUAL Expression .)
     ADD             shift and go to state 122
     SUBTRACT        shift and go to state 123
     OR              shift and go to state 124
@@ -5675,9 +5673,9 @@ state 163
     ASSIGNMENT      reduce using rule 100 (Expression -> Expression NOT_EQUAL Expression .)
     RIGHT_BRACE     reduce using rule 100 (Expression -> Expression NOT_EQUAL Expression .)
     LEFT_BRACE      reduce using rule 100 (Expression -> Expression NOT_EQUAL Expression .)
-    COLON           reduce using rule 100 (Expression -> Expression NOT_EQUAL Expression .)
     INCREMENT       reduce using rule 100 (Expression -> Expression NOT_EQUAL Expression .)
     DECREMENT       reduce using rule 100 (Expression -> Expression NOT_EQUAL Expression .)
+    COLON           reduce using rule 100 (Expression -> Expression NOT_EQUAL Expression .)
     ADD             shift and go to state 122
     SUBTRACT        shift and go to state 123
     OR              shift and go to state 124
@@ -5760,9 +5758,9 @@ state 164
     ASSIGNMENT      reduce using rule 101 (Expression -> Expression LESS_THAN Expression .)
     RIGHT_BRACE     reduce using rule 101 (Expression -> Expression LESS_THAN Expression .)
     LEFT_BRACE      reduce using rule 101 (Expression -> Expression LESS_THAN Expression .)
-    COLON           reduce using rule 101 (Expression -> Expression LESS_THAN Expression .)
     INCREMENT       reduce using rule 101 (Expression -> Expression LESS_THAN Expression .)
     DECREMENT       reduce using rule 101 (Expression -> Expression LESS_THAN Expression .)
+    COLON           reduce using rule 101 (Expression -> Expression LESS_THAN Expression .)
     ADD             shift and go to state 122
     SUBTRACT        shift and go to state 123
     OR              shift and go to state 124
@@ -5845,9 +5843,9 @@ state 165
     ASSIGNMENT      reduce using rule 102 (Expression -> Expression LESS_THAN_EQUAL Expression .)
     RIGHT_BRACE     reduce using rule 102 (Expression -> Expression LESS_THAN_EQUAL Expression .)
     LEFT_BRACE      reduce using rule 102 (Expression -> Expression LESS_THAN_EQUAL Expression .)
-    COLON           reduce using rule 102 (Expression -> Expression LESS_THAN_EQUAL Expression .)
     INCREMENT       reduce using rule 102 (Expression -> Expression LESS_THAN_EQUAL Expression .)
     DECREMENT       reduce using rule 102 (Expression -> Expression LESS_THAN_EQUAL Expression .)
+    COLON           reduce using rule 102 (Expression -> Expression LESS_THAN_EQUAL Expression .)
     ADD             shift and go to state 122
     SUBTRACT        shift and go to state 123
     OR              shift and go to state 124
@@ -5930,9 +5928,9 @@ state 166
     ASSIGNMENT      reduce using rule 103 (Expression -> Expression GREATER_THAN Expression .)
     RIGHT_BRACE     reduce using rule 103 (Expression -> Expression GREATER_THAN Expression .)
     LEFT_BRACE      reduce using rule 103 (Expression -> Expression GREATER_THAN Expression .)
-    COLON           reduce using rule 103 (Expression -> Expression GREATER_THAN Expression .)
     INCREMENT       reduce using rule 103 (Expression -> Expression GREATER_THAN Expression .)
     DECREMENT       reduce using rule 103 (Expression -> Expression GREATER_THAN Expression .)
+    COLON           reduce using rule 103 (Expression -> Expression GREATER_THAN Expression .)
     ADD             shift and go to state 122
     SUBTRACT        shift and go to state 123
     OR              shift and go to state 124
@@ -6015,9 +6013,9 @@ state 167
     ASSIGNMENT      reduce using rule 104 (Expression -> Expression GREATER_THAN_EQUAL Expression .)
     RIGHT_BRACE     reduce using rule 104 (Expression -> Expression GREATER_THAN_EQUAL Expression .)
     LEFT_BRACE      reduce using rule 104 (Expression -> Expression GREATER_THAN_EQUAL Expression .)
-    COLON           reduce using rule 104 (Expression -> Expression GREATER_THAN_EQUAL Expression .)
     INCREMENT       reduce using rule 104 (Expression -> Expression GREATER_THAN_EQUAL Expression .)
     DECREMENT       reduce using rule 104 (Expression -> Expression GREATER_THAN_EQUAL Expression .)
+    COLON           reduce using rule 104 (Expression -> Expression GREATER_THAN_EQUAL Expression .)
     ADD             shift and go to state 122
     SUBTRACT        shift and go to state 123
     OR              shift and go to state 124
@@ -6104,9 +6102,9 @@ state 168
     ASSIGNMENT      reduce using rule 105 (Expression -> Expression ADD Expression .)
     RIGHT_BRACE     reduce using rule 105 (Expression -> Expression ADD Expression .)
     LEFT_BRACE      reduce using rule 105 (Expression -> Expression ADD Expression .)
-    COLON           reduce using rule 105 (Expression -> Expression ADD Expression .)
     INCREMENT       reduce using rule 105 (Expression -> Expression ADD Expression .)
     DECREMENT       reduce using rule 105 (Expression -> Expression ADD Expression .)
+    COLON           reduce using rule 105 (Expression -> Expression ADD Expression .)
     MULTIPLY        shift and go to state 126
     QUOTIENT        shift and go to state 127
     REMAINDER       shift and go to state 128
@@ -6189,9 +6187,9 @@ state 169
     ASSIGNMENT      reduce using rule 106 (Expression -> Expression SUBTRACT Expression .)
     RIGHT_BRACE     reduce using rule 106 (Expression -> Expression SUBTRACT Expression .)
     LEFT_BRACE      reduce using rule 106 (Expression -> Expression SUBTRACT Expression .)
-    COLON           reduce using rule 106 (Expression -> Expression SUBTRACT Expression .)
     INCREMENT       reduce using rule 106 (Expression -> Expression SUBTRACT Expression .)
     DECREMENT       reduce using rule 106 (Expression -> Expression SUBTRACT Expression .)
+    COLON           reduce using rule 106 (Expression -> Expression SUBTRACT Expression .)
     MULTIPLY        shift and go to state 126
     QUOTIENT        shift and go to state 127
     REMAINDER       shift and go to state 128
@@ -6274,9 +6272,9 @@ state 170
     ASSIGNMENT      reduce using rule 107 (Expression -> Expression OR Expression .)
     RIGHT_BRACE     reduce using rule 107 (Expression -> Expression OR Expression .)
     LEFT_BRACE      reduce using rule 107 (Expression -> Expression OR Expression .)
-    COLON           reduce using rule 107 (Expression -> Expression OR Expression .)
     INCREMENT       reduce using rule 107 (Expression -> Expression OR Expression .)
     DECREMENT       reduce using rule 107 (Expression -> Expression OR Expression .)
+    COLON           reduce using rule 107 (Expression -> Expression OR Expression .)
     MULTIPLY        shift and go to state 126
     QUOTIENT        shift and go to state 127
     REMAINDER       shift and go to state 128
@@ -6359,9 +6357,9 @@ state 171
     ASSIGNMENT      reduce using rule 108 (Expression -> Expression XOR Expression .)
     RIGHT_BRACE     reduce using rule 108 (Expression -> Expression XOR Expression .)
     LEFT_BRACE      reduce using rule 108 (Expression -> Expression XOR Expression .)
-    COLON           reduce using rule 108 (Expression -> Expression XOR Expression .)
     INCREMENT       reduce using rule 108 (Expression -> Expression XOR Expression .)
     DECREMENT       reduce using rule 108 (Expression -> Expression XOR Expression .)
+    COLON           reduce using rule 108 (Expression -> Expression XOR Expression .)
     MULTIPLY        shift and go to state 126
     QUOTIENT        shift and go to state 127
     REMAINDER       shift and go to state 128
@@ -6451,9 +6449,9 @@ state 172
     ASSIGNMENT      reduce using rule 109 (Expression -> Expression MULTIPLY Expression .)
     RIGHT_BRACE     reduce using rule 109 (Expression -> Expression MULTIPLY Expression .)
     LEFT_BRACE      reduce using rule 109 (Expression -> Expression MULTIPLY Expression .)
-    COLON           reduce using rule 109 (Expression -> Expression MULTIPLY Expression .)
     INCREMENT       reduce using rule 109 (Expression -> Expression MULTIPLY Expression .)
     DECREMENT       reduce using rule 109 (Expression -> Expression MULTIPLY Expression .)
+    COLON           reduce using rule 109 (Expression -> Expression MULTIPLY Expression .)
 
   ! LOGICAL_OR      [ shift and go to state 114 ]
   ! LOGICAL_AND     [ shift and go to state 115 ]
@@ -6536,9 +6534,9 @@ state 173
     ASSIGNMENT      reduce using rule 110 (Expression -> Expression QUOTIENT Expression .)
     RIGHT_BRACE     reduce using rule 110 (Expression -> Expression QUOTIENT Expression .)
     LEFT_BRACE      reduce using rule 110 (Expression -> Expression QUOTIENT Expression .)
-    COLON           reduce using rule 110 (Expression -> Expression QUOTIENT Expression .)
     INCREMENT       reduce using rule 110 (Expression -> Expression QUOTIENT Expression .)
     DECREMENT       reduce using rule 110 (Expression -> Expression QUOTIENT Expression .)
+    COLON           reduce using rule 110 (Expression -> Expression QUOTIENT Expression .)
 
   ! LOGICAL_OR      [ shift and go to state 114 ]
   ! LOGICAL_AND     [ shift and go to state 115 ]
@@ -6621,9 +6619,9 @@ state 174
     ASSIGNMENT      reduce using rule 111 (Expression -> Expression REMAINDER Expression .)
     RIGHT_BRACE     reduce using rule 111 (Expression -> Expression REMAINDER Expression .)
     LEFT_BRACE      reduce using rule 111 (Expression -> Expression REMAINDER Expression .)
-    COLON           reduce using rule 111 (Expression -> Expression REMAINDER Expression .)
     INCREMENT       reduce using rule 111 (Expression -> Expression REMAINDER Expression .)
     DECREMENT       reduce using rule 111 (Expression -> Expression REMAINDER Expression .)
+    COLON           reduce using rule 111 (Expression -> Expression REMAINDER Expression .)
 
   ! LOGICAL_OR      [ shift and go to state 114 ]
   ! LOGICAL_AND     [ shift and go to state 115 ]
@@ -6706,9 +6704,9 @@ state 175
     ASSIGNMENT      reduce using rule 112 (Expression -> Expression SHIFT_LEFT Expression .)
     RIGHT_BRACE     reduce using rule 112 (Expression -> Expression SHIFT_LEFT Expression .)
     LEFT_BRACE      reduce using rule 112 (Expression -> Expression SHIFT_LEFT Expression .)
-    COLON           reduce using rule 112 (Expression -> Expression SHIFT_LEFT Expression .)
     INCREMENT       reduce using rule 112 (Expression -> Expression SHIFT_LEFT Expression .)
     DECREMENT       reduce using rule 112 (Expression -> Expression SHIFT_LEFT Expression .)
+    COLON           reduce using rule 112 (Expression -> Expression SHIFT_LEFT Expression .)
 
   ! LOGICAL_OR      [ shift and go to state 114 ]
   ! LOGICAL_AND     [ shift and go to state 115 ]
@@ -6791,9 +6789,9 @@ state 176
     ASSIGNMENT      reduce using rule 113 (Expression -> Expression SHIFT_RIGHT Expression .)
     RIGHT_BRACE     reduce using rule 113 (Expression -> Expression SHIFT_RIGHT Expression .)
     LEFT_BRACE      reduce using rule 113 (Expression -> Expression SHIFT_RIGHT Expression .)
-    COLON           reduce using rule 113 (Expression -> Expression SHIFT_RIGHT Expression .)
     INCREMENT       reduce using rule 113 (Expression -> Expression SHIFT_RIGHT Expression .)
     DECREMENT       reduce using rule 113 (Expression -> Expression SHIFT_RIGHT Expression .)
+    COLON           reduce using rule 113 (Expression -> Expression SHIFT_RIGHT Expression .)
 
   ! LOGICAL_OR      [ shift and go to state 114 ]
   ! LOGICAL_AND     [ shift and go to state 115 ]
@@ -6876,9 +6874,9 @@ state 177
     ASSIGNMENT      reduce using rule 114 (Expression -> Expression AND Expression .)
     RIGHT_BRACE     reduce using rule 114 (Expression -> Expression AND Expression .)
     LEFT_BRACE      reduce using rule 114 (Expression -> Expression AND Expression .)
-    COLON           reduce using rule 114 (Expression -> Expression AND Expression .)
     INCREMENT       reduce using rule 114 (Expression -> Expression AND Expression .)
     DECREMENT       reduce using rule 114 (Expression -> Expression AND Expression .)
+    COLON           reduce using rule 114 (Expression -> Expression AND Expression .)
 
   ! LOGICAL_OR      [ shift and go to state 114 ]
   ! LOGICAL_AND     [ shift and go to state 115 ]
@@ -6961,9 +6959,9 @@ state 178
     ASSIGNMENT      reduce using rule 115 (Expression -> Expression AND_NOT Expression .)
     RIGHT_BRACE     reduce using rule 115 (Expression -> Expression AND_NOT Expression .)
     LEFT_BRACE      reduce using rule 115 (Expression -> Expression AND_NOT Expression .)
-    COLON           reduce using rule 115 (Expression -> Expression AND_NOT Expression .)
     INCREMENT       reduce using rule 115 (Expression -> Expression AND_NOT Expression .)
     DECREMENT       reduce using rule 115 (Expression -> Expression AND_NOT Expression .)
+    COLON           reduce using rule 115 (Expression -> Expression AND_NOT Expression .)
 
   ! LOGICAL_OR      [ shift and go to state 114 ]
   ! LOGICAL_AND     [ shift and go to state 115 ]
@@ -7037,9 +7035,9 @@ state 180
     ASSIGNMENT      reduce using rule 129 (PrimaryExpr -> PrimaryExpr PERIOD IDENT .)
     RIGHT_BRACE     reduce using rule 129 (PrimaryExpr -> PrimaryExpr PERIOD IDENT .)
     LEFT_BRACE      reduce using rule 129 (PrimaryExpr -> PrimaryExpr PERIOD IDENT .)
-    COLON           reduce using rule 129 (PrimaryExpr -> PrimaryExpr PERIOD IDENT .)
     INCREMENT       reduce using rule 129 (PrimaryExpr -> PrimaryExpr PERIOD IDENT .)
     DECREMENT       reduce using rule 129 (PrimaryExpr -> PrimaryExpr PERIOD IDENT .)
+    COLON           reduce using rule 129 (PrimaryExpr -> PrimaryExpr PERIOD IDENT .)
 
 
 state 181
@@ -7131,9 +7129,9 @@ state 182
     ASSIGNMENT      reduce using rule 132 (Arguments -> LEFT_PARENTHESIS RIGHT_PARENTHESIS .)
     RIGHT_BRACE     reduce using rule 132 (Arguments -> LEFT_PARENTHESIS RIGHT_PARENTHESIS .)
     LEFT_BRACE      reduce using rule 132 (Arguments -> LEFT_PARENTHESIS RIGHT_PARENTHESIS .)
-    COLON           reduce using rule 132 (Arguments -> LEFT_PARENTHESIS RIGHT_PARENTHESIS .)
     INCREMENT       reduce using rule 132 (Arguments -> LEFT_PARENTHESIS RIGHT_PARENTHESIS .)
     DECREMENT       reduce using rule 132 (Arguments -> LEFT_PARENTHESIS RIGHT_PARENTHESIS .)
+    COLON           reduce using rule 132 (Arguments -> LEFT_PARENTHESIS RIGHT_PARENTHESIS .)
 
 
 state 183
@@ -7190,9 +7188,9 @@ state 184
     ASSIGNMENT      reduce using rule 126 (PrimaryExpr -> LEFT_PARENTHESIS Expression RIGHT_PARENTHESIS .)
     RIGHT_BRACE     reduce using rule 126 (PrimaryExpr -> LEFT_PARENTHESIS Expression RIGHT_PARENTHESIS .)
     LEFT_BRACE      reduce using rule 126 (PrimaryExpr -> LEFT_PARENTHESIS Expression RIGHT_PARENTHESIS .)
-    COLON           reduce using rule 126 (PrimaryExpr -> LEFT_PARENTHESIS Expression RIGHT_PARENTHESIS .)
     INCREMENT       reduce using rule 126 (PrimaryExpr -> LEFT_PARENTHESIS Expression RIGHT_PARENTHESIS .)
     DECREMENT       reduce using rule 126 (PrimaryExpr -> LEFT_PARENTHESIS Expression RIGHT_PARENTHESIS .)
+    COLON           reduce using rule 126 (PrimaryExpr -> LEFT_PARENTHESIS Expression RIGHT_PARENTHESIS .)
 
 
 state 185
@@ -7562,9 +7560,9 @@ state 203
     ASSIGNMENT      reduce using rule 131 (Index -> LEFT_BRACKET Expression RIGHT_BRACKET .)
     RIGHT_BRACE     reduce using rule 131 (Index -> LEFT_BRACKET Expression RIGHT_BRACKET .)
     LEFT_BRACE      reduce using rule 131 (Index -> LEFT_BRACKET Expression RIGHT_BRACKET .)
-    COLON           reduce using rule 131 (Index -> LEFT_BRACKET Expression RIGHT_BRACKET .)
     INCREMENT       reduce using rule 131 (Index -> LEFT_BRACKET Expression RIGHT_BRACKET .)
     DECREMENT       reduce using rule 131 (Index -> LEFT_BRACKET Expression RIGHT_BRACKET .)
+    COLON           reduce using rule 131 (Index -> LEFT_BRACKET Expression RIGHT_BRACKET .)
 
 
 state 204
@@ -7611,9 +7609,9 @@ state 204
     ASSIGNMENT      reduce using rule 133 (Arguments -> LEFT_PARENTHESIS ExpressionList RIGHT_PARENTHESIS .)
     RIGHT_BRACE     reduce using rule 133 (Arguments -> LEFT_PARENTHESIS ExpressionList RIGHT_PARENTHESIS .)
     LEFT_BRACE      reduce using rule 133 (Arguments -> LEFT_PARENTHESIS ExpressionList RIGHT_PARENTHESIS .)
-    COLON           reduce using rule 133 (Arguments -> LEFT_PARENTHESIS ExpressionList RIGHT_PARENTHESIS .)
     INCREMENT       reduce using rule 133 (Arguments -> LEFT_PARENTHESIS ExpressionList RIGHT_PARENTHESIS .)
     DECREMENT       reduce using rule 133 (Arguments -> LEFT_PARENTHESIS ExpressionList RIGHT_PARENTHESIS .)
+    COLON           reduce using rule 133 (Arguments -> LEFT_PARENTHESIS ExpressionList RIGHT_PARENTHESIS .)
 
 
 state 205
@@ -8494,9 +8492,9 @@ state 241
     ASSIGNMENT      reduce using rule 134 (Arguments -> LEFT_PARENTHESIS ExpressionList COMMA RIGHT_PARENTHESIS .)
     RIGHT_BRACE     reduce using rule 134 (Arguments -> LEFT_PARENTHESIS ExpressionList COMMA RIGHT_PARENTHESIS .)
     LEFT_BRACE      reduce using rule 134 (Arguments -> LEFT_PARENTHESIS ExpressionList COMMA RIGHT_PARENTHESIS .)
-    COLON           reduce using rule 134 (Arguments -> LEFT_PARENTHESIS ExpressionList COMMA RIGHT_PARENTHESIS .)
     INCREMENT       reduce using rule 134 (Arguments -> LEFT_PARENTHESIS ExpressionList COMMA RIGHT_PARENTHESIS .)
     DECREMENT       reduce using rule 134 (Arguments -> LEFT_PARENTHESIS ExpressionList COMMA RIGHT_PARENTHESIS .)
+    COLON           reduce using rule 134 (Arguments -> LEFT_PARENTHESIS ExpressionList COMMA RIGHT_PARENTHESIS .)
 
 
 state 242
@@ -9521,7 +9519,7 @@ state 285
     (184) SwitchStmt -> SWITCH LEFT_BRACE OpenSwitch . ExprCaseClauseStar CloseSwitch RIGHT_BRACE
     (189) ExprCaseClauseStar -> . ExprCaseClauseStar ExprCaseClause
     (190) ExprCaseClauseStar -> . ExprCaseClause
-    (191) ExprCaseClause -> . OpenScope CASE ExpressionList COLON StatementList CloseScope
+    (191) ExprCaseClause -> . OpenScope CASE Expression COLON StatementList CloseScope
     (192) ExprCaseClause -> . DEFAULT COLON OpenScope StatementList CloseScope
     (2) OpenScope -> .
 
@@ -9773,7 +9771,6 @@ state 290
     ASSIGNMENT      reduce using rule 41 (ExpressionList -> LEFT_BRACKET Expression RIGHT_BRACKET IDENT LEFT_BRACE ExpressionList RIGHT_BRACE .)
     RIGHT_BRACE     reduce using rule 41 (ExpressionList -> LEFT_BRACKET Expression RIGHT_BRACKET IDENT LEFT_BRACE ExpressionList RIGHT_BRACE .)
     LEFT_BRACE      reduce using rule 41 (ExpressionList -> LEFT_BRACKET Expression RIGHT_BRACKET IDENT LEFT_BRACE ExpressionList RIGHT_BRACE .)
-    COLON           reduce using rule 41 (ExpressionList -> LEFT_BRACKET Expression RIGHT_BRACKET IDENT LEFT_BRACE ExpressionList RIGHT_BRACE .)
 
 
 state 291
@@ -9906,7 +9903,7 @@ state 297
     (184) SwitchStmt -> SWITCH LEFT_BRACE OpenSwitch ExprCaseClauseStar . CloseSwitch RIGHT_BRACE
     (189) ExprCaseClauseStar -> ExprCaseClauseStar . ExprCaseClause
     (7) CloseSwitch -> .
-    (191) ExprCaseClause -> . OpenScope CASE ExpressionList COLON StatementList CloseScope
+    (191) ExprCaseClause -> . OpenScope CASE Expression COLON StatementList CloseScope
     (192) ExprCaseClause -> . DEFAULT COLON OpenScope StatementList CloseScope
     (2) OpenScope -> .
 
@@ -9929,7 +9926,7 @@ state 298
 
 state 299
 
-    (191) ExprCaseClause -> OpenScope . CASE ExpressionList COLON StatementList CloseScope
+    (191) ExprCaseClause -> OpenScope . CASE Expression COLON StatementList CloseScope
 
     CASE            shift and go to state 314
 
@@ -10008,7 +10005,7 @@ state 304
     (187) SwitchStmt -> SWITCH ExpressionName LEFT_BRACE OpenSwitch . ExprCaseClauseStar CloseSwitch RIGHT_BRACE
     (189) ExprCaseClauseStar -> . ExprCaseClauseStar ExprCaseClause
     (190) ExprCaseClauseStar -> . ExprCaseClause
-    (191) ExprCaseClause -> . OpenScope CASE ExpressionList COLON StatementList CloseScope
+    (191) ExprCaseClause -> . OpenScope CASE Expression COLON StatementList CloseScope
     (192) ExprCaseClause -> . DEFAULT COLON OpenScope StatementList CloseScope
     (2) OpenScope -> .
 
@@ -10196,10 +10193,7 @@ state 313
 
 state 314
 
-    (191) ExprCaseClause -> OpenScope CASE . ExpressionList COLON StatementList CloseScope
-    (39) ExpressionList -> . Expression
-    (40) ExpressionList -> . ExpressionList COMMA Expression
-    (41) ExpressionList -> . LEFT_BRACKET Expression RIGHT_BRACKET IDENT LEFT_BRACE ExpressionList RIGHT_BRACE
+    (191) ExprCaseClause -> OpenScope CASE . Expression COLON StatementList CloseScope
     (96) Expression -> . UnaryExpr
     (97) Expression -> . Expression LOGICAL_OR Expression
     (98) Expression -> . Expression LOGICAL_AND Expression
@@ -10250,7 +10244,6 @@ state 314
     (144) TrueFalseLit -> . FALSE
     (142) ImaginaryLit -> . IMAGINARY
 
-    LEFT_BRACKET    shift and go to state 67
     IDENT           shift and go to state 68
     LEFT_PARENTHESIS shift and go to state 77
     ADD             shift and go to state 70
@@ -10268,8 +10261,7 @@ state 314
     FALSE           shift and go to state 93
     IMAGINARY       shift and go to state 94
 
-    ExpressionList                 shift and go to state 327
-    Expression                     shift and go to state 66
+    Expression                     shift and go to state 327
     UnaryExpr                      shift and go to state 69
     PrimaryExpr                    shift and go to state 75
     unary_op                       shift and go to state 76
@@ -10326,7 +10318,7 @@ state 316
     (185) SwitchStmt -> SWITCH SimpleStmt SEMICOLON LEFT_BRACE OpenSwitch . ExprCaseClauseStar CloseSwitch RIGHT_BRACE
     (189) ExprCaseClauseStar -> . ExprCaseClauseStar ExprCaseClause
     (190) ExprCaseClauseStar -> . ExprCaseClause
-    (191) ExprCaseClause -> . OpenScope CASE ExpressionList COLON StatementList CloseScope
+    (191) ExprCaseClause -> . OpenScope CASE Expression COLON StatementList CloseScope
     (192) ExprCaseClause -> . DEFAULT COLON OpenScope StatementList CloseScope
     (2) OpenScope -> .
 
@@ -10352,7 +10344,7 @@ state 318
     (187) SwitchStmt -> SWITCH ExpressionName LEFT_BRACE OpenSwitch ExprCaseClauseStar . CloseSwitch RIGHT_BRACE
     (189) ExprCaseClauseStar -> ExprCaseClauseStar . ExprCaseClause
     (7) CloseSwitch -> .
-    (191) ExprCaseClause -> . OpenScope CASE ExpressionList COLON StatementList CloseScope
+    (191) ExprCaseClause -> . OpenScope CASE Expression COLON StatementList CloseScope
     (192) ExprCaseClause -> . DEFAULT COLON OpenScope StatementList CloseScope
     (2) OpenScope -> .
 
@@ -10515,11 +10507,47 @@ state 326
 
 state 327
 
-    (191) ExprCaseClause -> OpenScope CASE ExpressionList . COLON StatementList CloseScope
-    (40) ExpressionList -> ExpressionList . COMMA Expression
+    (191) ExprCaseClause -> OpenScope CASE Expression . COLON StatementList CloseScope
+    (97) Expression -> Expression . LOGICAL_OR Expression
+    (98) Expression -> Expression . LOGICAL_AND Expression
+    (99) Expression -> Expression . EQUAL Expression
+    (100) Expression -> Expression . NOT_EQUAL Expression
+    (101) Expression -> Expression . LESS_THAN Expression
+    (102) Expression -> Expression . LESS_THAN_EQUAL Expression
+    (103) Expression -> Expression . GREATER_THAN Expression
+    (104) Expression -> Expression . GREATER_THAN_EQUAL Expression
+    (105) Expression -> Expression . ADD Expression
+    (106) Expression -> Expression . SUBTRACT Expression
+    (107) Expression -> Expression . OR Expression
+    (108) Expression -> Expression . XOR Expression
+    (109) Expression -> Expression . MULTIPLY Expression
+    (110) Expression -> Expression . QUOTIENT Expression
+    (111) Expression -> Expression . REMAINDER Expression
+    (112) Expression -> Expression . SHIFT_LEFT Expression
+    (113) Expression -> Expression . SHIFT_RIGHT Expression
+    (114) Expression -> Expression . AND Expression
+    (115) Expression -> Expression . AND_NOT Expression
 
     COLON           shift and go to state 339
-    COMMA           shift and go to state 113
+    LOGICAL_OR      shift and go to state 114
+    LOGICAL_AND     shift and go to state 115
+    EQUAL           shift and go to state 116
+    NOT_EQUAL       shift and go to state 117
+    LESS_THAN       shift and go to state 118
+    LESS_THAN_EQUAL shift and go to state 119
+    GREATER_THAN    shift and go to state 120
+    GREATER_THAN_EQUAL shift and go to state 121
+    ADD             shift and go to state 122
+    SUBTRACT        shift and go to state 123
+    OR              shift and go to state 124
+    XOR             shift and go to state 125
+    MULTIPLY        shift and go to state 126
+    QUOTIENT        shift and go to state 127
+    REMAINDER       shift and go to state 128
+    SHIFT_LEFT      shift and go to state 129
+    SHIFT_RIGHT     shift and go to state 130
+    AND             shift and go to state 131
+    AND_NOT         shift and go to state 132
 
 
 state 328
@@ -10567,7 +10595,7 @@ state 329
     (185) SwitchStmt -> SWITCH SimpleStmt SEMICOLON LEFT_BRACE OpenSwitch ExprCaseClauseStar . CloseSwitch RIGHT_BRACE
     (189) ExprCaseClauseStar -> ExprCaseClauseStar . ExprCaseClause
     (7) CloseSwitch -> .
-    (191) ExprCaseClause -> . OpenScope CASE ExpressionList COLON StatementList CloseScope
+    (191) ExprCaseClause -> . OpenScope CASE Expression COLON StatementList CloseScope
     (192) ExprCaseClause -> . DEFAULT COLON OpenScope StatementList CloseScope
     (2) OpenScope -> .
 
@@ -10584,7 +10612,7 @@ state 330
     (186) SwitchStmt -> SWITCH SimpleStmt SEMICOLON ExpressionName LEFT_BRACE OpenSwitch . ExprCaseClauseStar CloseSwitch RIGHT_BRACE
     (189) ExprCaseClauseStar -> . ExprCaseClauseStar ExprCaseClause
     (190) ExprCaseClauseStar -> . ExprCaseClause
-    (191) ExprCaseClause -> . OpenScope CASE ExpressionList COLON StatementList CloseScope
+    (191) ExprCaseClause -> . OpenScope CASE Expression COLON StatementList CloseScope
     (192) ExprCaseClause -> . DEFAULT COLON OpenScope StatementList CloseScope
     (2) OpenScope -> .
 
@@ -10807,7 +10835,7 @@ state 338
 
 state 339
 
-    (191) ExprCaseClause -> OpenScope CASE ExpressionList COLON . StatementList CloseScope
+    (191) ExprCaseClause -> OpenScope CASE Expression COLON . StatementList CloseScope
     (94) StatementList -> . StatementList Statement SEMICOLON
     (95) StatementList -> .
 
@@ -11027,7 +11055,7 @@ state 342
     (186) SwitchStmt -> SWITCH SimpleStmt SEMICOLON ExpressionName LEFT_BRACE OpenSwitch ExprCaseClauseStar . CloseSwitch RIGHT_BRACE
     (189) ExprCaseClauseStar -> ExprCaseClauseStar . ExprCaseClause
     (7) CloseSwitch -> .
-    (191) ExprCaseClause -> . OpenScope CASE ExpressionList COLON StatementList CloseScope
+    (191) ExprCaseClause -> . OpenScope CASE Expression COLON StatementList CloseScope
     (192) ExprCaseClause -> . DEFAULT COLON OpenScope StatementList CloseScope
     (2) OpenScope -> .
 
@@ -11203,7 +11231,7 @@ state 350
 
 state 351
 
-    (191) ExprCaseClause -> OpenScope CASE ExpressionList COLON StatementList . CloseScope
+    (191) ExprCaseClause -> OpenScope CASE Expression COLON StatementList . CloseScope
     (94) StatementList -> StatementList . Statement SEMICOLON
     (3) CloseScope -> .
     (149) Statement -> . Declaration
@@ -11340,7 +11368,7 @@ state 351
     IMAGINARY       shift and go to state 94
 
     OpenScope                      shift and go to state 217
-    ExpressionList                 shift and go to state 226
+    Expression                     shift and go to state 221
     CloseScope                     shift and go to state 359
     Statement                      shift and go to state 211
     Declaration                    shift and go to state 212
@@ -11354,10 +11382,10 @@ state 351
     ConstDecl                      shift and go to state 13
     StructDecl                     shift and go to state 14
     VarDecl                        shift and go to state 15
-    Expression                     shift and go to state 221
     IncDecStmt                     shift and go to state 222
     Assignment                     shift and go to state 223
     ShortVarDecl                   shift and go to state 224
+    ExpressionList                 shift and go to state 226
     UnaryExpr                      shift and go to state 69
     IdentifierList                 shift and go to state 233
     PrimaryExpr                    shift and go to state 75
@@ -11435,11 +11463,11 @@ state 358
 
 state 359
 
-    (191) ExprCaseClause -> OpenScope CASE ExpressionList COLON StatementList CloseScope .
+    (191) ExprCaseClause -> OpenScope CASE Expression COLON StatementList CloseScope .
 
-    DEFAULT         reduce using rule 191 (ExprCaseClause -> OpenScope CASE ExpressionList COLON StatementList CloseScope .)
-    RIGHT_BRACE     reduce using rule 191 (ExprCaseClause -> OpenScope CASE ExpressionList COLON StatementList CloseScope .)
-    CASE            reduce using rule 191 (ExprCaseClause -> OpenScope CASE ExpressionList COLON StatementList CloseScope .)
+    DEFAULT         reduce using rule 191 (ExprCaseClause -> OpenScope CASE Expression COLON StatementList CloseScope .)
+    RIGHT_BRACE     reduce using rule 191 (ExprCaseClause -> OpenScope CASE Expression COLON StatementList CloseScope .)
+    CASE            reduce using rule 191 (ExprCaseClause -> OpenScope CASE Expression COLON StatementList CloseScope .)
 
 
 state 360
