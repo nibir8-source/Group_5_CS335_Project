@@ -539,7 +539,7 @@ def p_var_spec_star(p):
     p[0] = Node('VarSpecStar')
     if len(p) > 1:
         p[0].ast = ["Varspecstar", p[1].ast, p[3].ast]
-        print("Helloworld")
+        # print("Helloworld")
         # print(p[0].ast)
         p[0].code += p[1].code
         # p[0].code += p[3].code
@@ -1165,13 +1165,13 @@ def p_expression(p):
         # print(p[1].code)
         if p[1].data.get("deref") is not None:
             var1 = create_temp()
-            print('A')
+            # print('A')
             p[0].code.append([var1, "=", "*", p[1].expr_list[0]])
         else:
             var1 = p[1].expr_list[0]
         if p[3].data.get("deref") is not None:
             var2 = create_temp()
-            print('B')
+            # print('B')
             p[0].code.append([var2, "=", "*", p[3].expr_list[0]])
         else:
             var2 = p[3].expr_list[0]
@@ -1179,7 +1179,7 @@ def p_expression(p):
             p[1].expr_type_list[0], [p[2]], p[3].expr_type_list[0]))
         p[0].data["memory"] = 0
         var3 = create_temp()
-        print('C')
+        # print('C')
         p[0].expr_list = [var3]
         p[0].code.append(
             [var3, "=", var1, p[2]+p[3].expr_type_list[0][0], var2])

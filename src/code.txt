@@ -1,6 +1,60 @@
  main :
- * var_temp_no:0 = 5
- * var_temp_no:1 = 5
- temp_no:2 = * var_temp_no:0
- * var_temp_no:1 = temp_no:2
+ var_temp_no:1 = 0
+ label_no:0 :
+ label_no:2 :
+ temp_no:2 = var_temp_no:1 <int 10
+ ifnot temp_no:2 goto label_no:3
+ temp_no:3 = var_temp_no:1 %int 2
+ temp_no:4 = 0 |int 0
+ temp_no:5 = temp_no:3 ==int temp_no:4
+ ifnot temp_no:5 goto label_no:4
+ temp_no:6 = var_temp_no:1
+ temp_no:6 = temp_no:6 *int 12
+ temp_no:6 = temp_no:6 +int var_temp_no:0
+ temp_no:7 = temp_no:6 +int 0
+ temp_no:8 = var_temp_no:1 >>int 3
+ temp_no:9 = var_temp_no:1 +int temp_no:8
+ * temp_no:7 = temp_no:9
+ temp_no:10 = var_temp_no:1
+ temp_no:10 = temp_no:10 *int 12
+ temp_no:10 = temp_no:10 +int var_temp_no:0
+ temp_no:11 = temp_no:10 +int 4
+ temp_no:12 = var_temp_no:1 +int 1
+ temp_no:13 = var_temp_no:1 &int temp_no:12
+ temp_no:14 = var_temp_no:1 +int temp_no:13
+ * temp_no:11 = temp_no:14
+ goto label_no:5
+ label_no:4 : 
+ temp_no:15 = var_temp_no:1
+ temp_no:15 = temp_no:15 *int 12
+ temp_no:15 = temp_no:15 +int var_temp_no:0
+ temp_no:16 = temp_no:15 +int 0
+ * temp_no:16 = 56
+ temp_no:17 = var_temp_no:1
+ temp_no:17 = temp_no:17 *int 12
+ temp_no:17 = temp_no:17 +int var_temp_no:0
+ temp_no:18 = temp_no:17 +int 4
+ temp_no:19 = var_temp_no:1
+ temp_no:19 = temp_no:19 *int 12
+ temp_no:19 = temp_no:19 +int var_temp_no:0
+ temp_no:20 = temp_no:19 +int 0
+ temp_no:21 = * temp_no:20
+ * temp_no:18 = temp_no:21
+ label_no:5 : 
+ temp_no:22 = var_temp_no:1 !=int 0
+ ifnot temp_no:22 goto label_no:6
+ temp_no:23 = var_temp_no:1
+ temp_no:23 = temp_no:23 *int 12
+ temp_no:23 = temp_no:23 +int var_temp_no:0
+ temp_no:24 = temp_no:23 +int 8
+ temp_no:25 = var_temp_no:1 -int 1
+ temp_no:26 = temp_no:25
+ temp_no:26 = temp_no:26 *int 12
+ temp_no:26 = temp_no:26 +int var_temp_no:0
+ * temp_no:24 = temp_no:26
+ label_no:6 : 
+ var_temp_no:1 = var_temp_no:1 +int 1
+ goto label_no:2
+ label_no:3 :
+ label_no:1 :
  return
