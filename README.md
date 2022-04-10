@@ -44,3 +44,11 @@ For running the first test case given in the tests folder run the following comm
 ./bin/semantic ./tests/Ast_tests/test0.go</br>
 
 And similarly for the rest of the test files(test1.go, test2.go, test3.go, test4.go)</br>
+
+# Milestone 4
+
+For running the first test case given in the tests folder run the following command:</br>
+
+./bin/irc ./tests/Irc_tests/func.go</br>
+
+And similarly for the rest of the test files.</br>
