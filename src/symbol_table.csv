@@ -3,7 +3,7 @@ Table Number,0
 
 Parent,0,=,
 
-sum,"{'type': ['func'], 'scope': 1, 'accepts': [['int'], ['int']], 'total_param_size': 8, 'param_size_list': [4, 4], 'return_type': [['int'], ['int']], 'total_return_size': 8, 'return_size_list': [-16, -20]}"
+sum,"{'type': ['func'], 'scope': 1, 'accepts': [['int'], ['int']], 'total_param_size': 8, 'param_size_list': [4, 4], 'return_type': [['void']], 'total_return_size': 0, 'return_size_list': []}"
 main,"{'type': ['func'], 'scope': 2, 'accepts': [['void']], 'total_param_size': 0, 'return_type': [['void']], 'total_return_size': 0, 'return_size_list': []}"
 
 Table Number,1

@@ -1123,6 +1123,8 @@ def p_statement_list(p):
         else:
             p[0].ast = []
         p[0].code = p[1].code + p[2].code
+        if(p[1].data.get("hasReturnStmt") != None or p[2].data.get("hasReturnStmt") != None):
+            p[0].data["hasReturnStmt"] = 1
 #############################
 
 
@@ -1683,21 +1685,29 @@ def p_expr_switch_stmt(p):
     if len(p) == 7:
         p[0].ast = ["SWITCH", p[4].ast]
         p[0].code += p[4].code
+        if(p[4].data.get("hasReturnStmt") != None):
+            p[0].data["hasRStmt"] = 1
     elif len(p) == 8:
         p[0].ast = ["SWITCH", p[2].ast, p[5].ast]
         p[0].code += p[2].code
         p[0].code += p[5].code
+        if(p[5].data.get("hasReturnStmt") != None):
+            p[0].data["hasRStmt"] = 1
 
     elif len(p) == 10:
         p[0].ast = ["SWITCH", p[2].ast, p[4].ast, p[7].ast]
         p[0].code += p[2].code
         p[0].code += p[4].code
         p[0].code += p[7].code
+        if(p[7].data.get("hasReturnStmt") != None):
+            p[0].data["hasRStmt"] = 1
     else:
         p[0].code += p[2].code
         p[0].code += p[6].code
         p[0].ast = ["SWITCH", p[2].ast, p[6].ast]
         p[0].code.append([end_for[-1], ': '])
+        if(p[6].data.get("hasReturnStmt") != None):
+            p[0].data["hasRStmt"] = 1
     end_for = end_for[0: -1]
 
 
@@ -1774,6 +1784,8 @@ def p_for_stmt(p):
         p[0].code = p[4].code
         p[0].code += p[5].code
         p[0].code += p[4].data["for_label_pass"]
+        if(p[5].data.get("hasReturnStmt") != None):
+            p[0].data["hasReturnStmt"] = 1
 
     elif len(p) == 8:
         p[0].ast = ["FOR", p[4].ast, p[5].ast]
@@ -1789,6 +1801,8 @@ def p_for_stmt(p):
         p[0].code += p[5].code
         p[0].code.append(["goto", label2])
         p[0].code.append([label1, ":"])
+        if(p[5].data.get("hasReturnStmt") != None):
+            p[0].data["hasReturnStmt"] = 1
 
     else:
         p[0].ast = ["FOR", p[4].ast, ]
@@ -1796,6 +1810,8 @@ def p_for_stmt(p):
         p[0].code.append([label1, ":"])
         p[0].code += p[4].code
         p[0].code.append(["goto", label1])
+        if(p[4].data.get("hasReturnStmt") != None):
+            p[0].data["hasReturnStmt"] = 1
     p[0].code.append([end_for[-1], ":"])
     start_for = start_for[0:-1]
     end_for = end_for[0:-1]
@@ -1848,20 +1864,21 @@ def p_returnstmt(p):
     p[0] = Node('ReturnStmt')
 
     if len(p) == 2:
-        p[0].code = [["return"]]
+        # p[0].code = [["return"]]
         p[0].ast = ["return"]
+        p[0].data["hasReturnStmt"] = 1
     else:
         p[0].ast = ["return", p[2].ast]
+        p[0].data["hasReturnStmt"] = 1
         p[0].code = p[2].code
         for i in range(0, len(p[2].expr_list)):
             if(p[2].data["dereflist"][i] == 1):
                 var1 = create_temp()
                 p[0].code.append([var1, "=", "*", p[2].expr_list[i]])
-                p[0].code.append([curr_func, "return", var1, str(i)])
+                p[0].code.append(["return", var1])
             else:
-                p[0].code.append(
-                    [curr_func, "return", p[2].expr_list[i], str(i)])
-        p[0].code.append(["return"])
+                p[0].code.append(["return", p[2].expr_list[i]])
+        # p[0].code.append(["return"])
 
 
 # ---------------------------------

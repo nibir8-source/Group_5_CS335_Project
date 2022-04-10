@@ -1,8 +1,6 @@
  sum :
  temp_no:2 = var_temp_no:0 +int var_temp_no:1
  var_temp_no:3 = temp_no:2
- sum return var_temp_no:3 0
- return
  return
  main :
  var_temp_no:4 = 10

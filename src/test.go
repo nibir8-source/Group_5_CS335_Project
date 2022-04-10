@@ -1,9 +1,9 @@
 package main
 import "math"
 
-func sum(p,q int)(int,int){
+func sum(p,q int){
 	var s int=p+q
-	return s
+	return 
 }
 func main(){
 
