@@ -1,6 +1,11 @@
  main :
  * var_temp_no:0 = 5
- * var_temp_no:1 = 5
- temp_no:2 = * var_temp_no:0
- * var_temp_no:1 = temp_no:2
+ * var_temp_no:1 = 6
+ temp_no:2 = * var_temp_no:1
+ * var_temp_no:0 = temp_no:2
+ temp_no:4 = * var_temp_no:0
+ * var_temp_no:3 = temp_no:4
+ temp_no:5 = * var_temp_no:3
+ temp_no:5 = temp_no:5 +int 1
+ * var_temp_no:3 = temp_no:5
  return

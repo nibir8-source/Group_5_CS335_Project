@@ -10,9 +10,13 @@ Table Number,1
 Parent,1,=,0
 
 main,{'type': ['func']}
-d,"{'type': ['pointer', 'int'], 'tmp': 'var_temp_no:0', 'offset': 4}"
-var_temp_no:0,{'type': 'd'}
-c,"{'type': ['pointer', 'int'], 'tmp': 'var_temp_no:1', 'offset': 8}"
-var_temp_no:1,{'type': 'c'}
+a,"{'type': ['pointer', 'int'], 'tmp': 'var_temp_no:0', 'offset': 4}"
+var_temp_no:0,{'type': 'a'}
+b,"{'type': ['pointer', 'int'], 'tmp': 'var_temp_no:1', 'offset': 8}"
+var_temp_no:1,{'type': 'b'}
 temp_no:2,{'type': 'temp'}
-total_size,{'type': 12}
+c,"{'type': ['pointer', 'int'], 'tmp': 'var_temp_no:3', 'offset': 12}"
+var_temp_no:3,{'type': 'c'}
+temp_no:4,{'type': 'temp'}
+temp_no:5,{'type': 'temp'}
+total_size,{'type': 16}

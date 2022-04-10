@@ -1179,7 +1179,6 @@ def p_expression(p):
             p[1].expr_type_list[0], [p[2]], p[3].expr_type_list[0]))
         p[0].data["memory"] = 0
         var3 = create_temp()
-        print('C')
         p[0].expr_list = [var3]
         p[0].code.append(
             [var3, "=", var1, p[2]+p[3].expr_type_list[0][0], var2])
