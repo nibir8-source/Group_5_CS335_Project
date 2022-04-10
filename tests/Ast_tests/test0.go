@@ -18,11 +18,11 @@ var v1 ,v2,v3 float = 1,1.2,1.3
 
 func main(){
 	// all type of variable Decl
-	var a1 int;
+	var a1 int=c1+c2;
 	var  a2,a3,a4 int;
 	var a5,a6 int = 10,20;
 	var a7,a8 =1,2;
-	 
+	a7=a7+a8;
 	// all constants decl
 	const a9 ;
 	const a10,a11 = "helloworld","Hopefully code work"

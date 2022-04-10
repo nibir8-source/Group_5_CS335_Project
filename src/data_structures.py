@@ -9,6 +9,14 @@ class Node:
         self.data = {}
         self.ast = []
 
+class ActivationRecord:
+    def __init__(self, name):
+        self.ret = []
+        self.params = []
+        self.locals = []
+        self.locals_size = 0
+        self.params_size = 0
+        self.regs = []
 
 class SymTable:
     def __init__(self):
