@@ -1,6 +1,7 @@
 package main
 import "fmt"
 func main(){
+<<<<<<< HEAD
 	//Switch Case 
 
 	temp:=0
@@ -22,3 +23,19 @@ func main(){
 
 
 
+=======
+    var a int= 34<<45
+    i:=0
+    for {
+		for j:=0; j<10; j++ {
+			j++
+		}
+
+        if (56|i) < 78{
+            continue
+        }
+        a=a+(56|i)
+        i++
+    }
+}
+>>>>>>> 97a486935529c8cfd6fbe85e100471367a33a2c7
