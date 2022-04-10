@@ -281,10 +281,9 @@ def p_import_decl(p):
 
     if len(p) == 3:
         p[0].ast = p[2].ast
-        p[0].code += p[2].code
 
     else:
-        p[0].code += p[3].code
+
         p[0].ast = p[3].ast
 
 
@@ -293,7 +292,7 @@ def p_import_spec_semicolon_star(p):
     |'''
     p[0] = Node('ImportSpecSemicolonStar')
     if len(p) > 1:
-        p[0].code += p[1].code+p[2].code
+
         if(len(p[1].ast) > 0 and len(p[2].ast) > 0):
             p[0].ast = ['ImportSpecSemicolonStar', p[1].ast, p[2].ast]
         elif(len(p[1].ast) > 0):
@@ -320,7 +319,7 @@ def p_import_path(p):
     '''ImportPath : STRING'''
     p[0] = Node('ImportPath')
     p[0].ast = [p[1]]
-    p[0].code.append(p[1])
+
 
 # -----------------------------------------------------------------------------
 
@@ -382,7 +381,7 @@ def p_const_spec_star(p):
             p[0].ast = p[2].ast
         else:
             p[0].ast = []
-        p[0].code += p[1].code
+        # p[0].code += p[1].code
         p[0].code += p[2].code
 
 
@@ -394,6 +393,7 @@ def p_const_spec(p):
     if len(p) == 2:
         p[0] = p[1]
     elif len(p) == 5:
+        p[0].code = p[1].code+p[4].code
         p[0].ast = ["=", p[1].ast, [p[2]], p[4].ast]
         if len(p) == 5 and p[2] not in basic_types_list:
             errors.add_error("Type Error", line_number.get()+1,
@@ -427,6 +427,7 @@ def p_const_spec(p):
             temp.append(p[4].expr_list[i])
             p[0].code.append(temp)
     elif(len(p) == 4):
+        p[0].code = p[1].code+p[3].code
         p[0].ast = ["=", p[1].ast, p[3].ast]
         if len(p[1].ident_list) != len(p[3].expr_list):
             errors.add_error("Imbalaced assignment", line_number.get(
@@ -538,9 +539,10 @@ def p_var_spec_star(p):
     p[0] = Node('VarSpecStar')
     if len(p) > 1:
         p[0].ast = ["Varspecstar", p[1].ast, p[3].ast]
+        print("Helloworld")
         # print(p[0].ast)
         p[0].code += p[1].code
-        p[0].code += p[3].code
+        # p[0].code += p[3].code
 
 
 def p_var_spec(p):
@@ -1158,12 +1160,13 @@ def p_expression(p):
             errors.add_error("Operation Error", line_number.get()+1,
                              "Invalid types for operator")
         p[0].code = p[1].code+p[3].code
-        if p[1].data.get("deref") is None:
+        # print(p[1].code)
+        if p[1].data.get("deref") is not None:
             var1 = create_temp()
             p[0].code.append([var1, "=", "*", p[1].expr_list[0]])
         else:
             var1 = p[1].expr_list[0]
-        if p[3].data.get("deref") is None:
+        if p[3].data.get("deref") is not None:
             var2 = create_temp()
             p[0].code.append([var2, "=", "*", p[3].expr_list[0]])
         else:
@@ -1352,9 +1355,9 @@ def p_primary_expr(p):
         p[0].code.append(["startf", p[1].data["isID"]])
         for i in range(0, len(p[2].expr_list)):
             if(p[2].data["dereflist"][i] == 1):
-                var1 = create_temp()
-                p[0].code.append([var1, "=", "*", p[2].expr_list[i]])
-                p[0].code.append(["param", var1])
+                # var1 = create_temp()
+                # p[0].code.append([var1, "=", "*", p[2].expr_list[i]])
+                # p[0].code.append(["param", var1])
                 p[0].code.append(
                     ["param", p[2].expr_list[i], scope_table[0].table[p[1].data["isID"]]["param_size_list"][i]])
             else:

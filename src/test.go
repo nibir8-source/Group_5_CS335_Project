@@ -1,13 +1,20 @@
 package main
 import "math"
-import "string"
-func sum(p,q int)(int){
+
+func sum(p,q int)(int,int){
 	var s int=p+q
 	return s
 }
 func main(){
 
-	var l int;
-	l/=10
+	var l int=10;
+	var p,q,r int= 11,12,12;
+	var a[10] int;
+	
+	l/=10;
+	p=q+r+a[0];
+	q=r*l;
+	// r,q=sum(p,q);
 }
+
 
