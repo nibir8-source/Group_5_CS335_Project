@@ -41,30 +41,13 @@ func main(){
 	hell0:=666
 	switch(2+2/2) {
 		case 3*6*4/2+3*6/8-2-2*6: 
-			switch(*(x[0])) {
-				case 1: for y:=0;y < *(x[y]);y++ {
-							if(y<10) {
-								*(x[y])=*(&y)
-							} else {
-								break;
-							}
-						}		
-		    }
+			var y int=1
 		case 3:
 			var z int=0
-			for z<10 {
-				x[z]=&z
-				z++
-			}
-			if(*x[z-1]!=z) {
-				break		
-			} else {
-				temp+=1
-			}
+			
+			
 		default:
-			for i:=0;i<10;i++ {
-				x[i]=&hell0
-			}
+			var x int =2
 	}
 
 
