@@ -169,7 +169,7 @@ def p_source_file(p):
         for x in p[0].code[i]:
             y = y+" "+str(x)
         f.write(y+'\n')
-    print(p[0].ast)
+    # print(p[0].ast)
 
     writeGraph(p[0].ast)
     file1.write("}")
@@ -1165,11 +1165,13 @@ def p_expression(p):
         # print(p[1].code)
         if p[1].data.get("deref") is not None:
             var1 = create_temp()
+            print('A')
             p[0].code.append([var1, "=", "*", p[1].expr_list[0]])
         else:
             var1 = p[1].expr_list[0]
         if p[3].data.get("deref") is not None:
             var2 = create_temp()
+            print('B')
             p[0].code.append([var2, "=", "*", p[3].expr_list[0]])
         else:
             var2 = p[3].expr_list[0]
@@ -1177,6 +1179,7 @@ def p_expression(p):
             p[1].expr_type_list[0], [p[2]], p[3].expr_type_list[0]))
         p[0].data["memory"] = 0
         var3 = create_temp()
+        print('C')
         p[0].expr_list = [var3]
         p[0].code.append(
             [var3, "=", var1, p[2]+p[3].expr_type_list[0][0], var2])
@@ -1203,9 +1206,9 @@ def p_unary_expr(p):
         if p[1].expr_type_list[0][0] == "*":
             p[0].data["memory"] = 1
             p[0].data["deref"] = 1
-            var1 = create_temp()
-            p[0].code.append([var1, "=", "*", p[2].expr_list[0]])
-            p[0].expr_list = [var1]
+            # var1 = create_temp()
+            # p[0].code.append([var1, "=", "*", p[2].expr_list[0]])
+            p[0].expr_list = [p[2].expr_list[0]]
         elif p[1].expr_type_list[0][0] == "&":
             p[0].data["memory"] = 0
             if p[2].data.get("deref") is None:
@@ -1573,7 +1576,7 @@ def p_assignment(p):
                 p[0].code.append(
                     ["*", p[1].expr_list[i], p[2].expr_type_list[0][0], var1])
             else:
-                p[0].code.append(["*", p[1].expr_type_list[i],
+                p[0].code.append(["*", p[1].expr_list[i],
                                  p[2].expr_type_list[0][0], p[3].expr_list[i]])
         else:
             if(p[3].data["dereflist"][i] == 1):
@@ -1795,7 +1798,6 @@ def p_for_stmt(p):
             errors.add_error('Type Error', line_number.get(
             )+1, "The type of expression in for loop is not a boolean")
         label1 = create_label()
-        # print("hello")
         label2 = create_label()
         p[0].code += p[4].code
         p[0].code.append([label2, ": "])
@@ -1808,10 +1810,11 @@ def p_for_stmt(p):
 
     else:
         p[0].ast = ["FOR", p[4].ast, ]
-        label1 = create_label()
-        p[0].code.append([label1, ":"])
+        # label1 = create_label()
+        # p[0].code.append([label1, ":"])
         p[0].code += p[4].code
-        p[0].code.append(["goto", label1])
+        # p[0].code.append(["goto", label1])
+        p[0].code.append(["goto", start_for[-1]])
         if(p[4].data.get("hasReturnStmt") != None):
             p[0].data["hasReturnStmt"] = 1
     p[0].code.append([end_for[-1], ":"])

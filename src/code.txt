@@ -1,28 +1,6 @@
  main :
- var_temp_no:0 = 10
- var_temp_no:1 = 20
- temp_no:2 = 2 /int 2
- temp_no:3 = 2 +int temp_no:2
- temp_no:4 = 3 *int 6
- temp_no:5 = temp_no:4 *int 4
- temp_no:6 = temp_no:5 /int 2
- temp_no:7 = 3 *int 6
- temp_no:8 = temp_no:7 /int 8
- temp_no:9 = temp_no:6 +int temp_no:8
- temp_no:10 = temp_no:9 -int 2
- temp_no:11 = 2 *int 6
- temp_no:12 = temp_no:10 -int temp_no:11
- temp_no:14 = temp_no:3 == temp_no:12
- ifnot temp_no:14 goto label_no:3
- var_temp_no:13 = 1
- goto label_no:2
- label_no:3 : 
- goto label_no:2
- temp_no:16 = temp_no:3 == 3
- ifnot temp_no:16 goto label_no:4
- var_temp_no:15 = 0
- goto label_no:2
- label_no:4 : 
- goto label_no:2
- var_temp_no:17 = 2
+ * var_temp_no:0 = 5
+ * var_temp_no:1 = 5
+ temp_no:2 = * var_temp_no:0
+ * var_temp_no:1 = temp_no:2
  return

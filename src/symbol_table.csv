@@ -1,54 +1,18 @@
-
-Table Number,0
-
-Parent,0,=,
-
-main,"{'type': ['func'], 'scope': 1, 'accepts': [['void']], 'total_param_size': 0, 'return_type': [['void']], 'total_return_size': 0, 'return_size_list': []}"
-
-Table Number,1
-
-Parent,1,=,0
-
-main,{'type': ['func']}
-a,"{'type': ['int'], 'tmp': 'var_temp_no:0', 'offset': 4}"
-var_temp_no:0,{'type': 'a'}
-b,"{'type': ['int'], 'tmp': 'var_temp_no:1', 'offset': 8}"
-var_temp_no:1,{'type': 'b'}
-temp_no:2,{'type': 'temp'}
-temp_no:3,{'type': 'temp'}
-temp_no:14,{'type': 'temp'}
-temp_no:16,{'type': 'temp'}
-total_size,{'type': 24}
-
-Table Number,2
-
-Parent,2,=,1
-
-main,{'type': ['func']}
-temp_no:4,{'type': 'temp'}
-temp_no:5,{'type': 'temp'}
-temp_no:6,{'type': 'temp'}
-temp_no:7,{'type': 'temp'}
-temp_no:8,{'type': 'temp'}
-temp_no:9,{'type': 'temp'}
-temp_no:10,{'type': 'temp'}
-temp_no:11,{'type': 'temp'}
-temp_no:12,{'type': 'temp'}
-y,"{'type': ['int'], 'tmp': 'var_temp_no:13', 'offset': 12}"
-var_temp_no:13,{'type': 'y'}
-
-Table Number,3
-
-Parent,3,=,1
-
-main,{'type': ['func']}
-z,"{'type': ['int'], 'tmp': 'var_temp_no:15', 'offset': 16}"
-var_temp_no:15,{'type': 'z'}
-
-Table Number,4
-
-Parent,4,=,1
-
-main,{'type': ['func']}
-x,"{'type': ['int'], 'tmp': 'var_temp_no:17', 'offset': 20}"
-var_temp_no:17,{'type': 'x'}
+
+Table Number,0
+
+Parent,0,=,
+
+main,"{'type': ['func'], 'scope': 1, 'accepts': [['void']], 'total_param_size': 0, 'return_type': [['void']], 'total_return_size': 0, 'return_size_list': []}"
+
+Table Number,1
+
+Parent,1,=,0
+
+main,{'type': ['func']}
+d,"{'type': ['pointer', 'int'], 'tmp': 'var_temp_no:0', 'offset': 4}"
+var_temp_no:0,{'type': 'd'}
+c,"{'type': ['pointer', 'int'], 'tmp': 'var_temp_no:1', 'offset': 8}"
+var_temp_no:1,{'type': 'c'}
+temp_no:2,{'type': 'temp'}
+total_size,{'type': 12}
