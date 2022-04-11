@@ -45,7 +45,7 @@ For running the first test case given in the tests folder run the following comm
 
 And similarly for the rest of the test files(test1.go, test2.go, test3.go, test4.go)</br>
 
-# Milestone 4
+# Milestone 5
 
 For running the first test case given in the tests folder run the following command:</br>
 
