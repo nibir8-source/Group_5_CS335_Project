@@ -1,3 +1,5 @@
+import pickle as pkl
+import pickle
 import pprint
 import sys
 import ply.yacc as yacc
@@ -68,6 +70,8 @@ file1 = open("tree.txt", "w")  # write mode
 file1.write("digraph graphname {")
 file1.write("\n")
 counter = 0
+
+Sf_node = Node("Sf_node")
 
 
 def writeGraph(Ast_list):
@@ -148,6 +152,7 @@ def create_temp(p=None):
 
 def p_source_file(p):
     '''SourceFile  : PackageClause SEMICOLON ImportDeclStar TopLevelDeclStar'''
+    global Sf_node
     p[0] = Node('SourceFile')
     p[0].code += p[1].code + p[3].code + p[4].code
     p[0].ast = ["SourceFile", p[1].ast, p[3].ast, p[4].ast]
@@ -174,6 +179,7 @@ def p_source_file(p):
     writeGraph(p[0].ast)
     file1.write("}")
     file1.close()
+    Sf_node = p[0]
 
 
 def p_open_scope(p):
@@ -1967,3 +1973,7 @@ data = file.read()
 parser = yacc.yacc(debug=True)
 res = parser.parse(data, lexer=lexer)
 # pprint.pprint(res)
+with open('scopeTabDump', 'wb') as handle:
+    pickle.dump(scope_table, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+pkl.dump(Sf_node, open('Sf_node.p', 'wb'))
