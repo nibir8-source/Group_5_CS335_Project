@@ -2,6 +2,8 @@ import pickle as pkl
 import random
 import string
 import struct
+
+from sqlalchemy import func
 from data_structures import *
 
 
@@ -11,14 +13,14 @@ def binary(num):
 
 rootNode = pkl.load(open('Sf_node.p', 'rb'))
 with open('scopeTabDump', 'rb') as handle:
-    scopeTab = pkl.load(handle)
+    scopetab = pkl.load(handle)
 # # print(rootNode.code)
 # print(scopeTab[0].table.items())
 asmCode = []
 
 
 class CodeGen:
-    def __init__(self,):
+    def __init__(self, rootnode, scopetab):
         self.asmCode = []
         self.asmCode.append('global main')
         self.asmCode.append('extern printf')
@@ -34,41 +36,21 @@ class CodeGen:
         self.codeIndex = 0
         self.asmCode.append('section .text')
         self.counter = 0
-        self.scopeTab = scopeTab
-        self.code = rootNode.code
+        self.scopeTab = scopetab
+        self.code = rootnode.code
         self.relops = ['==int', '!=int', '<=int', '>=int', '>int', '<int']
         self.frelops = ['==float', '!=float',
                         '<=float', '>=float', '>float', '<float']
 
+    def ebpOffset(self, ident, identScope):
+        offset = self.scopeTab[identScope].table[ident]["offset"]
 
-    def ebpOffset(self, ident, identScope, funcScope):
-        paramSize = helper.getParamWidth(funcScope)
-
-        offset = 0
-        if 'is_arg' in self.helper.symbolTables[identScope].table[ident]:
-            if 'parent' not in self.helper.symbolTables[identScope].table[ident]:
-                offset = 8 + paramSize - \
-                    self.helper.symbolTables[identScope].table[ident]['size'] - \
-                    self.helper.symbolTables[identScope].table[ident]['offset']
-            else:
-                offset = 8 + paramSize - \
-                    self.helper.symbolTables[identScope].table[ident]['offset']
-
-        else:
-            if 'parent' in self.helper.symbolTables[identScope].table[ident]:
-                # parent = self.helper.symbolTables[identScope].table[ident]['parent']
-                # parentScope = self.helper.symbolTables[identScope].table[ident]['parentScope']
-                offset = self.helper.symbolTables[identScope].table[ident]['offset']
-            else:
-                offset = -(self.helper.symbolTables[identScope].table[ident]['offset'] +
-                        self.helper.symbolTables[identScope].table[ident]['size'] - paramSize)
         if offset >= 0:
             return '+'+str(offset)
         return str(offset)
 
-
     def addFunc(self, name):
-        funcScope = self.helper.symbolTables[0].functions[name]
+        funcScope = self.scopetab[0].table[name]["scope"]
 
         # add function label
         self.asmCode.append(name+':')
@@ -76,39 +58,52 @@ class CodeGen:
         # standard prologue
         self.add_prologue()
 
+        get_width = self.scopeTab[funcScope].table["total_size"]
+        # param_width = self.scopetab[0].table[name]["total_param_size"]
+
         # update stack pointer to store all the varaibles(except parameters) in current sym table
-        self.asmCode.append('sub esp, '+str(helper.getWidth(funcScope) -
-                            helper.getParamWidth(funcScope) + helper.getLargest(funcScope)))
+        self.asmCode.append('sub esp, ' + str(get_width))
 
         self.codeIndex += 1
         while True:
             if self.codeIndex >= len(self.code):
                 break
-            curr = self.code[self.codeIndex]
-            if (len(curr) == 1 and curr[0][-2:] == '::'):
-                break
+            # curr = self.code[self.codeIndex]
+            # if (len(curr) == 1 and curr[0][-2:] == '::'):
+            #     break
             code_ = self.genCode(self.codeIndex, funcScope)
             if len(code_) == 0:
                 # then it should be a return statement
                 if len(self.code[self.codeIndex]) != 1:
                     # this represents a non void function hence return value needs to be updated in eax
-                    retValOffset = self.ebpOffset(
-                        self.code[self.codeIndex][1], self.scopeInfo[self.codeIndex][1], funcScope)
-                    self.asmCode.append('lea eax, [ebp'+str(retValOffset) + ']')
+                    ident_scope = 0
+                    ident = self.code[self.codeIndex][1]
+                    for i in range(len(scopetab.keys())):
+                        if (scopetab[i].parent == funcScope):
+                            flag = 0
+                            for _, value in scopetab[i].table:
+                                if(value["tmp"] == ident):
+                                    flag = 1
+                                    ident_scope = i
+                                    break
+                            if flag == 1:
+                                break
+                    retValOffset = self.ebpOffset(ident, ident_scope)
+                    self.asmCode.append(
+                        'lea eax, [ebp'+str(retValOffset) + ']')
                 self.add_epilogue()
+                break
             else:
                 if code_[0] != 'none':
                     self.asmCode += code_
             self.codeIndex += 1
 
         # standard epilogue
-        self.add_epilogue()
-
+        # self.add_epilogue()
 
     def add_prologue(self):
         self.asmCode.append('push ebp')
         self.asmCode.append('mov ebp, esp')
-
 
     def add_epilogue(self):
         self.asmCode.append('mov esp, ebp')
@@ -124,7 +119,6 @@ class CodeGen:
             except:
                 pass
         return flag
-
 
     def add_op(self, instr, scopeInfo, funcScope):
 
@@ -263,7 +257,7 @@ class CodeGen:
         if instr[0] == 'goto':
             return self.goto_op(instr, scopeInfo, funcScope)
 
-        if instr[0] in [ '||' , '&&']:
+        if instr[0] in ['||', '&&']:
             return self.logical(instr, scopeInfo, funcScope)
 
         if instr[0] in ['--', '++']:
@@ -298,13 +292,14 @@ class CodeGen:
             self.addFunc(funcName[0])
         return self.asmCode
 
+
 if __name__ == '__main__':
     # Load files
     # rootNode = pkl.load(open('rootNode.p', 'rb'))
     # assert(len(rootNode.code) == len(rootNode.scopeInfo))
     # helper = pkl.load(open('helper.p', 'rb'))
 
-    codeGen = CodeGenerator(rootNode, scopeTab)
+    codeGen = CodeGen(rootNode, scopetab)
 
     outfile = open('assembly.asm', 'w')
     x86Code = codeGen.getCode()

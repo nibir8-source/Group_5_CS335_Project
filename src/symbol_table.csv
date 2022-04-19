@@ -11,11 +11,11 @@ Table Number,1
 Parent,1,=,0
 
 sum,{'type': ['func']}
-p,"{'type': ['int'], 'tmp': 'var_temp_no:0', 'offset': -12}"
-var_temp_no:0,{'type': 'p'}
-q,"{'type': ['int'], 'tmp': 'var_temp_no:1', 'offset': -8}"
-var_temp_no:1,{'type': 'q'}
-temp_no:2,{'type': 'temp'}
+p,"{'type': ['int'], 'tmp': 'var_temp_no_0', 'offset': -12}"
+var_temp_no_0,{'type': 'p'}
+q,"{'type': ['int'], 'tmp': 'var_temp_no_1', 'offset': -8}"
+var_temp_no_1,{'type': 'q'}
+temp_no_2,{'type': 'temp'}
 total_size,{'type': 4}
 
 Table Number,2
@@ -24,38 +24,42 @@ Parent,2,=,0
 
 sum,{'type': ['func']}
 main,{'type': ['func']}
-e1,"{'type': ['int'], 'tmp': 'var_temp_no:3', 'offset': 4}"
-var_temp_no:3,{'type': 'e1'}
-e2,"{'type': ['int'], 'tmp': 'var_temp_no:4', 'offset': 8}"
-var_temp_no:4,{'type': 'e2'}
-e3,"{'type': ['int'], 'tmp': 'var_temp_no:5', 'offset': 12}"
-var_temp_no:5,{'type': 'e3'}
-e4,"{'type': ['int'], 'tmp': 'var_temp_no:6', 'offset': 16}"
-var_temp_no:6,{'type': 'e4'}
-e5,"{'type': ['int'], 'tmp': 'var_temp_no:7', 'offset': 20}"
-var_temp_no:7,{'type': 'e5'}
-e6,"{'type': ['int'], 'tmp': 'var_temp_no:8', 'offset': 24}"
-var_temp_no:8,{'type': 'e6'}
-e7,"{'type': ['int'], 'tmp': 'var_temp_no:9', 'offset': 28}"
-var_temp_no:9,{'type': 'e7'}
-e8,"{'type': ['int'], 'tmp': 'var_temp_no:10', 'offset': 32}"
-var_temp_no:10,{'type': 'e8'}
-temp_no:11,{'type': 'temp'}
-temp_no:12,{'type': 'temp'}
-s,"{'type': ['float'], 'tmp': 'var_temp_no:13', 'offset': 36}"
-var_temp_no:13,{'type': 's'}
-temp_no:14,{'type': 'temp'}
-temp_no:15,{'type': 'temp'}
-temp_no:16,{'type': 'temp'}
-temp_no:17,{'type': 'temp'}
-temp_no:18,{'type': 'temp'}
-temp_no:19,{'type': 'temp'}
-temp_no:20,{'type': 'temp'}
-temp_no:21,{'type': 'temp'}
-temp_no:22,{'type': 'temp'}
-temp_no:23,{'type': 'temp'}
-temp_no:24,{'type': 'temp'}
-temp_no:25,{'type': 'temp'}
-d,"{'type': ['int'], 'tmp': 'var_temp_no:26', 'offset': 40}"
-var_temp_no:26,{'type': 'd'}
-total_size,{'type': 44}
+e1,"{'type': ['int'], 'tmp': 'var_temp_no_3', 'offset': 4}"
+var_temp_no_3,{'type': 'e1'}
+e2,"{'type': ['int'], 'tmp': 'var_temp_no_4', 'offset': 8}"
+var_temp_no_4,{'type': 'e2'}
+e3,"{'type': ['int'], 'tmp': 'var_temp_no_5', 'offset': 12}"
+var_temp_no_5,{'type': 'e3'}
+e4,"{'type': ['int'], 'tmp': 'var_temp_no_6', 'offset': 16}"
+var_temp_no_6,{'type': 'e4'}
+e5,"{'type': ['int'], 'tmp': 'var_temp_no_7', 'offset': 20}"
+var_temp_no_7,{'type': 'e5'}
+e6,"{'type': ['int'], 'tmp': 'var_temp_no_8', 'offset': 24}"
+var_temp_no_8,{'type': 'e6'}
+e7,"{'type': ['int'], 'tmp': 'var_temp_no_9', 'offset': 28}"
+var_temp_no_9,{'type': 'e7'}
+e8,"{'type': ['int'], 'tmp': 'var_temp_no_10', 'offset': 32}"
+var_temp_no_10,{'type': 'e8'}
+temp_no_11,{'type': 'temp'}
+temp_no_12,{'type': 'temp'}
+temp_no_13,{'type': 'temp'}
+temp_no_14,{'type': 'temp'}
+temp_no_15,{'type': 'temp'}
+temp_no_16,{'type': 'temp'}
+temp_no_17,{'type': 'temp'}
+d,"{'type': ['int'], 'tmp': 'var_temp_no_18', 'offset': 36}"
+var_temp_no_18,{'type': 'd'}
+temp_no_19,{'type': 'temp'}
+l,"{'type': ['int'], 'tmp': 'var_temp_no_20', 'offset': 40}"
+var_temp_no_20,{'type': 'l'}
+total_size,{'type': 48}
+
+Table Number,3
+
+Parent,3,=,2
+
+sum,{'type': ['func']}
+main,{'type': ['func']}
+temp_no_21,{'type': 'temp'}
+j,"{'type': ['int'], 'tmp': 'var_temp_no_22', 'offset': 44}"
+var_temp_no_22,{'type': 'j'}

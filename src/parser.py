@@ -46,6 +46,7 @@ curr_scope = 0
 scope_number = 0
 scope_list = [0]
 scope_table = {}
+
 scope_table[0] = SymTable()
 open_for = 0
 open_switch = 0
@@ -139,11 +140,11 @@ def create_label(p=None):
 def create_temp(p=None):
     global temp_count
     if p is None:
-        temp = "temp_no:" + str(temp_count)
+        temp = "temp_no_" + str(temp_count)
         temp_count += 1
         scope_table[curr_scope].insert(temp, "temp")
     else:
-        temp = "var_temp_no:" + str(temp_count)
+        temp = "var_temp_no_" + str(temp_count)
         temp_count += 1
     return temp
 
@@ -1977,3 +1978,4 @@ with open('scopeTabDump', 'wb') as handle:
     pickle.dump(scope_table, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 pkl.dump(Sf_node, open('Sf_node.p', 'wb'))
+print((scope_table[2].table))
