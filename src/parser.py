@@ -1978,4 +1978,4 @@ with open('scopeTabDump', 'wb') as handle:
     pickle.dump(scope_table, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 pkl.dump(Sf_node, open('Sf_node.p', 'wb'))
-print((scope_table[2].table))
+print((scope_table[0].table))
