@@ -230,17 +230,19 @@ class CodeGen:
 
         # s1 = self.get_scope(instr[0])
         # s2 = self.get_scope(instr[2])
-        # dst_info=self.scopeTab[s1].table[]
+        dst_info = self.get_ident_info(dst)
+        src_info = self.get_ident_info(src)
 
-        # baseType = helper.getBaseType(data_['type'])
+        baseType = dst_info["type"]
+        #baseType = helper.getBaseType(data_['type'])
 
         if baseType[0] in ['struct', 'array']:
-            offset1 = self.ebpOffset(instr[1], scopeInfo[1], funcScope)
-            offset2 = self.ebpOffset(instr[2], scopeInfo[2], funcScope)
+            offset1 = self.ebpOffset(instr[0])
+            offset2 = self.ebpOffset(instr[2])
 
             self.counter += 1
             label = 'looping' + str(self.counter)
-            iters = int(data_['size'] / 4)
+            iters = int(dst_info['size'] / 4)
             code_ = ['mov esi, ebp', 'mov ebx, ebp']
             code_.append('add esi, '+offset1)
             code_.append('add ebx, '+offset2)
@@ -259,20 +261,20 @@ class CodeGen:
             return code_
         if baseType == ['float']:
             if isinstance(scopeInfo[2], int):
-                dstOffset = self.ebpOffset(dst, scopeInfo[1], funcScope)
-                srcOffset = self.ebpOffset(src, scopeInfo[2], funcScope)
+                dstOffset = self.ebpOffset(dst)
+                srcOffset = self.ebpOffset(src)
                 code.append('fld dword [ebp' + srcOffset + ']')
                 code.append('fstp dword [ebp' + dstOffset + ']')
             else:
-                dstOffset = self.ebpOffset(dst, scopeInfo[1], funcScope)
+                dstOffset = self.ebpOffset(dst)
 
                 binaryCode = binary(float(src))
                 code.append('mov edi, 0b' + str(binaryCode))
                 code.append('mov [ebp' + dstOffset + '], edi')
         else:
             if isinstance(scopeInfo[2], int):
-                dstOffset = self.ebpOffset(dst, scopeInfo[1], funcScope)
-                srcOffset = self.ebpOffset(src, scopeInfo[2], funcScope)
+                dstOffset = self.ebpOffset(dst)
+                srcOffset = self.ebpOffset(src)
                 code.append('mov edi, [ebp' + srcOffset + ']')
                 if flag[2] == 1:
                     code.append('mov edi, [edi]')
@@ -282,7 +284,7 @@ class CodeGen:
                 else:
                     code.append('mov [ebp' + str(dstOffset) + '], edi')
             else:
-                dstOffset = self.ebpOffset(dst, scopeInfo[1], funcScope)
+                dstOffset = self.ebpOffset(dst)
                 code.append('mov edi, ' + str(src))
                 if flag[1] == 1:
                     code.append('mov esi, [ebp' + str(dstOffset) + ']')
@@ -292,16 +294,16 @@ class CodeGen:
 
         return code
 
-    def assign_op_ptr(self, instr, scopeInfo, funcScope):
+    def assign_op_ptr(self, instr):
         dst = instr[1][1:]
         src = instr[2]
         # *t1 += t2
         code = []
         instr[1] = dst
-        flag = self.setFlags(instr, scopeInfo)
+        flag = self.setFlags(instr)
 
-        dstOffset = self.ebpOffset(dst, scopeInfo[1], funcScope)
-        srcOffset = self.ebpOffset(src, scopeInfo[2], funcScope)
+        dstOffset = self.ebpOffset(dst)
+        srcOffset = self.ebpOffset(src)
         code.append('mov edi, [ebp' + srcOffset + ']')
         code.append('mov esi, [ebp' + dstOffset + ']')
         if flag[1] == 1:
