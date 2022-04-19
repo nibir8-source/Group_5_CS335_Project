@@ -42,8 +42,9 @@ class CodeGen:
         self.frelops = ['==float', '!=float',
                         '<=float', '>=float', '>float', '<float']
 
-    def ebpOffset(self, ident, identScope):
-        offset = self.scopeTab[identScope].table[ident]["offset"]
+    def ebpOffset(self, ident):
+        scope = self.get_scope(ident)
+        offset = self.scopeTab[scope].table[ident]["offset"]
 
         if offset >= 0:
             return '+'+str(offset)
@@ -130,57 +131,60 @@ class CodeGen:
 
     def add_op(self, instr, scopeInfo, funcScope):
 
-        dst = instr[1]
+        dst = instr[0]
+        scope_dst = self.get_scope(instr[0])
         src1 = instr[2]
-        src2 = instr[3]
-        flag = self.setFlags(instr, scopeInfo)
+        scope_src1 = self.get_scope(instr[2])
+        src2 = instr[4]
+        scope_src2 = self.get_scope(instr[4])
+        flag = self.setFlags(instr)
 
         info_src1 = self.helper.symbolTables[scopeInfo[2]].get(src1)
 
         baseType = helper.getBaseType(info_src1['type'])
-        if baseType[0] == 'struct':
-            objOffset = self.ebpOffset(src1, scopeInfo[2], funcScope)
-            dstOffset = self.ebpOffset(dst, scopeInfo[1], funcScope)
-            code_ = []
-            if flag[2] == 1:
-                code_.append('mov edx, [ebp'+str(objOffset)+']')
-                # dont add ebp
-            else:
-                code_.append('mov edx, '+str(objOffset))
-            code_.append('mov esi, ' + str(src2))
-            if flag[3] == 1:
-                code_.append('mov esi, [esi]')
-            code_.append('add edx, esi')
+        # if baseType[0] == 'struct':
+        #     objOffset = self.ebpOffset(src1, scopeInfo[2], funcScope)
+        #     dstOffset = self.ebpOffset(dst, scopeInfo[1], funcScope)
+        #     code_ = []
+        #     if flag[2] == 1:
+        #         code_.append('mov edx, [ebp'+str(objOffset)+']')
+        #         # dont add ebp
+        #     else:
+        #         code_.append('mov edx, '+str(objOffset))
+        #     code_.append('mov esi, ' + str(src2))
+        #     if flag[3] == 1:
+        #         code_.append('mov esi, [esi]')
+        #     code_.append('add edx, esi')
 
-            if flag[2] == 1:
-                code_.append('mov esi, 0')
-            else:
-                code_.append('mov esi, ebp')
-            code_.append('add esi, edx')
-            code_.append('mov [ebp' + str(dstOffset) + '], esi')
-            return code_
-        elif baseType[0] == 'array':
-            objOffset = self.ebpOffset(src1, scopeInfo[2], funcScope)
-            dstOffset = self.ebpOffset(dst, scopeInfo[1], funcScope)
-            src2Offset = self.ebpOffset(src2, scopeInfo[3], funcScope)
-            code_ = []
-            if flag[2] == 1:
-                code_.append('mov edx, [ebp'+str(objOffset)+']')
-                # dont add ebp
-            else:
-                code_.append('mov edx, '+str(objOffset))
-            code_.append('mov esi, [ebp'+str(src2Offset)+']')
-            if flag[3] == 1:
-                code_.append('mov esi, [esi]')
-            code_.append('add edx, esi')
+        #     if flag[2] == 1:
+        #         code_.append('mov esi, 0')
+        #     else:
+        #         code_.append('mov esi, ebp')
+        #     code_.append('add esi, edx')
+        #     code_.append('mov [ebp' + str(dstOffset) + '], esi')
+        #     return code_
+        # elif baseType[0] == 'array':
+        #     objOffset = self.ebpOffset(src1, scopeInfo[2], funcScope)
+        #     dstOffset = self.ebpOffset(dst, scopeInfo[1], funcScope)
+        #     src2Offset = self.ebpOffset(src2, scopeInfo[3], funcScope)
+        #     code_ = []
+        #     if flag[2] == 1:
+        #         code_.append('mov edx, [ebp'+str(objOffset)+']')
+        #         # dont add ebp
+        #     else:
+        #         code_.append('mov edx, '+str(objOffset))
+        #     code_.append('mov esi, [ebp'+str(src2Offset)+']')
+        #     if flag[3] == 1:
+        #         code_.append('mov esi, [esi]')
+        #     code_.append('add edx, esi')
 
-            if flag[2] == 1:
-                code_.append('mov esi, 0')
-            else:
-                code_.append('mov esi, ebp')
-            code_.append('add esi, edx')
-            code_.append('mov [ebp' + str(dstOffset) + '], esi')
-            return code_
+        #     if flag[2] == 1:
+        #         code_.append('mov esi, 0')
+        #     else:
+        #         code_.append('mov esi, ebp')
+        #     code_.append('add esi, edx')
+        #     code_.append('mov [ebp' + str(dstOffset) + '], esi')
+        #     return code_
 
         dstOffset = self.ebpOffset(dst, scopeInfo[1], funcScope)
         src1Offset = self.ebpOffset(src1, scopeInfo[2], funcScope)
