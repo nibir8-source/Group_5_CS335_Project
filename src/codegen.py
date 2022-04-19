@@ -145,9 +145,9 @@ class CodeGen:
         scope_src2 = self.get_scope(instr[4])
         flag = self.setFlags(instr)
 
-        info_src1 = self.helper.symbolTables[scopeInfo[2]].get(src1)
+        src1_type = self.scopeTab[scope_src1].table[src1]["type"][0]
 
-        baseType = helper.getBaseType(info_src1['type'])
+        # baseType = helper.getBaseType(info_src1['type'])
         # if baseType[0] == 'struct':
         #     objOffset = self.ebpOffset(src1, scopeInfo[2], funcScope)
         #     dstOffset = self.ebpOffset(dst, scopeInfo[1], funcScope)
@@ -192,30 +192,133 @@ class CodeGen:
         #     code_.append('mov [ebp' + str(dstOffset) + '], esi')
         #     return code_
 
-        dstOffset = self.ebpOffset(dst, scopeInfo[1], funcScope)
-        src1Offset = self.ebpOffset(src1, scopeInfo[2], funcScope)
-        if isinstance(scopeInfo[3], int):
-            src2Offset = self.ebpOffset(src2, scopeInfo[3], funcScope)
+        dstOffset = self.ebpOffset(dst)
+        src1Offset = self.ebpOffset(src1)
+        src2Offset = self.ebpOffset(src2)
 
         code = []
         code.append('mov edi, [ebp' + str(src1Offset) + ']')
         if flag[2] == 1:
             code.append('mov edi, [edi]')
 
-        if isinstance(scopeInfo[3], int):
-            code.append('mov esi, [ebp' + str(src2Offset) + ']')
-            if flag[3] == 1:
-                code.append('mov esi, [esi]')
-        else:
-            code.append('mov esi, ' + str(src2))
+        code.append('mov esi, [ebp' + str(src2Offset) + ']')
+        if flag[3] == 1:
+            code.append('mov esi, [esi]')
 
         code.append('add edi, esi')
 
-        if flag[1] == 1:
+        if flag[0] == 1:
             code.append('mov esi, [ebp' + str(dstOffset) + ']')
             code.append('mov [esi], edi')
         else:
             code.append('mov [ebp' + str(dstOffset) + '], edi')
+        return code
+
+    def sub_op(self, instr, scopeInfo, funcScope):
+
+        dst = instr[0]
+        src1 = instr[2]
+        src2 = instr[4]
+        flag = self.setFlags(instr)
+
+        dstOffset = self.ebpOffset(dst, scopeInfo[0], funcScope)
+        src1Offset = self.ebpOffset(src1, scopeInfo[2], funcScope)
+        src2Offset = self.ebpOffset(src2, scopeInfo[4], funcScope)
+
+        code = []
+        code.append('mov edi, [ebp' + str(src1Offset) + ']')
+        if flag[2] == 1:
+            code.append('mov edi, [edi]')
+
+        code.append('mov esi, [ebp' + str(src2Offset) + ']')
+        if flag[3] == 1:
+            code.append('mov esi, [esi]')
+        code.append('sub edi, esi')
+
+        if flag[0] == 1:
+            code.append('mov esi, [ebp'+ str(dstOffset) + ']')
+            code.append('mov [esi], edi')
+        else:
+            code.append('mov [ebp' + str(dstOffset) + '], edi')
+        return code
+
+    def mul_op(self, instr, scopeInfo, funcScope):
+
+        dst = instr[0]
+        src1 = instr[2]
+        src2 = instr[4]
+        flag = self.setFlags(instr)
+
+        dstOffset = self.ebpOffset(dst, scopeInfo[0], funcScope)
+        src1Offset = self.ebpOffset(src1, scopeInfo[2], funcScope)
+        src2Offset = self.ebpOffset(src2, scopeInfo[4], funcScope)
+
+        code = []
+        code.append('mov edi, [ebp' + str(src1Offset) + ']')
+        if flag[2] == 1:
+            code.append('mov edi, [edi]')
+
+        code.append('mov esi, [ebp' + str(src2Offset) + ']')
+        if flag[3] == 1:
+            code.append('mov esi, [esi]')
+        code.append('imul edi, esi')
+
+        if flag[0] == 1:
+            code.append('mov esi, [ebp'+ str(dstOffset) + ']')
+            code.append('mov [esi], edi')
+        else:
+            code.append('mov [ebp' + str(dstOffset) + '], edi')
+        return code
+
+    def sub_op(self, instr, scopeInfo, funcScope):
+
+        dst = instr[0]
+        src1 = instr[2]
+        src2 = instr[4]
+        flag = self.setFlags(instr)
+
+        dstOffset = self.ebpOffset(dst, scopeInfo[0], funcScope)
+        src1Offset = self.ebpOffset(src1, scopeInfo[2], funcScope)
+        src2Offset = self.ebpOffset(src2, scopeInfo[4], funcScope)
+
+        code = []
+        code.append('mov edi, [ebp' + str(src1Offset) + ']')
+        if flag[2] == 1:
+            code.append('mov edi, [edi]')
+
+        code.append('mov esi, [ebp' + str(src2Offset) + ']')
+        if flag[3] == 1:
+            code.append('mov esi, [esi]')
+        code.append('sub edi, esi')
+
+        if flag[0] == 1:
+            code.append('mov esi, [ebp'+ str(dstOffset) + ']')
+            code.append('mov [esi], edi')
+        else:
+            code.append('mov [ebp' + str(dstOffset) + '], edi')
+        return code
+
+    def div_op(self, instr, scopeInfo, funcScope):
+        dst = instr[0]
+        src1 = instr[2]
+        src2 = instr[4]
+        flag = self.setFlags(instr)
+
+        dstOffset = self.ebpOffset(dst, scopeInfo[0], funcScope)
+        src1Offset = self.ebpOffset(src1, scopeInfo[2], funcScope)
+        src2Offset = self.ebpOffset(src2, scopeInfo[4], funcScope)
+
+        code = []
+        code.append('xor edx, edx')
+        code.append('mov eax, [ebp' + str(src1Offset) + ']')
+        code.append('mov ebx, [ebp' + str(src2Offset) + ']')
+        code.append('idiv ebx')
+
+        if flag[0] == 1:
+            code.append('mov esi, [ebp'+ str(dstOffset) + ']')
+            code.append('mov [esi], eax')
+        else:
+            code.append('mov [ebp' + str(dstOffset) + '], eax')
         return code
 
     def assign_op(self, instr):
