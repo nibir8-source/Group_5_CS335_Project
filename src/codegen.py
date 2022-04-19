@@ -40,15 +40,19 @@ class CodeGen:
         self.frelops = ['==float', '!=float',
                         '<=float', '>=float', '>float', '<float']
 
+
 def ebpOffset(self, ident, identScope, funcScope):
     paramSize = helper.getParamWidth(funcScope)
 
     offset = 0
     if 'is_arg' in self.helper.symbolTables[identScope].table[ident]:
         if 'parent' not in self.helper.symbolTables[identScope].table[ident]:
-            offset = 8 + paramSize - self.helper.symbolTables[identScope].table[ident]['size'] - self.helper.symbolTables[identScope].table[ident]['offset']
+            offset = 8 + paramSize - \
+                self.helper.symbolTables[identScope].table[ident]['size'] - \
+                self.helper.symbolTables[identScope].table[ident]['offset']
         else:
-            offset = 8 + paramSize - self.helper.symbolTables[identScope].table[ident]['offset']
+            offset = 8 + paramSize - \
+                self.helper.symbolTables[identScope].table[ident]['offset']
 
     else:
         if 'parent' in self.helper.symbolTables[identScope].table[ident]:
@@ -56,12 +60,14 @@ def ebpOffset(self, ident, identScope, funcScope):
             # parentScope = self.helper.symbolTables[identScope].table[ident]['parentScope']
             offset = self.helper.symbolTables[identScope].table[ident]['offset']
         else:
-            offset = -(self.helper.symbolTables[identScope].table[ident]['offset'] + self.helper.symbolTables[identScope].table[ident]['size'] - paramSize)
+            offset = -(self.helper.symbolTables[identScope].table[ident]['offset'] +
+                       self.helper.symbolTables[identScope].table[ident]['size'] - paramSize)
     if offset >= 0:
         return '+'+str(offset)
     return str(offset)
 
-def addFunc(self,name):
+
+def addFunc(self, name):
     funcScope = self.helper.symbolTables[0].functions[name]
 
     # add function label
@@ -71,7 +77,8 @@ def addFunc(self,name):
     self.add_prologue()
 
     # update stack pointer to store all the varaibles(except parameters) in current sym table
-    self.asmCode.append('sub esp, '+str(helper.getWidth(funcScope) - helper.getParamWidth(funcScope) + helper.getLargest(funcScope)))
+    self.asmCode.append('sub esp, '+str(helper.getWidth(funcScope) -
+                        helper.getParamWidth(funcScope) + helper.getLargest(funcScope)))
 
     self.codeIndex += 1
     while True:
@@ -85,7 +92,8 @@ def addFunc(self,name):
             # then it should be a return statement
             if len(self.code[self.codeIndex]) != 1:
                 # this represents a non void function hence return value needs to be updated in eax
-                retValOffset = self.ebpOffset(self.code[self.codeIndex][1], self.scopeInfo[self.codeIndex][1], funcScope)
+                retValOffset = self.ebpOffset(
+                    self.code[self.codeIndex][1], self.scopeInfo[self.codeIndex][1], funcScope)
                 self.asmCode.append('lea eax, [ebp'+str(retValOffset) + ']')
             self.add_epilogue()
         else:
@@ -101,10 +109,12 @@ def add_prologue(self):
     self.asmCode.append('push ebp')
     self.asmCode.append('mov ebp, esp')
 
+
 def add_epilogue(self):
     self.asmCode.append('mov esp, ebp')
     self.asmCode.append('pop ebp')
     self.asmCode.append('ret')
+
 
 def unary_minus(self, instr, scopeInfo, funcScope):
     dst = instr[1]
@@ -121,11 +131,12 @@ def unary_minus(self, instr, scopeInfo, funcScope):
     code.append('mov esi, 0')
     code.append('sub esi, edi')
     if flag[1] == 1:
-        code.append('mov esi, [ebp'+ str(dstOffset) + ']')
+        code.append('mov esi, [ebp' + str(dstOffset) + ']')
         code.append('mov [esi], edi')
     else:
         code.append('mov [ebp' + str(dstOffset) + '], esi')
     return code
+
 
 def unary_fminus(self, instr, scopeInfo, funcScope):
     dst = instr[1]
@@ -155,15 +166,17 @@ def unary_fminus(self, instr, scopeInfo, funcScope):
     code.append('fstp dword [ebp' + str(dstOffset) + ']')
     return code
 
+
 def setFlags(self, instr, scopeInfo):
     flag = [0 for x in instr]
-    for i in range(1,len(instr)):
+    for i in range(1, len(instr)):
         try:
             if 'reference' in self.helper.symbolTables[scopeInfo[i]].get(instr[i]):
                 flag[i] = 1
         except:
             pass
     return flag
+
 
 def add_op(self, instr, scopeInfo, funcScope):
 
@@ -239,11 +252,12 @@ def add_op(self, instr, scopeInfo, funcScope):
     code.append('add edi, esi')
 
     if flag[1] == 1:
-        code.append('mov esi, [ebp'+ str(dstOffset) + ']')
+        code.append('mov esi, [ebp' + str(dstOffset) + ']')
         code.append('mov [esi], edi')
     else:
         code.append('mov [ebp' + str(dstOffset) + '], edi')
     return code
+
 
 def fadd_op(self, instr, scopeInfo, funcScope):
 
@@ -275,6 +289,7 @@ def fadd_op(self, instr, scopeInfo, funcScope):
     code.append('fstp dword [ebp' + str(dstOffset) + ']')
     return code
 
+
 def sub_op(self, instr, scopeInfo, funcScope):
 
     dst = instr[1]
@@ -301,11 +316,12 @@ def sub_op(self, instr, scopeInfo, funcScope):
     code.append('sub edi, esi')
 
     if flag[1] == 1:
-        code.append('mov esi, [ebp'+ str(dstOffset) + ']')
+        code.append('mov esi, [ebp' + str(dstOffset) + ']')
         code.append('mov [esi], edi')
     else:
         code.append('mov [ebp' + str(dstOffset) + '], edi')
     return code
+
 
 def fsub_op(self, instr, scopeInfo, funcScope):
     # print(instr)
@@ -337,6 +353,7 @@ def fsub_op(self, instr, scopeInfo, funcScope):
     code.append('fstp dword [ebp' + str(dstOffset) + ']')
     return code
 
+
 def mul_op(self, instr, scopeInfo, funcScope):
     dst = instr[1]
     src1 = instr[2]
@@ -362,11 +379,12 @@ def mul_op(self, instr, scopeInfo, funcScope):
     code.append('imul edi, esi')
 
     if flag[1] == 1:
-        code.append('mov esi, [ebp'+ str(dstOffset) + ']')
+        code.append('mov esi, [ebp' + str(dstOffset) + ']')
         code.append('mov [esi], edi')
     else:
         code.append('mov [ebp' + str(dstOffset) + '], edi')
     return code
+
 
 def fmul_op(self, instr, scopeInfo, funcScope):
     dst = instr[1]
@@ -396,6 +414,7 @@ def fmul_op(self, instr, scopeInfo, funcScope):
     code.append('fstp dword [ebp' + str(dstOffset) + ']')
     return code
 
+
 def div_op(self, instr, scopeInfo, funcScope):
     dst = instr[1]
     src1 = instr[2]
@@ -417,11 +436,12 @@ def div_op(self, instr, scopeInfo, funcScope):
     code.append('idiv ebx')
 
     if flag[1] == 1:
-        code.append('mov esi, [ebp'+ str(dstOffset) + ']')
+        code.append('mov esi, [ebp' + str(dstOffset) + ']')
         code.append('mov [esi], eax')
     else:
         code.append('mov [ebp' + str(dstOffset) + '], eax')
     return code
+
 
 def fdiv_op(self, instr, scopeInfo, funcScope):
     dst = instr[1]
@@ -451,6 +471,7 @@ def fdiv_op(self, instr, scopeInfo, funcScope):
     code.append('fstp dword [ebp' + str(dstOffset) + ']')
     return code
 
+
 def pointer_assign(self, instr, scopeInfo, funcScope):
     dst = instr[1][1:]
     src = instr[2]
@@ -469,3 +490,26 @@ def pointer_assign(self, instr, scopeInfo, funcScope):
         code.append('mov esi, [esi]')
     code.append('mov [esi], edi')
     return code
+
+
+if __name__ == '__main__':
+    # Load files
+    # rootNode = pkl.load(open('rootNode.p', 'rb'))
+    # assert(len(rootNode.code) == len(rootNode.scopeInfo))
+    # helper = pkl.load(open('helper.p', 'rb'))
+
+    codeGen = CodeGenerator(rootNode, scopeTab)
+
+    outfile = open('assembly.asm', 'w')
+    x86Code = codeGen.getCode()
+
+    for code_ in x86Code:
+        if code_.split(' ')[0] in ['global', 'section', 'extern']:
+            outfile.write(code_ + '\n')
+        elif code_[-1:] == ':' and 'main' in code_:
+            outfile.write('main:\n')
+        elif code_[-1:] == ':':
+            outfile.write(code_ + '\n')
+        else:
+            outfile.write('    '+code_+'\n')
+    outfile.close()

@@ -1,4 +1,3 @@
-<<<<<<< HEAD
  sum :
  temp_no:2 = var_temp_no:0 +int var_temp_no:1
  return temp_no:2
@@ -36,13 +35,4 @@
  temp_no:24 = 3 *int temp_no:23
  temp_no:25 = temp_no:22 -int temp_no:24
  var_temp_no:26 = temp_no:25
-=======
- var_temp_no:0 = 5
- var_temp_no:1 = 6
- main :
- var_temp_no:2 = 34
- var_temp_no:3 = 23
- temp_no:4 = var_temp_no:0 +int var_temp_no:1
- var_temp_no:5 = temp_no:4
->>>>>>> 94d2e617236ca09224e8ec632162d0e19be84213
  return
