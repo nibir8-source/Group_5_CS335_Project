@@ -1,54 +1,26 @@
-
-Table Number,0
-
-Parent,0,=,
-
-sum,"{'type': ['func'], 'scope': 1, 'accepts': [['int'], ['int']], 'total_param_size': 8, 'param_size_list': [4, 4], 'return_type': [['int']], 'total_return_size': 4, 'return_size_list': [-16]}"
-main,"{'type': ['func'], 'scope': 2, 'accepts': [['void']], 'total_param_size': 0, 'return_type': [['void']], 'total_return_size': 0, 'return_size_list': []}"
-
-Table Number,1
-
-Parent,1,=,0
-
-sum,{'type': ['func']}
-p,"{'type': ['int'], 'tmp': 'var_temp_no_0', 'offset': -12}"
-var_temp_no_0,{'type': 'p'}
-q,"{'type': ['int'], 'tmp': 'var_temp_no_1', 'offset': -8}"
-var_temp_no_1,{'type': 'q'}
-temp_no_2,{'type': 'temp'}
-total_size,{'type': 4}
-
-Table Number,2
-
-Parent,2,=,0
-
-sum,{'type': ['func']}
-main,{'type': ['func']}
-s,"{'type': ['pointer', 'int'], 'tmp': 'var_temp_no_3', 'offset': 4}"
-var_temp_no_3,{'type': 's'}
-a,"{'type': ['int'], 'tmp': 'var_temp_no_4', 'offset': 8}"
-var_temp_no_4,{'type': 'a'}
-temp_no_5,{'type': 'temp'}
-temp_no_6,{'type': 'temp'}
-temp_no_7,{'type': 'temp'}
-temp_no_8,{'type': 'temp'}
-temp_no_9,{'type': 'temp'}
-temp_no_10,{'type': 'temp'}
-temp_no_11,{'type': 'temp'}
-temp_no_12,{'type': 'temp'}
-d,"{'type': ['int'], 'tmp': 'var_temp_no_13', 'offset': 12}"
-var_temp_no_13,{'type': 'd'}
-temp_no_14,{'type': 'temp'}
-l,"{'type': ['int'], 'tmp': 'var_temp_no_15', 'offset': 16}"
-var_temp_no_15,{'type': 'l'}
-total_size,{'type': 24}
-
-Table Number,3
-
-Parent,3,=,2
-
-sum,{'type': ['func']}
-main,{'type': ['func']}
-temp_no_16,{'type': 'temp'}
-j,"{'type': ['int'], 'tmp': 'var_temp_no_17', 'offset': 20}"
-var_temp_no_17,{'type': 'j'}
+
+Table Number,0
+
+Parent,0,=,
+
+e,"{'type': ['int'], 'tmp': 'var_temp_no_0', 'offset': 0}"
+var_temp_no_0,{'type': 'e'}
+d,"{'type': ['int'], 'tmp': 'var_temp_no_1', 'offset': 4}"
+var_temp_no_1,{'type': 'd'}
+main,"{'type': ['func'], 'scope': 1, 'accepts': [['void']], 'total_param_size': 0, 'return_type': [['void']], 'total_return_size': 0, 'return_size_list': []}"
+
+Table Number,1
+
+Parent,1,=,0
+
+main,{'type': ['func']}
+a,"{'type': ['pointer', 'int'], 'tmp': 'var_temp_no_2', 'offset': 4}"
+var_temp_no_2,{'type': 'a'}
+b,"{'type': ['pointer', 'int'], 'tmp': 'var_temp_no_3', 'offset': 8}"
+var_temp_no_3,{'type': 'b'}
+temp_no_4,{'type': 'temp'}
+temp_no_5,{'type': 'temp'}
+temp_no_6,{'type': 'temp'}
+c,"{'type': ['int'], 'tmp': 'var_temp_no_7', 'offset': 12}"
+var_temp_no_7,{'type': 'c'}
+total_size,{'type': 16}

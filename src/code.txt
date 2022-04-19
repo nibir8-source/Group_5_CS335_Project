@@ -1,29 +1,10 @@
- sum :
- temp_no_2 = var_temp_no_0 +int var_temp_no_1
- return temp_no_2
- return
- return
+ var_temp_no_0 = 5
+ var_temp_no_1 = 6
  main :
- var_temp_no_4 = 1
- temp_no_5 = & var_temp_no_4
- * var_temp_no_3 = temp_no_5
- temp_no_6 = 3 *int 4
- temp_no_7 = 5 +int 6
- temp_no_8 = temp_no_7 +int 7
- temp_no_9 = temp_no_6 *int temp_no_8
- temp_no_10 = -int 3
- temp_no_11 = 3 *int temp_no_10
- temp_no_12 = temp_no_9 -int temp_no_11
- var_temp_no_13 = temp_no_12
- startf sum
- param 4
- param 5
- call sum
- endf sum
- temp_no_14 = retval_1
- var_temp_no_15 = temp_no_14
- temp_no_16 = 5 >int 3
- ifnot temp_no_16 goto label_no:0
- var_temp_no_17 = 10
- label_no:0 : 
+ * var_temp_no_2 = 6
+ * var_temp_no_3 = 8
+ temp_no_4 = * var_temp_no_2
+ temp_no_5 = * var_temp_no_3
+ temp_no_6 = temp_no_4 +int temp_no_5
+ var_temp_no_7 = temp_no_6
  return

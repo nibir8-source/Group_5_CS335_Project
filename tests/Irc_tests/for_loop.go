@@ -5,7 +5,9 @@ var e int = 5
 var d int = 6
 
 func main(){
-    var a int = 34
-    var b int = 23
-    c := e + d
+    var a *int
+    var b *int
+    *a = 6
+    *b = 8
+    c := *a + *b
 }

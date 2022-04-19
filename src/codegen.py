@@ -110,11 +110,19 @@ class CodeGen:
         self.asmCode.append('pop ebp')
         self.asmCode.append('ret')
 
-    def setFlags(self, instr, scopeInfo):
+    #do
+    def get_scope(self, ident):
+        for i in range(len(self.scopeTab.keys())):
+            if ident in self.scopeTab[i].table:
+                return i
+        return -1
+
+    def setFlags(self, instr):
         flag = [0 for x in instr]
-        for i in range(1, len(instr)):
+        for i in range(0, len(instr)):
             try:
-                if 'reference' in self.helper.symbolTables[scopeInfo[i]].get(instr[i]):
+                scope = self.get_scope(instr[i])
+                if scope != -1 and self.scopeTab[scope].table[instr[i]]["type"] == ['pointer', 'int']:
                     flag[i] = 1
             except:
                 pass
