@@ -111,11 +111,17 @@ class CodeGen:
         self.asmCode.append('pop ebp')
         self.asmCode.append('ret')
 
-    #do
+    # do
     def get_scope(self, ident):
         for i in range(len(self.scopeTab.keys())):
             if ident in self.scopeTab[i].table:
                 return i
+        return -1
+
+    def get_ident_info(self, ident):
+        for i in range(len(self.scopeTab.keys())):
+            if ident in self.scopeTab[i].table:
+                return self.scopeTab[i].table[ident]
         return -1
 
     def setFlags(self, instr):
@@ -212,18 +218,21 @@ class CodeGen:
             code.append('mov [ebp' + str(dstOffset) + '], edi')
         return code
 
-    def assign_op(self, instr, scopeInfo, funcScope):
+    def assign_op(self, instr):
 
         dst = instr[0]
         src = instr[2]
         code = []
-        flag = self.setFlags(instr, scopeInfo)
+        flag = self.setFlags(instr)
 
         if dst[0] == '*':
-            return self.pointer_assign(instr, scopeInfo, funcScope)
+            return self.pointer_assign(instr)
 
-        data_ = helper.symbolTables[scopeInfo[1]].get(instr[1])
-        baseType = helper.getBaseType(data_['type'])
+        # s1 = self.get_scope(instr[0])
+        # s2 = self.get_scope(instr[2])
+        # dst_info=self.scopeTab[s1].table[]
+
+        # baseType = helper.getBaseType(data_['type'])
 
         if baseType[0] in ['struct', 'array']:
             offset1 = self.ebpOffset(instr[1], scopeInfo[1], funcScope)
