@@ -1974,30 +1974,42 @@ data = file.read()
 parser = yacc.yacc(debug=True)
 res = parser.parse(data, lexer=lexer)
 # pprint.pprint(res)
-with open('scopeTabDump', 'wb') as handle:
-    pickle.dump(scope_table, handle, protocol=pickle.HIGHEST_PROTOCOL)
+# with open('scopeTabDump', 'wb') as handle:
+#     pickle.dump(scope_table, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 pkl.dump(Sf_node, open('Sf_node.p', 'wb'))
 # print((scope_table[0].table))
 # print(Sf_node.code)
-print(temp_count)
-l = []
+# print(temp_count)
+# l = []
 
 # for i in range(scope_table.keys()):
 #     print(i)
 # print(scope_table.keys())
 print(offset_list)
-for i in range(len(scope_table.keys())):
+for i in range(1, len(scope_table.keys())):
     # print(scope_table[i].table.keys())
     for key in scope_table[i].table:
         if "temp_no" in key and key[0] == "t":
             scope_table[i].table[key]["offset"] = offset_list[i]
             offset_list[i] += 4
+    scope_table[i].table["total_size"]["type"] = offset_list[i]
 
-for i in range(len(scope_table.keys())):
+for i in range(1, len(scope_table.keys())):
     print(scope_table[i].table)
-    # for key in scope_table[i].table:
-    #     if "temp_no" in key and key[0] == "t":
-    #         scope_table[i].table[key]["offset"] = offset_list[i]
-    #         offset_list[i] += 4
-# def constant_folding(code,)
+
+with open('scopeTabDump', 'wb') as handle:
+    pickle.dump(scope_table, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+csv_file = "symbol_table2.csv"
+with open(csv_file, 'w+') as csvfile:
+    for x in range(0, scope_number+1):
+        #           print("Table number",x)
+        writer = csv.writer(csvfile)
+        writer.writerow([])
+        writer.writerow(["Table Number", x])
+        writer.writerow([])
+        writer.writerow(["Parent", x, "=", scope_table[x].parent])
+        writer.writerow([])
+        for key, value in scope_table[x].table.items():
+            writer.writerow([key, value])
