@@ -128,7 +128,7 @@ def close_scope():
 
 def create_label(p=None):
     global label_count
-    label = "label_no:" + str(label_count)
+    label = "label_no_" + str(label_count)
     label_count += 1
     if ((not p is None) and (p == 1)):
         start_for.append(label)

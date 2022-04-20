@@ -36,4 +36,13 @@
  temp_no_30 = temp_no_30 *int 4
  temp_no_30 = temp_no_30 +int var_temp_no_29
  * temp_no_30 = 10
+ temp_no_31 = -int var_temp_no_21
+ var_temp_no_22 = temp_no_31
+ startf sum
+ param 4
+ param 5
+ call sum
+ endf sum
+ temp_no_32 = retval_1
+ var_temp_no_22 = temp_no_32
  return

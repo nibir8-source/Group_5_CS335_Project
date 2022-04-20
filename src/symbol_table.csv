@@ -81,4 +81,6 @@ var_temp_no_28,{'type': 'e8'}
 a,"{'type': ['arr10', 'int'], 'tmp': 'var_temp_no_29', 'offset': 36}"
 var_temp_no_29,{'type': 'a'}
 temp_no_30,{'type': 'temp'}
+temp_no_31,{'type': 'temp'}
+temp_no_32,{'type': 'temp'}
 total_size,{'type': 76}
