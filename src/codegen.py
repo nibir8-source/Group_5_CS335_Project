@@ -121,7 +121,8 @@ class CodeGen:
     def get_ident_info(self, ident):
         for i in range(len(self.scopeTab.keys())):
             if ident in self.scopeTab[i].table:
-                return self.scopeTab[i].table[ident]
+                name = self.scopeTab[i].table[ident]["type"]
+                return self.scopeTab[i].table[name]
         return -1
 
     def setFlags(self, instr):
@@ -236,7 +237,7 @@ class CodeGen:
         code.append('sub edi, esi')
 
         if flag[0] == 1:
-            code.append('mov esi, [ebp'+ str(dstOffset) + ']')
+            code.append('mov esi, [ebp' + str(dstOffset) + ']')
             code.append('mov [esi], edi')
         else:
             code.append('mov [ebp' + str(dstOffset) + '], edi')
@@ -264,7 +265,7 @@ class CodeGen:
         code.append('imul edi, esi')
 
         if flag[0] == 1:
-            code.append('mov esi, [ebp'+ str(dstOffset) + ']')
+            code.append('mov esi, [ebp' + str(dstOffset) + ']')
             code.append('mov [esi], edi')
         else:
             code.append('mov [ebp' + str(dstOffset) + '], edi')
@@ -292,7 +293,7 @@ class CodeGen:
         code.append('sub edi, esi')
 
         if flag[0] == 1:
-            code.append('mov esi, [ebp'+ str(dstOffset) + ']')
+            code.append('mov esi, [ebp' + str(dstOffset) + ']')
             code.append('mov [esi], edi')
         else:
             code.append('mov [ebp' + str(dstOffset) + '], edi')
@@ -315,7 +316,7 @@ class CodeGen:
         code.append('idiv ebx')
 
         if flag[0] == 1:
-            code.append('mov esi, [ebp'+ str(dstOffset) + ']')
+            code.append('mov esi, [ebp' + str(dstOffset) + ']')
             code.append('mov [esi], eax')
         else:
             code.append('mov [ebp' + str(dstOffset) + '], eax')
@@ -427,14 +428,15 @@ class CodeGen:
             code.append('mov [esi], eax')
         return code
 
-    def assign_ptr_rhs(self, instr, scopeInfo, funcScope):
-        sz = helper.symbolTables[scopeInfo[1]].get(instr[1])['size']
-        dst = instr[1]
+    def assign_ptr_rhs(self, instr):
+        # sz = helper.symbolTables[scopeInfo[1]].get(instr[1])['size']
+        sz = self.get_ident_info(instr[0])['size']
+        dst = instr[0]
         src = instr[2]
-        flag = self.setFlags(instr, scopeInfo)
+        flag = self.setFlags(instr)
 
-        offset1 = self.ebpOffset(instr[1], scopeInfo[1], funcScope)
-        offset2 = self.ebpOffset(instr[2], scopeInfo[2], funcScope)
+        offset1 = self.ebpOffset(instr[0])
+        offset2 = self.ebpOffset(instr[2])
 
         self.counter += 1
         label = 'looping' + str(self.counter)
@@ -457,41 +459,86 @@ class CodeGen:
         code_.append('jnz '+label)
         return code_
 
-    def add_assign_op(self, instr, scopeInfo, funcScope):
-        if instr[1][0] == '*':
-            return self.assign_op_ptr(instr, scopeInfo, funcScope)
-        instr.insert(2, instr[1])
-        scopeInfo.insert(2, scopeInfo[1])
-        return self.add_op(instr, scopeInfo, funcScope)
+    def add_assign_op(self, instr):
+        if instr[0][0] == '*':
+            return self.assign_op_ptr(instr)
+        # instr.insert(2, instr[1])
+        # scopeInfo.insert(2, scopeInfo[1])
+        instr1 = []
+        instr1.append(instr[0])
+        instr1.append("=")
+        instr1.append(instr[0])
+        if(instr[1] == "+=float"):
+            instr1.append("+float")
+            instr1.append(instr[2])
+            return self.fadd_op(instr1)
+        instr1.append("+"+instr[1][2:])
+        instr1.append(instr[2])
+        return self.add_op(instr1)
 
-    def sub_assign_op(self, instr, scopeInfo, funcScope):
-        if instr[1][0] == '*':
-            return self.assign_op_ptr(instr, scopeInfo, funcScope)
-        instr.insert(2, instr[1])
-        scopeInfo.insert(2, scopeInfo[1])
-        return self.sub_op(instr, scopeInfo, funcScope)
+    def sub_assign_op(self, instr):
+        if instr[0][0] == '*':
+            return self.assign_op_ptr(instr)
+        # instr.insert(2, instr[1])
+        # scopeInfo.insert(2, scopeInfo[1])
 
-    def mul_assign_op(self, instr, scopeInfo, funcScope):
-        if instr[1][0] == '*':
-            return self.assign_op_ptr(instr, scopeInfo, funcScope)
-        instr.insert(2, instr[1])
-        scopeInfo.insert(2, scopeInfo[1])
-        return self.mul_op(instr, scopeInfo, funcScope)
+        instr1 = []
+        instr1.append(instr[0])
+        instr1.append("=")
+        instr1.append(instr[0])
+        if(instr[1] == "-=float"):
+            instr1.append("-float")
+            instr1.append(instr[2])
+            return self.fsub_op(instr1)
+        instr1.append("-"+instr[1][2:])
+        instr1.append(instr[2])
+        return self.sub_op(instr1)
 
-    def div_assign_op(self, instr, scopeInfo, funcScope):
-        if instr[1][0] == '*':
-            return self.assign_op_ptr(instr, scopeInfo, funcScope)
-        instr.insert(2, instr[1])
-        scopeInfo.insert(2, scopeInfo[1])
-        return self.div_op(instr, scopeInfo, funcScope)
+    def mul_assign_op(self, instr):
+        if instr[0][0] == '*':
+            return self.assign_op_ptr(instr)
+        # instr.insert(2, instr[1])
+        # scopeInfo.insert(2, scopeInfo[1])
+        instr1 = []
+        instr1.append(instr[0])
+        instr1.append("=")
+        instr1.append(instr[0])
+        if(instr[1] == "*=float"):
+            instr1.append("*float")
+            instr1.append(instr[2])
+            return self.fmul_op(instr1)
+        instr1.append("*"+instr[1][2:])
+        instr1.append(instr[2])
+        return self.mul_op(instr1)
 
-    def ampersand_op(self, instr, scopeInfo, funcScope):
-        dst = instr[1]
+        # return self.mul_op(instr)
+
+    def div_assign_op(self, instr):
+        if instr[0][0] == '*':
+            return self.assign_op_ptr(instr)
+        # instr.insert(2, instr[1])
+        # scopeInfo.insert(2, scopeInfo[1])
+        instr1 = []
+        instr1.append(instr[0])
+        instr1.append("=")
+        instr1.append(instr[0])
+        if(instr[1] == "/=float"):
+            instr1.append("/float")
+            instr1.append(instr[2])
+            return self.fdiv_op(instr1)
+        instr1.append("*"+instr[1][2:])
+        instr1.append(instr[2])
+        return self.div_op(instr1)
+
+        # return self.div_op(instr)
+
+    def ampersand_op(self, instr):
+        dst = instr[0]
         src = instr[2]
-        flag = self.setFlags(instr, scopeInfo)
+        flag = self.setFlags(instr)
 
-        dstOffset = self.ebpOffset(dst, scopeInfo[1], funcScope)
-        srcOffset = self.ebpOffset(src, scopeInfo[2], funcScope)
+        dstOffset = self.ebpOffset(dst)
+        srcOffset = self.ebpOffset(src)
         code = []
 
         if flag[2] == 1:
@@ -499,7 +546,7 @@ class CodeGen:
         else:
             code.append('lea edi, [ebp' + srcOffset + ']')
 
-        if flag[1] == 1:
+        if flag[0] == 1:
             code.append('mov esi, [ebp' + dstOffset + ']')
             code.append('mov [esi], edi')
         else:
@@ -507,15 +554,15 @@ class CodeGen:
 
         return code
 
-    def relops_cmp(self, instr, scopeInfo, funcScope):
-        dst = instr[1]
+    def relops_cmp(self, instr):
+        dst = instr[0]
         src1 = instr[2]
         src2 = instr[3]
-        flag = self.setFlags(instr, scopeInfo)
+        flag = self.setFlags(instr)
 
-        dstOffset = self.ebpOffset(dst, scopeInfo[1], funcScope)
-        src1Offset = self.ebpOffset(src1, scopeInfo[2], funcScope)
-        src2Offset = self.ebpOffset(src2, scopeInfo[3], funcScope)
+        dstOffset = self.ebpOffset(dst)
+        src1Offset = self.ebpOffset(src1)
+        src2Offset = self.ebpOffset(src2)
 
         code = []
         code.append('mov edi, [ebp' + str(src1Offset) + ']')
@@ -526,35 +573,35 @@ class CodeGen:
             code.append('mov esi, [esi]')
         code.append('xor eax, eax')
         code.append('cmp edi, esi')
-        if instr[0] == '==int':
+        if instr[1] == '==int':
             code.append('sete al')
-        elif instr[0] == '!=int':
+        elif instr[1] == '!=int':
             code.append('setne al')
-        elif instr[0] == '<int':
+        elif instr[1] == '<int':
             code.append('setl al')
-        elif instr[0] == '>int':
+        elif instr[1] == '>int':
             code.append('setg al')
-        elif instr[0] == '<=int':
+        elif instr[1] == '<=int':
             code.append('setle al')
-        elif instr[0] == '>=int':
+        elif instr[1] == '>=int':
             code.append('setge al')
 
-        if flag[1] == 1:
+        if flag[0] == 1:
             code.append('mov esi, [ebp' + str(dstOffset) + ']')
             code.append('mov [esi], eax')
         else:
             code.append('mov [ebp' + str(dstOffset) + '], eax')
         return code
 
-    def relops_fcmp(self, instr, scopeInfo, funcScope):
-        dst = instr[1]
+    def relops_fcmp(self, instr):
+        dst = instr[0]
         src1 = instr[2]
         src2 = instr[3]
-        flag = self.setFlags(instr, scopeInfo)
+        flag = self.setFlags(instr)
 
-        dstOffset = self.ebpOffset(dst, scopeInfo[1], funcScope)
-        src1Offset = self.ebpOffset(src1, scopeInfo[2], funcScope)
-        src2Offset = self.ebpOffset(src2, scopeInfo[3], funcScope)
+        dstOffset = self.ebpOffset(dst)
+        src1Offset = self.ebpOffset(src1)
+        src2Offset = self.ebpOffset(src2)
 
         code = []
         code.append('fld dword [ebp' + str(src1Offset) + ']')
@@ -568,115 +615,116 @@ class CodeGen:
         # code.append('sahf')
         code.append('fstp dword [temp]')
         # code.append('mov al, c0')
-        if instr[0] == '==float':
+        if instr[1] == '==float':
             code.append('sete al')
-        elif instr[0] == '!=float':
+        elif instr[1] == '!=float':
             code.append('setne al')
-        elif instr[0] == '<float':
+        elif instr[1] == '<float':
             code.append('setl al')
-        elif instr[0] == '>float':
+        elif instr[1] == '>float':
             code.append('setg al')
-        elif instr[0] == '<=float':
+        elif instr[1] == '<=float':
             code.append('setle al')
-        elif instr[0] == '>=float':
+        elif instr[1] == '>=float':
             code.append('setge al')
 
-        if flag[1] == 1:
+        if flag[0] == 1:
             code.append('mov esi, [ebp' + str(dstOffset) + ']')
             code.append('mov [esi], eax')
         else:
             code.append('mov [ebp' + str(dstOffset) + '], eax')
         return code
 
-    def print_int(self, instr, scopeInfo, funcScope):
-        src = instr[1]
-        srcOffset = self.ebpOffset(src, scopeInfo[1], funcScope)
-        flag = self.setFlags(instr, scopeInfo)
-        code = []
-        code.append('mov esi, [ebp' + srcOffset + ']')
-        if flag[1] == 1:
-            code.append('mov esi, [esi]')
-        code.append('push esi')
-        code.append('push print_int')
-        code.append('call printf')
-        code.append('pop esi')
-        code.append('pop esi')
-        return code
+    # def print_int(self, instr):
+    #     src = instr[1]
+    #     srcOffset = self.ebpOffset(src)
+    #     flag = self.setFlags(instr)
+    #     code = []
+    #     code.append('mov esi, [ebp' + srcOffset + ']')
+    #     if flag[1] == 1:
+    #         code.append('mov esi, [esi]')
+    #     code.append('push esi')
+    #     code.append('push print_int')
+    #     code.append('call printf')
+    #     code.append('pop esi')
+    #     code.append('pop esi')
+    #     return code
 
-    def print_float(self, instr, scopeInfo, funcScope):
-        src = instr[1]
-        srcOffset = self.ebpOffset(src, scopeInfo[1], funcScope)
-        flag = self.setFlags(instr, scopeInfo)
-        code = []
-        # code.append('mov esi, [ebp' + srcOffset + ']')
-        # if flag[1] == 1:
-        #     code.append('mov esi, [esi]')
-        # code.append('push esi')
-        # code.append('push farray_print')
-        # code.append('call printf')
-        # code.append('pop esi')
-        # code.append('pop esi')
+    # def print_float(self, instr, scopeInfo, funcScope):
+    #     src = instr[1]
+    #     srcOffset = self.ebpOffset(src, scopeInfo[1], funcScope)
+    #     flag = self.setFlags(instr, scopeInfo)
+    #     code = []
+    #     # code.append('mov esi, [ebp' + srcOffset + ']')
+    #     # if flag[1] == 1:
+    #     #     code.append('mov esi, [esi]')
+    #     # code.append('push esi')
+    #     # code.append('push farray_print')
+    #     # code.append('call printf')
+    #     # code.append('pop esi')
+    #     # code.append('pop esi')
 
-        code.append('fld dword [ebp' + srcOffset + ']')
-        code.append('fstp qword [temp]')
-        code.append('push dword [temp+4]')
-        code.append('push dword [temp+4]')
-        code.append('push dword farray_print')
-        code.append('call printf')
-        code.append('add esp, 12')
+    #     code.append('fld dword [ebp' + srcOffset + ']')
+    #     code.append('fstp qword [temp]')
+    #     code.append('push dword [temp+4]')
+    #     code.append('push dword [temp+4]')
+    #     code.append('push dword farray_print')
+    #     code.append('call printf')
+    #     code.append('add esp, 12')
 
-        return code
+    #     return code
 
-    def print_string(self, instr, scopeInfo, funcScope):
-        src = instr[1]
-        flag = self.setFlags(instr, scopeInfo)
-        srcOffset = self.ebpOffset(src, scopeInfo[1], funcScope)
-        code = []
+    # def print_string(self, instr, scopeInfo, funcScope):
+    #     src = instr[1]
+    #     flag = self.setFlags(instr, scopeInfo)
+    #     srcOffset = self.ebpOffset(src, scopeInfo[1], funcScope)
+    #     code = []
 
-        code.append('mov esi, [ebp' + srcOffset + ']')
+    #     code.append('mov esi, [ebp' + srcOffset + ']')
 
-        code.append('push esi')
-        code.append('call puts')
-        code.append('pop esi')
-        return code
+    #     code.append('push esi')
+    #     code.append('call puts')
+    #     code.append('pop esi')
+    #     return code
 
-    def scan_int(self, instr, scopeInfo, funcScope):
-        src = instr[1]
-        flag = self.setFlags(instr, scopeInfo)
-        srcOffset = self.ebpOffset(src, scopeInfo[1], funcScope)
-        code = []
-        code.append('lea esi, [ebp' + srcOffset + ']')
-        if flag[1] == 1:
-            code.append('mov esi, [esi]')
-        code.append('push esi')
-        code.append('push scan_int')
-        code.append('call scanf')
-        code.append('pop esi')
-        code.append('pop esi')
-        return code
+    # def scan_int(self, instr, scopeInfo, funcScope):
+    #     src = instr[1]
+    #     flag = self.setFlags(instr, scopeInfo)
+    #     srcOffset = self.ebpOffset(src, scopeInfo[1], funcScope)
+    #     code = []
+    #     code.append('lea esi, [ebp' + srcOffset + ']')
+    #     if flag[1] == 1:
+    #         code.append('mov esi, [esi]')
+    #     code.append('push esi')
+    #     code.append('push scan_int')
+    #     code.append('call scanf')
+    #     code.append('pop esi')
+    #     code.append('pop esi')
+    #     return code
 
-    def scan_string(self, instr, scopeInfo, funcScope):
-        src = instr[1]
-        flag = self.setFlags(instr, scopeInfo)
-        srcOffset = self.ebpOffset(src, scopeInfo[1], funcScope)
-        code = []
+    # def scan_string(self, instr, scopeInfo, funcScope):
+    #     src = instr[1]
+    #     flag = self.setFlags(instr, scopeInfo)
+    #     srcOffset = self.ebpOffset(src, scopeInfo[1], funcScope)
+    #     code = []
 
-        code.append('mov edi, 100')
-        code.append('call malloc')
-        code.append('pop edi')
-        code.append('mov [ebp' + srcOffset + '],  eax')
-        code.append('mov esi, eax')
+    #     code.append('mov edi, 100')
+    #     code.append('call malloc')
+    #     code.append('pop edi')
+    #     code.append('mov [ebp' + srcOffset + '],  eax')
+    #     code.append('mov esi, eax')
 
-        code.append('push esi')
-        code.append('call gets')
-        code.append('pop esi')
-        return code
+    #     code.append('push esi')
+    #     code.append('call gets')
+    #     code.append('pop esi')
+    #     return code
 
-    def param(self, instr, scopeInfo, funcScope):
-        data_ = helper.symbolTables[scopeInfo[1]].get(instr[1])
-        baseType = helper.getBaseType(data_['type'])
-        flag = self.setFlags(instr, scopeInfo)
-        offset = self.ebpOffset(instr[1], scopeInfo[1], funcScope)
+    def param(self, instr):
+        # data_ = helper.symbolTables[scopeInfo[1]].get(instr[1])
+        data_ = self.get_ident_info(instr[1])
+        baseType = data_['type']
+        flag = self.setFlags(instr)
+        offset = self.ebpOffset(instr[1])
         if baseType[0] in ['int', 'bool', 'float', 'string']:
             if flag[1] == 1:
                 return [
@@ -704,37 +752,36 @@ class CodeGen:
             code_.append('jnz '+label)
             return code_
 
-    def if_op(self, instr, scopeInfo, funcScope):
+    def if_op(self, instr):
         var = instr[1]
-        jLabel = instr[5]
+        jLabel = instr[3]
         code = []
-        flag = self.setFlags(instr, scopeInfo)
+        flag = self.setFlags(instr)
 
-        varOffset = self.ebpOffset(var, scopeInfo[1], funcScope)
+        varOffset = self.ebpOffset(var)
         code.append('mov edi, [ebp' + varOffset + ']')
         if flag[1] == 1:
             code.append('mov edi, [edi]')
         code.append('cmp edi, 0')
         code.append('je ' + jLabel)
-
         return code
 
-    def goto_op(self, instr, scopeInfo, funcScope):
+    def goto_op(self, instr):
         jLabel = instr[1]
         code = []
 
         code.append('jmp ' + jLabel)
         return code
 
-    def logical(self, instr, scopeInfo, funcScope):
-        dst = instr[1]
+    def logical(self, instr):
+        dst = instr[0]
         src1 = instr[2]
         src2 = instr[3]
-        flag = self.setFlags(instr, scopeInfo)
+        flag = self.setFlags(instr)
 
-        dstOffset = self.ebpOffset(dst, scopeInfo[1], funcScope)
-        src1Offset = self.ebpOffset(src1, scopeInfo[2], funcScope)
-        src2Offset = self.ebpOffset(src2, scopeInfo[3], funcScope)
+        dstOffset = self.ebpOffset(dst)
+        src1Offset = self.ebpOffset(src1)
+        src2Offset = self.ebpOffset(src2)
 
         code = []
         code.append('mov edi, [ebp' + str(src1Offset) + ']')
@@ -744,21 +791,22 @@ class CodeGen:
         if flag[3] == 1:
             code.append('mov esi, [esi]')
 
-        if instr[0] == '||':
+        if instr[1] == '||':
             code.append('or edi, esi')
-        elif instr[0] == '&&':
+        elif instr[1] == '&&':
             code.append('and edi, esi')
 
-        if flag[1] == 1:
+        if flag[0] == 1:
             code.append('mov esi, [ebp' + str(dstOffset) + ']')
             code.append('mov [esi], edi')
         else:
             code.append('mov [ebp' + str(dstOffset) + '], edi')
         return code
 
-    def getRetVal(self, instr, scopeInfo, funcScope):
-        data_ = helper.symbolTables[scopeInfo[1]].get(instr[1])
-        offset = self.ebpOffset(instr[1], scopeInfo[1], funcScope)
+    def getRetVal(self, instr):
+        # data_ = helper.symbolTables[scopeInfo[1]].get(instr[1])
+        data_ = self.get_ident_info(instr[1])
+        offset = self.ebpOffset(instr[1])
 
         self.counter += 1
         label = 'looping' + str(self.counter)
@@ -775,26 +823,26 @@ class CodeGen:
         code_.append('jnz '+label)
         return code_
 
-    def inc_dec(self, instr, scopeInfo, funcScope):
-        dst = instr[1]
-        dstOffset = self.ebpOffset(dst, scopeInfo[1], funcScope)
-        flag = self.setFlags(instr, scopeInfo)
+    # def inc_dec(self, instr):
+    #     dst = instr[1]
+    #     dstOffset = self.ebpOffset(dst)
+    #     flag = self.setFlags(instr)
 
-        code = []
-        code.append('mov esi, [ebp' + dstOffset + ']')
-        if flag[1] == 1:
-            code.append('mov esi, [esi]')
-        if instr[0] == '++':
-            code.append('inc esi')
-        else:
-            code.append('dec esi')
+    #     code = []
+    #     code.append('mov esi, [ebp' + dstOffset + ']')
+    #     if flag[1] == 1:
+    #         code.append('mov esi, [esi]')
+    #     if instr[0] == '++':
+    #         code.append('inc esi')
+    #     else:
+    #         code.append('dec esi')
 
-        if flag[1] == 1:
-            code.append('mov edi, [ebp' + str(dstOffset) + ']')
-            code.append('mov [edi], esi')
-        else:
-            code.append('mov [ebp' + str(dstOffset) + '], esi')
-        return code
+    #     if flag[1] == 1:
+    #         code.append('mov edi, [ebp' + str(dstOffset) + ']')
+    #         code.append('mov [edi], esi')
+    #     else:
+    #         code.append('mov [ebp' + str(dstOffset) + '], esi')
+    #     return code
 
     def genCode(self, idx, funcScope):
         # Check instruction type and call function accordingly
@@ -805,16 +853,16 @@ class CodeGen:
             return []
         elif len(instr) == 1:
             return [instr[0]+':']
-        elif instr[0] == '+int':
-            return self.add_op(instr, scopeInfo, funcScope)
-        elif instr[0] == '+float':
-            return self.fadd_op(instr, scopeInfo, funcScope)
-        elif instr[0] == '-float':
+        elif instr[3] == '+int':
+            return self.add_op(instr)
+        elif instr[3] == '+float':
+            return self.fadd_op(instr)
+        elif instr[3] == '-float':
             if len(instr) == 4:
-                return self.fsub_op(instr, scopeInfo, funcScope)
+                return self.fsub_op(instr)
             else:
-                return self.unary_fminus(instr, scopeInfo, funcScope)
-        if instr[0] == '-int':
+                return self.unary_fminus(instr)
+        if instr[1] == '-int':
             if len(instr) == 4:
                 return self.sub_op(instr, scopeInfo, funcScope)
             else:

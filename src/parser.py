@@ -1978,4 +1978,14 @@ with open('scopeTabDump', 'wb') as handle:
     pickle.dump(scope_table, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 pkl.dump(Sf_node, open('Sf_node.p', 'wb'))
-print((scope_table[0].table))
+# print((scope_table[0].table))
+# print(Sf_node.code)
+print(temp_count)
+l = []
+
+# for i in range(scope_table.keys()):
+#     print(i)
+print(scope_table.keys())
+for i in range(len(scope_table.keys())):
+    print(scope_table[i].table)
+# def constant_folding(code,)
