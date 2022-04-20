@@ -3,7 +3,7 @@ import random
 import string
 import struct
 
-from sqlalchemy import func
+# from sqlalchemy import func
 from data_structures import *
 
 
@@ -15,7 +15,7 @@ rootNode = pkl.load(open('Sf_node.p', 'rb'))
 with open('scopeTabDump', 'rb') as handle:
     scopetab = pkl.load(handle)
 # # print(rootNode.code)
-# print(scopeTab[0].table.items())
+# print(scopetab[0].table.items())
 asmCode = []
 
 
@@ -36,7 +36,7 @@ class CodeGen:
         self.codeIndex = 0
         self.asmCode.append('section .text')
         self.counter = 0
-        self.scopeTab = scopetab
+        self.scopetab = scopetab
         self.code = rootnode.code
         self.relops = ['==int', '!=int', '<=int', '>=int', '>int', '<int']
         self.frelops = ['==float', '!=float',
@@ -44,9 +44,13 @@ class CodeGen:
 
     def ebpOffset(self, ident):
         scope = self.get_scope(ident)
-        # offset = self.scopeTab[scope].table[ident]["offset"]
-        name = self.scopeTab[scope].table[ident]["type"]
-        offset = self.scopeTab[scope].table[name]["offset"]
+        # offset = self.scopetab[scope].table[ident]["offset"]
+        name = self.scopetab[scope].table[ident]["type"]
+        print(name)
+        if(name=="temp"):
+            offset= self.scopetab[scope].table[ident]["offset"]
+        else :
+            offset = self.scopetab[scope].table[name]["offset"]
         if offset >= 0:
             return '+'+str(offset)
         return str(offset)
@@ -60,7 +64,7 @@ class CodeGen:
         # standard prologue
         self.add_prologue()
 
-        get_width = self.scopeTab[funcScope].table["total_size"]
+        get_width = self.scopetab[funcScope].table["total_size"]["type"]
         # param_width = self.scopetab[0].table[name]["total_param_size"]
 
         # update stack pointer to store all the varaibles(except parameters) in current sym table
@@ -73,7 +77,8 @@ class CodeGen:
             # curr = self.code[self.codeIndex]
             # if (len(curr) == 1 and curr[0][-2:] == '::'):
             #     break
-            code_ = self.genCode(self.codeIndex, funcScope)
+            code_ = self.genCode(self.codeIndex)
+            print(code_)
             if len(code_) == 0:
                 # then it should be a return statement
                 if len(self.code[self.codeIndex]) != 1:
@@ -94,6 +99,7 @@ class CodeGen:
                     self.asmCode.append(
                         'lea eax, [ebp'+str(retValOffset) + ']')
                 self.add_epilogue()
+                self.codeIndex += 1
                 break
             else:
                 if code_[0] != 'none':
@@ -114,16 +120,18 @@ class CodeGen:
 
     # do
     def get_scope(self, ident):
-        for i in range(len(self.scopeTab.keys())):
-            if ident in self.scopeTab[i].table:
+        for i in range(len(self.scopetab.keys())):
+            if ident in self.scopetab[i].table:
                 return i
         return -1
 
     def get_ident_info(self, ident):
-        for i in range(len(self.scopeTab.keys())):
-            if ident in self.scopeTab[i].table:
-                name = self.scopeTab[i].table[ident]["type"]
-                return self.scopeTab[i].table[name]
+        for i in range(len(self.scopetab.keys())):
+            if ident in self.scopetab[i].table:
+                name = self.scopetab[i].table[ident]["type"]
+                if name == 'temp':
+                    return self.scopetab[i].table[ident]
+                return self.scopetab[i].table[name]
         return -1
 
     def setFlags(self, instr):
@@ -131,13 +139,13 @@ class CodeGen:
         for i in range(0, len(instr)):
             try:
                 scope = self.get_scope(instr[i])
-                if scope != -1 and self.scopeTab[scope].table[instr[i]]["type"] == ['pointer', 'int']:
+                if scope != -1 and self.scopetab[scope].table[instr[i]]["type"] == ['pointer', 'int']:
                     flag[i] = 1
             except:
                 pass
         return flag
 
-    def unary_minus(self, instr, scopeInfo, funcScope):
+    def unary_minus(self, instr):
         dst = instr[1]
         src1 = instr[2]
         flag = self.setFlags(instr)
@@ -158,7 +166,7 @@ class CodeGen:
             code.append('mov [ebp' + str(dstOffset) + '], esi')
         return code
 
-    def unary_fminus(self, instr, scopeInfo, funcScope):
+    def unary_fminus(self, instr):
         dst = instr[1]
         src1 = instr[2]
         flag = self.setFlags(instr)
@@ -186,7 +194,7 @@ class CodeGen:
         code.append('fstp dword [ebp' + str(dstOffset) + ']')
         return code
 
-    def add_op(self, instr, scopeInfo, funcScope):
+    def add_op(self, instr):
 
         dst = instr[0]
         scope_dst = self.get_scope(instr[0])
@@ -196,7 +204,7 @@ class CodeGen:
         scope_src2 = self.get_scope(instr[4])
         flag = self.setFlags(instr)
 
-        src1_type = self.scopeTab[scope_src1].table[src1]["type"][0]
+        src1_type = self.scopetab[scope_src1].table[src1]["type"][0]
 
         # baseType = helper.getBaseType(info_src1['type'])
         # if baseType[0] == 'struct':
@@ -269,7 +277,7 @@ class CodeGen:
             code.append('mov [ebp' + str(dstOffset) + '], edi')
         return code
 
-    def fadd_op(self, instr, scopeInfo, funcScope):
+    def fadd_op(self, instr):
 
         dst = instr[0]
         src1 = instr[2]
@@ -295,7 +303,7 @@ class CodeGen:
         code.append('fstp dword [ebp' + str(dstOffset) + ']')
         return code
 
-    def sub_op(self, instr, scopeInfo, funcScope):
+    def sub_op(self, instr):
 
         dst = instr[0]
         src1 = instr[2]
@@ -328,7 +336,7 @@ class CodeGen:
             code.append('mov [ebp' + str(dstOffset) + '], edi')
         return code
 
-    def fsub_op(self, instr, scopeInfo, funcScope):
+    def fsub_op(self, instr):
 
         dst = instr[0]
         src1 = instr[2]
@@ -354,7 +362,7 @@ class CodeGen:
         code.append('fstp dword [ebp' + str(dstOffset) + ']')
         return code
 
-    def mul_op(self, instr, scopeInfo, funcScope):
+    def mul_op(self, instr):
 
         dst = instr[0]
         src1 = instr[2]
@@ -387,7 +395,7 @@ class CodeGen:
             code.append('mov [ebp' + str(dstOffset) + '], edi')
         return code
 
-    def fmul_op(self, instr, scopeInfo, funcScope):
+    def fmul_op(self, instr):
 
         dst = instr[0]
         src1 = instr[2]
@@ -413,16 +421,16 @@ class CodeGen:
         code.append('fstp dword [ebp' + str(dstOffset) + ']')
         return code
 
-    def div_op(self, instr, scopeInfo, funcScope):
+    def div_op(self, instr):
         dst = instr[0]
         src1 = instr[2]
         src2 = instr[4]
         flag = self.setFlags(instr)
 
-        dstOffset = self.ebpOffset(dst, scopeInfo[1], funcScope)
-        src1Offset = self.ebpOffset(src1, scopeInfo[2], funcScope)
+        dstOffset = self.ebpOffset(dst)
+        src1Offset = self.ebpOffset(src1)
         if self.get_ident_info(src2) != -1:
-            src2Offset = self.ebpOffset(src2, scopeInfo[3], funcScope)
+            src2Offset = self.ebpOffset(src2)
 
         code = []
         code.append('xor edx, edx')
@@ -440,7 +448,7 @@ class CodeGen:
             code.append('mov [ebp' + str(dstOffset) + '], eax')
         return code
 
-    def fdiv_op(self, instr, scopeInfo, funcScope):
+    def fdiv_op(self, instr):
 
         dst = instr[0]
         src1 = instr[2]
@@ -539,7 +547,7 @@ class CodeGen:
                 code.append('mov edi, 0b' + str(binaryCode))
                 code.append('mov [ebp' + dstOffset + '], edi')
         else:
-            if isinstance(src_info != -1):
+            if src_info != -1:
                 dstOffset = self.ebpOffset(dst)
                 srcOffset = self.ebpOffset(src)
                 code.append('mov edi, [ebp' + srcOffset + ']')
@@ -1007,32 +1015,32 @@ class CodeGen:
     #         code.append('mov [ebp' + str(dstOffset) + '], esi')
     #     return code
 
-    def genCode(self, idx, funcScope):
+    def genCode(self, idx):
         # Check instruction type and call function accordingly
         instr = self.code[idx]
-        scopeInfo = self.scopeInfo[idx]
+        print(instr)
 
         if instr[0] == 'return':
             return []
         elif len(instr) == 1:
             return [instr[0]+':']
-        elif instr[3] == '+int':
+        elif len(instr)==5 and  instr[3] == '+int':
             return self.add_op(instr)
-        elif instr[3] == '+float':
+        elif len(instr)==5 and instr[3] == '+float':
             return self.fadd_op(instr)
         # elif instr[3] == '-float':
         #     if len(instr) == 4:
         #         return self.fsub_op(instr)
         #     else:
         #         return self.unary_fminus(instr)
-        elif instr[2] == '-float':
+        elif len(instr)==4 and instr[2] == '-float':
             return self.unary_fminus(instr)
-        elif instr[3] == '-float':
+        elif len(instr)==5 and instr[3] == '-float':
             return self.fsub_op(instr)
 
-        elif instr[2] == '-int':
+        elif len(instr)==4 and instr[2] == '-int':
             return self.unary_minus(instr)
-        elif instr[3] == '-int':
+        elif len(instr)==5 and instr[3] == '-int':
             return self.sub_op(instr)
 
         # if instr[1] == '-int':
@@ -1040,42 +1048,42 @@ class CodeGen:
         #         return self.sub_op(instr, scopeInfo, funcScope)
         #     else:
         #         return self.unary_minus(instr, scopeInfo, funcScope)
-        elif instr[3] == '*int':
-            return self.mul_op(instr, scopeInfo, funcScope)
-        elif instr[3] == '*float':
-            return self.fmul_op(instr, scopeInfo, funcScope)
-        elif instr[3] == '/int':
-            return self.div_op(instr, scopeInfo, funcScope)
-        elif instr[3] == '/float':
-            return self.fdiv_op(instr, scopeInfo, funcScope)
+        elif len(instr)==5 and instr[3] == '*int':
+            return self.mul_op(instr)
+        elif len(instr)==5 and instr[3] == '*float':
+            return self.fmul_op(instr)
+        elif len(instr)==5 and instr[3] == '/int':
+            return self.div_op(instr)
+        elif len(instr)==5 and instr[3] == '/float':
+            return self.fdiv_op(instr)
 
-        elif instr[2] == '=':
-            return self.assign_op(instr, scopeInfo, funcScope)
-        elif instr[2] == '+=':
-            return self.add_assign_op(instr, scopeInfo, funcScope)
-        elif instr[2] == '-=':
-            return self.sub_assign_op(instr, scopeInfo, funcScope)
-        elif instr[2] == '*=':
-            return self.mul_assign_op(instr, scopeInfo, funcScope)
-        elif instr[2] == '/=':
-            return self.div_assign_op(instr, scopeInfo, funcScope)
+        elif len(instr)==3 and instr[1] == '=':
+            return self.assign_op(instr)
+        elif len(instr)==3 and instr[1] == '+=':
+            return self.add_assign_op(instr)
+        elif len(instr)==3 and instr[1] == '-=':
+            return self.sub_assign_op(instr)
+        elif len(instr)==3 and instr[1] == '*=':
+            return self.mul_assign_op(instr)
+        elif len(instr)==3 and instr[1] == '/=':
+            return self.div_assign_op(instr)
 
-        elif instr[0][0:6] == 'retval':
-            return self.getRetVal(instr, scopeInfo, funcScope)
+        elif len(instr)==5 and instr[0][0:6] == 'retval':
+            return self.getRetVal(instr)#error
 
-        elif instr[3] in self.relops:
-            return self.relops_cmp(instr, scopeInfo, funcScope)
+        elif len(instr)==5 and instr[3] in self.relops:
+            return self.relops_cmp(instr)
 
-        elif instr[3] in self.frelops:
-            return self.relops_fcmp(instr, scopeInfo, funcScope)
+        elif len(instr)==5 and instr[3] in self.frelops:
+            return self.relops_fcmp(instr)
 
-        elif instr[0] == 'if':
-            return self.if_op(instr, scopeInfo, funcScope)
-        elif instr[0] == 'goto':
-            return self.goto_op(instr, scopeInfo, funcScope)
+        elif len(instr)==4 and instr[0] == 'if':
+            return self.if_op(instr)
+        elif len(instr)==2 and instr[0] == 'goto':
+            return self.goto_op(instr)
 
-        elif instr[3] in ['||', '&&']:
-            return self.logical(instr, scopeInfo, funcScope)
+        elif len(instr)==5 and instr[3] in ['||', '&&']:
+            return self.logical(instr)
 
         # elif instr[0] in ['--', '++']:
         #     return self.inc_dec(instr, scopeInfo, funcScope)
@@ -1090,16 +1098,16 @@ class CodeGen:
         #     return self.scan_int(instr, scopeInfo, funcScope)
         # elif instr[0] == 'scan_string':
         #     return self.scan_string(instr, scopeInfo, funcScope)
-        elif instr[0] == 'param':
-            return self.param(instr, scopeInfo, funcScope)
-        elif instr[0] == 'call':
+        elif len(instr)==2 and instr[0] == 'param':
+            return self.param(instr)
+        elif len(instr)==2 and instr[0] == 'call':
             # function call
             return ['call '+instr[1]]
 
-        elif instr[0] == '*pointer':
-            return self.assign_ptr_rhs(instr, scopeInfo, funcScope)
-        elif instr[2][0] == '&':
-            return self.ampersand_op(instr, scopeInfo, funcScope)
+        elif len(instr)==5 and instr[0] == '*pointer':
+            return self.assign_ptr_rhs(instr)
+        elif len(instr)==4 and instr[2][0] == '&':
+            return self.ampersand_op(instr)
 
     def getCode(self):
         while True:

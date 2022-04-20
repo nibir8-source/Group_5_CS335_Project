@@ -1,48 +1,6 @@
- sum :
- temp_no_2 = var_temp_no_0 +int var_temp_no_1
- return temp_no_2
- return
- return
- mul :
- temp_no_6 = var_temp_no_3 *int var_temp_no_4
- temp_no_7 = temp_no_6 *int var_temp_no_5
- var_temp_no_8 = temp_no_7
- var_temp_no_9 = 1
- var_temp_no_10 = 10
- var_temp_no_11 = 11
- var_temp_no_12 = 12
- var_temp_no_13 = 13
- temp_no_14 = 3 *int 4
- temp_no_15 = temp_no_14 *int 5
- temp_no_16 = temp_no_15 *int 6
- temp_no_17 = temp_no_16 *int 7
- temp_no_18 = temp_no_17 *int 8
- temp_no_19 = temp_no_18 *int 9
- var_temp_no_20 = temp_no_19
- return 0
- return
- return
  main :
- var_temp_no_21 = 10
- var_temp_no_22 = 11
- var_temp_no_23 = 12
- var_temp_no_24 = 13
- var_temp_no_25 = 14
- var_temp_no_26 = 15
- var_temp_no_27 = 16
- var_temp_no_28 = 17
- var_temp_no_21 = var_temp_no_21 +int 1
- temp_no_30 = 6
- temp_no_30 = temp_no_30 *int 4
- temp_no_30 = temp_no_30 +int var_temp_no_29
- * temp_no_30 = 10
- temp_no_31 = -int var_temp_no_21
- var_temp_no_22 = temp_no_31
- startf sum
- param 4
- param 5
- call sum
- endf sum
- temp_no_32 = retval_1
- var_temp_no_22 = temp_no_32
+ var_temp_no_0 = 5
+ var_temp_no_1 = 6
+ temp_no_2 = var_temp_no_0 +int var_temp_no_1
+ var_temp_no_3 = temp_no_2
  return
