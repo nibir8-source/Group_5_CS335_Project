@@ -136,6 +136,55 @@ class CodeGen:
                 pass
         return flag
 
+    def unary_minus(self, instr, scopeInfo, funcScope):
+        dst = instr[1]
+        src1 = instr[2]
+        flag = self.setFlags(instr)
+
+        dstOffset = self.ebpOffset(dst)
+        src1Offset = self.ebpOffset(src1)
+
+        code = []
+        code.append('mov edi, [ebp' + str(src1Offset) + ']')
+        if flag[2] == 1:
+            code.append('mov edi, [edi]')
+        code.append('mov esi, 0')
+        code.append('sub esi, edi')
+        if flag[1] == 1:
+            code.append('mov esi, [ebp'+ str(dstOffset) + ']')
+            code.append('mov [esi], edi')
+        else:
+            code.append('mov [ebp' + str(dstOffset) + '], esi')
+        return code
+
+    def unary_fminus(self, instr, scopeInfo, funcScope):
+        dst = instr[1]
+        src1 = instr[2]
+        flag = self.setFlags(instr)
+
+        dstOffset = self.ebpOffset(dst)
+        src1Offset = self.ebpOffset(src1)
+
+        binaryCode = binary(float(0.0))
+
+        code = []
+        code.append('mov edi, 0b' + str(binaryCode))
+        code.append('mov [ebp' + str(dstOffset) + '], edi')
+
+        code.append('fld dword [ebp' + str(dstOffset) + ']')
+        # if flag[2] == 1:
+        #     code.append('mov edi, [edi]')
+        # code.append('mov esi, 0')
+        # code.append('sub esi, edi')
+        code.append('fsub dword [ebp+' + str(src1Offset) + ']')
+        # if flag[1] == 1:
+        #     code.append('mov esi, [ebp'+ str(dstOffset) + ']')
+        #     code.append('mov [esi], edi')
+        # else:
+        #     code.append('mov [ebp' + str(dstOffset) + '], esi')
+        code.append('fstp dword [ebp' + str(dstOffset) + ']')
+        return code
+
     def add_op(self, instr, scopeInfo, funcScope):
 
         dst = instr[0]
@@ -215,6 +264,23 @@ class CodeGen:
             code.append('mov [ebp' + str(dstOffset) + '], edi')
         return code
 
+    def fadd_op(self, instr, scopeInfo, funcScope):
+
+        dst = instr[0]
+        src1 = instr[2]
+        src2 = instr[4]
+
+        dstOffset = self.ebpOffset(dst, scopeInfo[0], funcScope)
+        src1Offset = self.ebpOffset(src1, scopeInfo[2], funcScope)
+        src2Offset = self.ebpOffset(src2, scopeInfo[4], funcScope)
+
+        code = []
+
+        code.append('fld dword [ebp' + str(src1Offset) + ']')
+        code.append('fadd dword [ebp' + str(src2Offset) + ']')
+        code.append('fstp dword [ebp' + str(dstOffset) + ']')
+        return code
+
     def sub_op(self, instr, scopeInfo, funcScope):
 
         dst = instr[0]
@@ -241,6 +307,23 @@ class CodeGen:
             code.append('mov [esi], edi')
         else:
             code.append('mov [ebp' + str(dstOffset) + '], edi')
+        return code
+
+    def fsub_op(self, instr, scopeInfo, funcScope):
+
+        dst = instr[0]
+        src1 = instr[2]
+        src2 = instr[4]
+
+        dstOffset = self.ebpOffset(dst, scopeInfo[0], funcScope)
+        src1Offset = self.ebpOffset(src1, scopeInfo[2], funcScope)
+        src2Offset = self.ebpOffset(src2, scopeInfo[4], funcScope)
+
+        code = []
+
+        code.append('fld dword [ebp' + str(src1Offset) + ']')
+        code.append('fsub dword [ebp' + str(src2Offset) + ']')
+        code.append('fstp dword [ebp' + str(dstOffset) + ']')
         return code
 
     def mul_op(self, instr, scopeInfo, funcScope):
@@ -271,32 +354,21 @@ class CodeGen:
             code.append('mov [ebp' + str(dstOffset) + '], edi')
         return code
 
-    def sub_op(self, instr, scopeInfo, funcScope):
+    def fmul_op(self, instr, scopeInfo, funcScope):
 
         dst = instr[0]
         src1 = instr[2]
         src2 = instr[4]
-        flag = self.setFlags(instr)
 
         dstOffset = self.ebpOffset(dst, scopeInfo[0], funcScope)
         src1Offset = self.ebpOffset(src1, scopeInfo[2], funcScope)
         src2Offset = self.ebpOffset(src2, scopeInfo[4], funcScope)
 
         code = []
-        code.append('mov edi, [ebp' + str(src1Offset) + ']')
-        if flag[2] == 1:
-            code.append('mov edi, [edi]')
 
-        code.append('mov esi, [ebp' + str(src2Offset) + ']')
-        if flag[3] == 1:
-            code.append('mov esi, [esi]')
-        code.append('sub edi, esi')
-
-        if flag[0] == 1:
-            code.append('mov esi, [ebp' + str(dstOffset) + ']')
-            code.append('mov [esi], edi')
-        else:
-            code.append('mov [ebp' + str(dstOffset) + '], edi')
+        code.append('fld dword [ebp' + str(src1Offset) + ']')
+        code.append('fmul dword [ebp' + str(src2Offset) + ']')
+        code.append('fstp dword [ebp' + str(dstOffset) + ']')
         return code
 
     def div_op(self, instr, scopeInfo, funcScope):
@@ -320,6 +392,42 @@ class CodeGen:
             code.append('mov [esi], eax')
         else:
             code.append('mov [ebp' + str(dstOffset) + '], eax')
+        return code
+
+    def fdiv_op(self, instr, scopeInfo, funcScope):
+
+        dst = instr[0]
+        src1 = instr[2]
+        src2 = instr[4]
+
+        dstOffset = self.ebpOffset(dst, scopeInfo[0], funcScope)
+        src1Offset = self.ebpOffset(src1, scopeInfo[2], funcScope)
+        src2Offset = self.ebpOffset(src2, scopeInfo[4], funcScope)
+
+        code = []
+
+        code.append('fld dword [ebp' + str(src1Offset) + ']')
+        code.append('fdiv dword [ebp' + str(src2Offset) + ']')
+        code.append('fstp dword [ebp' + str(dstOffset) + ']')
+        return code
+
+    def pointer_assign(self, instr):
+        dst = instr[1][1:]
+        src = instr[2]
+        code = []
+        instr[1] = dst
+        flag = self.setFlags(instr)
+
+        dstOffset = self.ebpOffset(dst)
+        srcOffset = self.ebpOffset(src)
+
+        code.append('mov edi, [ebp' + srcOffset + ']')
+        if flag[2] == 1:
+            code.append('mov edi [edi]')
+        code.append('mov esi, [ebp' + dstOffset + ']')
+        if flag[1] == 1:
+            code.append('mov esi, [esi]')
+        code.append('mov [esi], edi')
         return code
 
     def assign_op(self, instr):
