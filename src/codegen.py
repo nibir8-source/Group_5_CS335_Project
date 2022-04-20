@@ -244,21 +244,25 @@ class CodeGen:
 
         dstOffset = self.ebpOffset(dst)
         src1Offset = self.ebpOffset(src1)
-        src2Offset = self.ebpOffset(src2)
+        if self.get_ident_info(src2) != -1:
+            src2Offset = self.ebpOffset(src2)
 
         code = []
         code.append('mov edi, [ebp' + str(src1Offset) + ']')
         if flag[2] == 1:
             code.append('mov edi, [edi]')
 
-        code.append('mov esi, [ebp' + str(src2Offset) + ']')
-        if flag[3] == 1:
-            code.append('mov esi, [esi]')
+        if self.get_ident_info(src2) != -1:
+            code.append('mov esi, [ebp' + str(src2Offset) + ']')
+            if flag[3] == 1:
+                code.append('mov esi, [esi]')
+        else:
+            code.append('mov esi, ' + str(src2))
 
         code.append('add edi, esi')
 
-        if flag[0] == 1:
-            code.append('mov esi, [ebp' + str(dstOffset) + ']')
+        if flag[1] == 1:
+            code.append('mov esi, [ebp'+ str(dstOffset) + ']')
             code.append('mov [esi], edi')
         else:
             code.append('mov [ebp' + str(dstOffset) + '], edi')
@@ -270,14 +274,23 @@ class CodeGen:
         src1 = instr[2]
         src2 = instr[4]
 
-        dstOffset = self.ebpOffset(dst, scopeInfo[0], funcScope)
-        src1Offset = self.ebpOffset(src1, scopeInfo[2], funcScope)
-        src2Offset = self.ebpOffset(src2, scopeInfo[4], funcScope)
+        dstOffset = self.ebpOffset(dst)
+        src1Offset = self.ebpOffset(src1)
+        if self.get_ident_info(src2) != -1:
+            src2Offset = self.ebpOffset(src2)
 
         code = []
 
         code.append('fld dword [ebp' + str(src1Offset) + ']')
-        code.append('fadd dword [ebp' + str(src2Offset) + ']')
+        if self.get_ident_info(src2) != -1:
+            code.append('fadd dword [ebp' + str(src2Offset) + ']')
+        else:
+            binaryCode = binary(float(src2))
+
+            code.append('mov edi, 0b' + str(binaryCode))
+            code.append('mov [ebp' + str(dstOffset) + '], edi')
+
+            code.append('fadd dword [ebp' + str(dstOffset) + ']')
         code.append('fstp dword [ebp' + str(dstOffset) + ']')
         return code
 
@@ -288,22 +301,27 @@ class CodeGen:
         src2 = instr[4]
         flag = self.setFlags(instr)
 
-        dstOffset = self.ebpOffset(dst, scopeInfo[0], funcScope)
-        src1Offset = self.ebpOffset(src1, scopeInfo[2], funcScope)
-        src2Offset = self.ebpOffset(src2, scopeInfo[4], funcScope)
+        dstOffset = self.ebpOffset(dst)
+        src1Offset = self.ebpOffset(src1)
+        if self.get_ident_info(src2) != -1:
+            src2Offset = self.ebpOffset(src2)
 
         code = []
         code.append('mov edi, [ebp' + str(src1Offset) + ']')
         if flag[2] == 1:
             code.append('mov edi, [edi]')
 
-        code.append('mov esi, [ebp' + str(src2Offset) + ']')
-        if flag[3] == 1:
-            code.append('mov esi, [esi]')
+        if self.get_ident_info(src2) != -1:
+            code.append('mov esi, [ebp' + str(src2Offset) + ']')
+            if flag[3] == 1:
+                code.append('mov esi, [esi]')
+        else:
+            code.append('mov esi, ' + str(src2))
+
         code.append('sub edi, esi')
 
-        if flag[0] == 1:
-            code.append('mov esi, [ebp' + str(dstOffset) + ']')
+        if flag[1] == 1:
+            code.append('mov esi, [ebp'+ str(dstOffset) + ']')
             code.append('mov [esi], edi')
         else:
             code.append('mov [ebp' + str(dstOffset) + '], edi')
@@ -315,14 +333,23 @@ class CodeGen:
         src1 = instr[2]
         src2 = instr[4]
 
-        dstOffset = self.ebpOffset(dst, scopeInfo[0], funcScope)
-        src1Offset = self.ebpOffset(src1, scopeInfo[2], funcScope)
-        src2Offset = self.ebpOffset(src2, scopeInfo[4], funcScope)
+        dstOffset = self.ebpOffset(dst)
+        src1Offset = self.ebpOffset(src1)
+        if self.get_ident_info(src2) != -1:
+            src2Offset = self.ebpOffset(src2)
 
         code = []
 
         code.append('fld dword [ebp' + str(src1Offset) + ']')
-        code.append('fsub dword [ebp' + str(src2Offset) + ']')
+        if self.get_ident_info(src2) != -1:
+            code.append('fsub dword [ebp' + str(src2Offset) + ']')
+        else:
+            binaryCode = binary(float(src2))
+
+            code.append('mov edi, 0b' + str(binaryCode))
+            code.append('mov [ebp' + str(dstOffset) + '], edi')
+
+            code.append('fsub dword [ebp' + str(dstOffset) + ']')
         code.append('fstp dword [ebp' + str(dstOffset) + ']')
         return code
 
@@ -333,22 +360,27 @@ class CodeGen:
         src2 = instr[4]
         flag = self.setFlags(instr)
 
-        dstOffset = self.ebpOffset(dst, scopeInfo[0], funcScope)
-        src1Offset = self.ebpOffset(src1, scopeInfo[2], funcScope)
-        src2Offset = self.ebpOffset(src2, scopeInfo[4], funcScope)
+        dstOffset = self.ebpOffset(dst)
+        src1Offset = self.ebpOffset(src1)
+        if self.get_ident_info(src2) != -1:
+            src2Offset = self.ebpOffset(src2)
 
         code = []
         code.append('mov edi, [ebp' + str(src1Offset) + ']')
         if flag[2] == 1:
             code.append('mov edi, [edi]')
 
-        code.append('mov esi, [ebp' + str(src2Offset) + ']')
-        if flag[3] == 1:
-            code.append('mov esi, [esi]')
+        if self.get_ident_info(src2) != -1:
+            code.append('mov esi, [ebp' + str(src2Offset) + ']')
+            if flag[3] == 1:
+                code.append('mov esi, [esi]')
+        else:
+            code.append('mov esi, ' + str(src2))
+
         code.append('imul edi, esi')
 
-        if flag[0] == 1:
-            code.append('mov esi, [ebp' + str(dstOffset) + ']')
+        if flag[1] == 1:
+            code.append('mov esi, [ebp'+ str(dstOffset) + ']')
             code.append('mov [esi], edi')
         else:
             code.append('mov [ebp' + str(dstOffset) + '], edi')
@@ -360,14 +392,23 @@ class CodeGen:
         src1 = instr[2]
         src2 = instr[4]
 
-        dstOffset = self.ebpOffset(dst, scopeInfo[0], funcScope)
-        src1Offset = self.ebpOffset(src1, scopeInfo[2], funcScope)
-        src2Offset = self.ebpOffset(src2, scopeInfo[4], funcScope)
+        dstOffset = self.ebpOffset(dst)
+        src1Offset = self.ebpOffset(src1)
+        if self.get_ident_info(src2) != -1:
+            src2Offset = self.ebpOffset(src2)
 
         code = []
 
         code.append('fld dword [ebp' + str(src1Offset) + ']')
-        code.append('fmul dword [ebp' + str(src2Offset) + ']')
+        if self.get_ident_info(src2) != -1:
+            code.append('fmul dword [ebp' + str(src2Offset) + ']')
+        else:
+            binaryCode = binary(float(src2))
+
+            code.append('mov edi, 0b' + str(binaryCode))
+            code.append('mov [ebp' + str(dstOffset) + '], edi')
+
+            code.append('fmul dword [ebp' + str(dstOffset) + ']')
         code.append('fstp dword [ebp' + str(dstOffset) + ']')
         return code
 
@@ -377,18 +418,22 @@ class CodeGen:
         src2 = instr[4]
         flag = self.setFlags(instr)
 
-        dstOffset = self.ebpOffset(dst, scopeInfo[0], funcScope)
+        dstOffset = self.ebpOffset(dst, scopeInfo[1], funcScope)
         src1Offset = self.ebpOffset(src1, scopeInfo[2], funcScope)
-        src2Offset = self.ebpOffset(src2, scopeInfo[4], funcScope)
+        if self.get_ident_info(src2) != -1:
+            src2Offset = self.ebpOffset(src2, scopeInfo[3], funcScope)
 
         code = []
         code.append('xor edx, edx')
         code.append('mov eax, [ebp' + str(src1Offset) + ']')
-        code.append('mov ebx, [ebp' + str(src2Offset) + ']')
+        if self.get_ident_info(src2) != -1:
+            code.append('mov ebx, [ebp' + str(src2Offset) + ']')
+        else:
+            code.append('mov ebx, ' + str(src2))
         code.append('idiv ebx')
 
-        if flag[0] == 1:
-            code.append('mov esi, [ebp' + str(dstOffset) + ']')
+        if flag[1] == 1:
+            code.append('mov esi, [ebp'+ str(dstOffset) + ']')
             code.append('mov [esi], eax')
         else:
             code.append('mov [ebp' + str(dstOffset) + '], eax')
@@ -400,14 +445,23 @@ class CodeGen:
         src1 = instr[2]
         src2 = instr[4]
 
-        dstOffset = self.ebpOffset(dst, scopeInfo[0], funcScope)
-        src1Offset = self.ebpOffset(src1, scopeInfo[2], funcScope)
-        src2Offset = self.ebpOffset(src2, scopeInfo[4], funcScope)
+        dstOffset = self.ebpOffset(dst)
+        src1Offset = self.ebpOffset(src1)
+        if self.get_ident_info(src2) != -1:
+            src2Offset = self.ebpOffset(src2)
 
         code = []
 
         code.append('fld dword [ebp' + str(src1Offset) + ']')
-        code.append('fdiv dword [ebp' + str(src2Offset) + ']')
+        if self.get_ident_info(src2) != -1:
+            code.append('fdiv dword [ebp' + str(src2Offset) + ']')
+        else:
+            binaryCode = binary(float(src2))
+
+            code.append('mov edi, 0b' + str(binaryCode))
+            code.append('mov [ebp' + str(dstOffset) + '], edi')
+
+            code.append('fdiv dword [ebp' + str(dstOffset) + ']')
         code.append('fstp dword [ebp' + str(dstOffset) + ']')
         return code
 
