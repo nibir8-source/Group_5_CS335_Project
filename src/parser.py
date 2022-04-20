@@ -1985,7 +1985,19 @@ l = []
 
 # for i in range(scope_table.keys()):
 #     print(i)
-print(scope_table.keys())
+# print(scope_table.keys())
+print(offset_list)
+for i in range(len(scope_table.keys())):
+    # print(scope_table[i].table.keys())
+    for key in scope_table[i].table:
+        if "temp_no" in key and key[0] == "t":
+            scope_table[i].table[key]["offset"] = offset_list[i]
+            offset_list[i] += 4
+
 for i in range(len(scope_table.keys())):
     print(scope_table[i].table)
+    # for key in scope_table[i].table:
+    #     if "temp_no" in key and key[0] == "t":
+    #         scope_table[i].table[key]["offset"] = offset_list[i]
+    #         offset_list[i] += 4
 # def constant_folding(code,)
