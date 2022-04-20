@@ -78,4 +78,7 @@ e7,"{'type': ['int'], 'tmp': 'var_temp_no_27', 'offset': 28}"
 var_temp_no_27,{'type': 'e7'}
 e8,"{'type': ['int'], 'tmp': 'var_temp_no_28', 'offset': 32}"
 var_temp_no_28,{'type': 'e8'}
-total_size,{'type': 36}
+a,"{'type': ['arr10', 'int'], 'tmp': 'var_temp_no_29', 'offset': 36}"
+var_temp_no_29,{'type': 'a'}
+temp_no_30,{'type': 'temp'}
+total_size,{'type': 76}

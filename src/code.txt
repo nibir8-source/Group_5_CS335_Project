@@ -32,4 +32,8 @@
  var_temp_no_27 = 16
  var_temp_no_28 = 17
  var_temp_no_21 = var_temp_no_21 +int 1
+ temp_no_30 = 6
+ temp_no_30 = temp_no_30 *int 4
+ temp_no_30 = temp_no_30 +int var_temp_no_29
+ * temp_no_30 = 10
  return

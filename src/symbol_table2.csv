@@ -1,162 +1,84 @@
-
-
-Table Number,0
-
-
-
-Parent,0,=,
-
-
-
-sum,"{'type': ['func'], 'scope': 1, 'accepts': [['int'], ['int']], 'total_param_size': 8, 'param_size_list': [4, 4], 'return_type': [['int']], 'total_return_size': 4, 'return_size_list': [-16]}"
-
-mul,"{'type': ['func'], 'scope': 2, 'accepts': [['int'], ['int'], ['int']], 'total_param_size': 12, 'param_size_list': [4, 4, 4], 'return_type': [['int']], 'total_return_size': 4, 'return_size_list': [-20]}"
-
-main,"{'type': ['func'], 'scope': 3, 'accepts': [['void']], 'total_param_size': 0, 'return_type': [['void']], 'total_return_size': 0, 'return_size_list': []}"
-
-
-
-Table Number,1
-
-
-
-Parent,1,=,0
-
-
-
-sum,{'type': ['func']}
-
-p,"{'type': ['int'], 'tmp': 'var_temp_no_0', 'offset': -12}"
-
-var_temp_no_0,{'type': 'p'}
-
-q,"{'type': ['int'], 'tmp': 'var_temp_no_1', 'offset': -8}"
-
-var_temp_no_1,{'type': 'q'}
-
-temp_no_2,"{'type': 'temp', 'offset': 4}"
-
-total_size,{'type': 8}
-
-
-
-Table Number,2
-
-
-
-Parent,2,=,0
-
-
-
-sum,{'type': ['func']}
-
-mul,{'type': ['func']}
-
-a1,"{'type': ['int'], 'tmp': 'var_temp_no_3', 'offset': -16}"
-
-var_temp_no_3,{'type': 'a1'}
-
-a2,"{'type': ['int'], 'tmp': 'var_temp_no_4', 'offset': -12}"
-
-var_temp_no_4,{'type': 'a2'}
-
-a3,"{'type': ['int'], 'tmp': 'var_temp_no_5', 'offset': -8}"
-
-var_temp_no_5,{'type': 'a3'}
-
-temp_no_6,"{'type': 'temp', 'offset': 32}"
-
-temp_no_7,"{'type': 'temp', 'offset': 36}"
-
-res,"{'type': ['int'], 'tmp': 'var_temp_no_8', 'offset': 4}"
-
-var_temp_no_8,{'type': 'res'}
-
-hello,"{'type': ['int'], 'tmp': 'var_temp_no_9', 'offset': 8}"
-
-var_temp_no_9,{'type': 'hello'}
-
-p1,"{'type': ['int'], 'tmp': 'var_temp_no_10', 'offset': 12}"
-
-var_temp_no_10,{'type': 'p1'}
-
-p2,"{'type': ['int'], 'tmp': 'var_temp_no_11', 'offset': 16}"
-
-var_temp_no_11,{'type': 'p2'}
-
-p3,"{'type': ['int'], 'tmp': 'var_temp_no_12', 'offset': 20}"
-
-var_temp_no_12,{'type': 'p3'}
-
-p4,"{'type': ['int'], 'tmp': 'var_temp_no_13', 'offset': 24}"
-
-var_temp_no_13,{'type': 'p4'}
-
-temp_no_14,"{'type': 'temp', 'offset': 40}"
-
-temp_no_15,"{'type': 'temp', 'offset': 44}"
-
-temp_no_16,"{'type': 'temp', 'offset': 48}"
-
-temp_no_17,"{'type': 'temp', 'offset': 52}"
-
-temp_no_18,"{'type': 'temp', 'offset': 56}"
-
-temp_no_19,"{'type': 'temp', 'offset': 60}"
-
-p5,"{'type': ['int'], 'tmp': 'var_temp_no_20', 'offset': 28}"
-
-var_temp_no_20,{'type': 'p5'}
-
-total_size,{'type': 64}
-
-
-
-Table Number,3
-
-
-
-Parent,3,=,0
-
-
-
-sum,{'type': ['func']}
-
-mul,{'type': ['func']}
-
-main,{'type': ['func']}
-
-e1,"{'type': ['int'], 'tmp': 'var_temp_no_21', 'offset': 4}"
-
-var_temp_no_21,{'type': 'e1'}
-
-e2,"{'type': ['int'], 'tmp': 'var_temp_no_22', 'offset': 8}"
-
-var_temp_no_22,{'type': 'e2'}
-
-e3,"{'type': ['int'], 'tmp': 'var_temp_no_23', 'offset': 12}"
-
-var_temp_no_23,{'type': 'e3'}
-
-e4,"{'type': ['int'], 'tmp': 'var_temp_no_24', 'offset': 16}"
-
-var_temp_no_24,{'type': 'e4'}
-
-e5,"{'type': ['int'], 'tmp': 'var_temp_no_25', 'offset': 20}"
-
-var_temp_no_25,{'type': 'e5'}
-
-e6,"{'type': ['int'], 'tmp': 'var_temp_no_26', 'offset': 24}"
-
-var_temp_no_26,{'type': 'e6'}
-
-e7,"{'type': ['int'], 'tmp': 'var_temp_no_27', 'offset': 28}"
-
-var_temp_no_27,{'type': 'e7'}
-
-e8,"{'type': ['int'], 'tmp': 'var_temp_no_28', 'offset': 32}"
-
-var_temp_no_28,{'type': 'e8'}
-
-total_size,{'type': 36}
-
+
+Table Number,0
+
+Parent,0,=,
+
+sum,"{'type': ['func'], 'scope': 1, 'accepts': [['int'], ['int']], 'total_param_size': 8, 'param_size_list': [4, 4], 'return_type': [['int']], 'total_return_size': 4, 'return_size_list': [-16]}"
+mul,"{'type': ['func'], 'scope': 2, 'accepts': [['int'], ['int'], ['int']], 'total_param_size': 12, 'param_size_list': [4, 4, 4], 'return_type': [['int']], 'total_return_size': 4, 'return_size_list': [-20]}"
+main,"{'type': ['func'], 'scope': 3, 'accepts': [['void']], 'total_param_size': 0, 'return_type': [['void']], 'total_return_size': 0, 'return_size_list': []}"
+
+Table Number,1
+
+Parent,1,=,0
+
+sum,{'type': ['func']}
+p,"{'type': ['int'], 'tmp': 'var_temp_no_0', 'offset': -12}"
+var_temp_no_0,{'type': 'p'}
+q,"{'type': ['int'], 'tmp': 'var_temp_no_1', 'offset': -8}"
+var_temp_no_1,{'type': 'q'}
+temp_no_2,"{'type': 'temp', 'offset': 4}"
+total_size,{'type': 8}
+
+Table Number,2
+
+Parent,2,=,0
+
+sum,{'type': ['func']}
+mul,{'type': ['func']}
+a1,"{'type': ['int'], 'tmp': 'var_temp_no_3', 'offset': -16}"
+var_temp_no_3,{'type': 'a1'}
+a2,"{'type': ['int'], 'tmp': 'var_temp_no_4', 'offset': -12}"
+var_temp_no_4,{'type': 'a2'}
+a3,"{'type': ['int'], 'tmp': 'var_temp_no_5', 'offset': -8}"
+var_temp_no_5,{'type': 'a3'}
+temp_no_6,"{'type': 'temp', 'offset': 32}"
+temp_no_7,"{'type': 'temp', 'offset': 36}"
+res,"{'type': ['int'], 'tmp': 'var_temp_no_8', 'offset': 4}"
+var_temp_no_8,{'type': 'res'}
+hello,"{'type': ['int'], 'tmp': 'var_temp_no_9', 'offset': 8}"
+var_temp_no_9,{'type': 'hello'}
+p1,"{'type': ['int'], 'tmp': 'var_temp_no_10', 'offset': 12}"
+var_temp_no_10,{'type': 'p1'}
+p2,"{'type': ['int'], 'tmp': 'var_temp_no_11', 'offset': 16}"
+var_temp_no_11,{'type': 'p2'}
+p3,"{'type': ['int'], 'tmp': 'var_temp_no_12', 'offset': 20}"
+var_temp_no_12,{'type': 'p3'}
+p4,"{'type': ['int'], 'tmp': 'var_temp_no_13', 'offset': 24}"
+var_temp_no_13,{'type': 'p4'}
+temp_no_14,"{'type': 'temp', 'offset': 40}"
+temp_no_15,"{'type': 'temp', 'offset': 44}"
+temp_no_16,"{'type': 'temp', 'offset': 48}"
+temp_no_17,"{'type': 'temp', 'offset': 52}"
+temp_no_18,"{'type': 'temp', 'offset': 56}"
+temp_no_19,"{'type': 'temp', 'offset': 60}"
+p5,"{'type': ['int'], 'tmp': 'var_temp_no_20', 'offset': 28}"
+var_temp_no_20,{'type': 'p5'}
+total_size,{'type': 64}
+
+Table Number,3
+
+Parent,3,=,0
+
+sum,{'type': ['func']}
+mul,{'type': ['func']}
+main,{'type': ['func']}
+e1,"{'type': ['int'], 'tmp': 'var_temp_no_21', 'offset': 4}"
+var_temp_no_21,{'type': 'e1'}
+e2,"{'type': ['int'], 'tmp': 'var_temp_no_22', 'offset': 8}"
+var_temp_no_22,{'type': 'e2'}
+e3,"{'type': ['int'], 'tmp': 'var_temp_no_23', 'offset': 12}"
+var_temp_no_23,{'type': 'e3'}
+e4,"{'type': ['int'], 'tmp': 'var_temp_no_24', 'offset': 16}"
+var_temp_no_24,{'type': 'e4'}
+e5,"{'type': ['int'], 'tmp': 'var_temp_no_25', 'offset': 20}"
+var_temp_no_25,{'type': 'e5'}
+e6,"{'type': ['int'], 'tmp': 'var_temp_no_26', 'offset': 24}"
+var_temp_no_26,{'type': 'e6'}
+e7,"{'type': ['int'], 'tmp': 'var_temp_no_27', 'offset': 28}"
+var_temp_no_27,{'type': 'e7'}
+e8,"{'type': ['int'], 'tmp': 'var_temp_no_28', 'offset': 32}"
+var_temp_no_28,{'type': 'e8'}
+a,"{'type': ['arr10', 'int'], 'tmp': 'var_temp_no_29', 'offset': 36}"
+var_temp_no_29,{'type': 'a'}
+temp_no_30,"{'type': 'temp', 'offset': 76}"
+total_size,{'type': 80}

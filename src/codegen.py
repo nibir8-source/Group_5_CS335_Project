@@ -44,8 +44,9 @@ class CodeGen:
 
     def ebpOffset(self, ident):
         scope = self.get_scope(ident)
-        offset = self.scopeTab[scope].table[ident]["offset"]
-
+        # offset = self.scopeTab[scope].table[ident]["offset"]
+        name = self.scopeTab[i].table[ident]["type"]
+        offset = self.scopeTab[scope].table[name]["offset"]
         if offset >= 0:
             return '+'+str(offset)
         return str(offset)
@@ -151,7 +152,7 @@ class CodeGen:
         code.append('mov esi, 0')
         code.append('sub esi, edi')
         if flag[1] == 1:
-            code.append('mov esi, [ebp'+ str(dstOffset) + ']')
+            code.append('mov esi, [ebp' + str(dstOffset) + ']')
             code.append('mov [esi], edi')
         else:
             code.append('mov [ebp' + str(dstOffset) + '], esi')
@@ -472,7 +473,7 @@ class CodeGen:
             code_.append('jnz '+label)
             return code_
         if baseType == ['float']:
-            if isinstance(scopeInfo[2], int):
+            if src_info != -1:
                 dstOffset = self.ebpOffset(dst)
                 srcOffset = self.ebpOffset(src)
                 code.append('fld dword [ebp' + srcOffset + ']')
@@ -484,7 +485,7 @@ class CodeGen:
                 code.append('mov edi, 0b' + str(binaryCode))
                 code.append('mov [ebp' + dstOffset + '], edi')
         else:
-            if isinstance(scopeInfo[2], int):
+            if isinstance(src_info != -1):
                 dstOffset = self.ebpOffset(dst)
                 srcOffset = self.ebpOffset(src)
                 code.append('mov edi, [ebp' + srcOffset + ']')
