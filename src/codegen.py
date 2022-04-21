@@ -51,9 +51,9 @@ class CodeGen:
             offset = self.scopetab[scope].table[ident]["offset"]
         else:
             offset = self.scopetab[scope].table[name]["offset"]
-        if offset >= 0:
-            return '+'+str(offset)
-        return str(offset)
+        # if offset >= 0:
+        return '-'+str(offset)
+        # return str(offset)
 
     def addFunc(self, name):
         funcScope = self.scopetab[0].table[name]["scope"]
