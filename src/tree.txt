@@ -1,1 +1,22 @@
 digraph graphname {
+0[label="SourceFile" ] ;1[label="main" ] ;0->1;
+0[label="SourceFile" ] ;2[label="fmt" ] ;0->2;
+0[label="SourceFile" ] ;3[label="FUNCTION" ] ;0->3;
+3[label="FUNCTION" ] ;4[label="main" ] ;3->4;
+3[label="FUNCTION" ] ;5[label="Parameters" ] ;3->5;
+3[label="FUNCTION" ] ;6[label="StatementList" ] ;3->6;
+6[label="StatementList" ] ;7[label="StatementList" ] ;6->7;
+7[label="StatementList" ] ;8[label="VarSpec Assignment" ] ;7->8;
+8[label="VarSpec Assignment" ] ;9[label="a" ] ;8->9;
+8[label="VarSpec Assignment" ] ;10[label="int" ] ;8->10;
+8[label="VarSpec Assignment" ] ;11[label="5" ] ;8->11;
+7[label="StatementList" ] ;12[label="VarSpec Assignment" ] ;7->12;
+12[label="VarSpec Assignment" ] ;13[label="b" ] ;12->13;
+12[label="VarSpec Assignment" ] ;14[label="int" ] ;12->14;
+12[label="VarSpec Assignment" ] ;15[label="6" ] ;12->15;
+6[label="StatementList" ] ;16[label=":=" ] ;6->16;
+16[label=":=" ] ;17[label="c" ] ;16->17;
+16[label=":=" ] ;18[label="+" ] ;16->18;
+18[label="+" ] ;19[label="a" ] ;18->19;
+18[label="+" ] ;20[label="b" ] ;18->20;
+}
