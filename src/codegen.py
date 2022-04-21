@@ -47,9 +47,9 @@ class CodeGen:
         # offset = self.scopetab[scope].table[ident]["offset"]
         name = self.scopetab[scope].table[ident]["type"]
         print(name)
-        if(name=="temp"):
-            offset= self.scopetab[scope].table[ident]["offset"]
-        else :
+        if(name == "temp"):
+            offset = self.scopetab[scope].table[ident]["offset"]
+        else:
             offset = self.scopetab[scope].table[name]["offset"]
         if offset >= 0:
             return '+'+str(offset)
@@ -705,7 +705,7 @@ class CodeGen:
 
     def ampersand_op(self, instr):
         dst = instr[0]
-        src = instr[2]
+        src = instr[3]
         flag = self.setFlags(instr)
 
         dstOffset = self.ebpOffset(dst)
@@ -728,7 +728,7 @@ class CodeGen:
     def relops_cmp(self, instr):
         dst = instr[0]
         src1 = instr[2]
-        src2 = instr[3]
+        src2 = instr[4]
         flag = self.setFlags(instr)
 
         dstOffset = self.ebpOffset(dst)
@@ -1024,23 +1024,23 @@ class CodeGen:
             return []
         elif len(instr) == 1:
             return [instr[0]+':']
-        elif len(instr)==5 and  instr[3] == '+int':
+        elif len(instr) == 5 and instr[3] == '+int':
             return self.add_op(instr)
-        elif len(instr)==5 and instr[3] == '+float':
+        elif len(instr) == 5 and instr[3] == '+float':
             return self.fadd_op(instr)
         # elif instr[3] == '-float':
         #     if len(instr) == 4:
         #         return self.fsub_op(instr)
         #     else:
         #         return self.unary_fminus(instr)
-        elif len(instr)==4 and instr[2] == '-float':
+        elif len(instr) == 4 and instr[2] == '-float':
             return self.unary_fminus(instr)
-        elif len(instr)==5 and instr[3] == '-float':
+        elif len(instr) == 5 and instr[3] == '-float':
             return self.fsub_op(instr)
 
-        elif len(instr)==4 and instr[2] == '-int':
+        elif len(instr) == 4 and instr[2] == '-int':
             return self.unary_minus(instr)
-        elif len(instr)==5 and instr[3] == '-int':
+        elif len(instr) == 5 and instr[3] == '-int':
             return self.sub_op(instr)
 
         # if instr[1] == '-int':
@@ -1048,41 +1048,41 @@ class CodeGen:
         #         return self.sub_op(instr, scopeInfo, funcScope)
         #     else:
         #         return self.unary_minus(instr, scopeInfo, funcScope)
-        elif len(instr)==5 and instr[3] == '*int':
+        elif len(instr) == 5 and instr[3] == '*int':
             return self.mul_op(instr)
-        elif len(instr)==5 and instr[3] == '*float':
+        elif len(instr) == 5 and instr[3] == '*float':
             return self.fmul_op(instr)
-        elif len(instr)==5 and instr[3] == '/int':
+        elif len(instr) == 5 and instr[3] == '/int':
             return self.div_op(instr)
-        elif len(instr)==5 and instr[3] == '/float':
+        elif len(instr) == 5 and instr[3] == '/float':
             return self.fdiv_op(instr)
 
-        elif len(instr)==3 and instr[1] == '=':
+        elif len(instr) == 3 and instr[1] == '=':
             return self.assign_op(instr)
-        elif len(instr)==3 and instr[1] == '+=':
+        elif len(instr) == 3 and instr[1] == '+=':
             return self.add_assign_op(instr)
-        elif len(instr)==3 and instr[1] == '-=':
+        elif len(instr) == 3 and instr[1] == '-=':
             return self.sub_assign_op(instr)
-        elif len(instr)==3 and instr[1] == '*=':
+        elif len(instr) == 3 and instr[1] == '*=':
             return self.mul_assign_op(instr)
-        elif len(instr)==3 and instr[1] == '/=':
+        elif len(instr) == 3 and instr[1] == '/=':
             return self.div_assign_op(instr)
 
-        elif len(instr)==5 and instr[0][0:6] == 'retval':
-            return self.getRetVal(instr)#error
+        elif len(instr) == 5 and instr[0][0:6] == 'retval':
+            return self.getRetVal(instr)  # error
 
-        elif len(instr)==5 and instr[3] in self.relops:
+        elif len(instr) == 5 and instr[3] in self.relops:
             return self.relops_cmp(instr)
 
-        elif len(instr)==5 and instr[3] in self.frelops:
+        elif len(instr) == 5 and instr[3] in self.frelops:
             return self.relops_fcmp(instr)
 
-        elif len(instr)==4 and instr[0] == 'if':
+        elif len(instr) == 4 and instr[0] == 'if':
             return self.if_op(instr)
-        elif len(instr)==2 and instr[0] == 'goto':
+        elif len(instr) == 2 and instr[0] == 'goto':
             return self.goto_op(instr)
 
-        elif len(instr)==5 and instr[3] in ['||', '&&']:
+        elif len(instr) == 5 and instr[3] in ['||', '&&']:
             return self.logical(instr)
 
         # elif instr[0] in ['--', '++']:
@@ -1098,15 +1098,15 @@ class CodeGen:
         #     return self.scan_int(instr, scopeInfo, funcScope)
         # elif instr[0] == 'scan_string':
         #     return self.scan_string(instr, scopeInfo, funcScope)
-        elif len(instr)==2 and instr[0] == 'param':
+        elif len(instr) == 2 and instr[0] == 'param':
             return self.param(instr)
-        elif len(instr)==2 and instr[0] == 'call':
+        elif len(instr) == 2 and instr[0] == 'call':
             # function call
             return ['call '+instr[1]]
 
-        elif len(instr)==5 and instr[0] == '*pointer':
+        elif len(instr) == 5 and instr[0] == '*pointer':
             return self.assign_ptr_rhs(instr)
-        elif len(instr)==4 and instr[2][0] == '&':
+        elif len(instr) == 4 and instr[2][0] == '&':
             return self.ampersand_op(instr)
 
     def getCode(self):
