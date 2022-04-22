@@ -1,9 +1,0 @@
- main :
- var_temp_no_0 = 10
- var_temp_no_1 = 10
- print_int var_temp_no_0
- print_int var_temp_no_1
- print_int 111
- scan_int var_temp_no_0
- print_int var_temp_no_0
- return

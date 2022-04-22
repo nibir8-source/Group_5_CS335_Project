@@ -1,12 +1,14 @@
 package main
 import "fmt"
 
-func main(){
-    var a int = 5
-    var b int = 6
-    c := a + b
-	if 5 < 6 {
-		d := a * b
-	}
+func main() {
+	var a *int
+	var b *int
+	*a = 5
+	*b = 6
+	*a = *b
 
+	var c *int 
+	*c = *a
+	*c ++
 }
