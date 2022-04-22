@@ -1504,7 +1504,8 @@ def p_statement(p):
     | OpenScope Block CloseScope 
     | IfStmt 
     | SwitchStmt 
-    | ForStmt  '''
+    | ForStmt
+    | PrintStmt  '''
     if len(p) == 2:
         p[0] = p[1]
     else:
@@ -1809,6 +1810,19 @@ def p_expr_case_clause(p):
         p[0].code.append(['goto', end_for[-1]])
         p[0].code.append([label, ': '])
         p[0].code.append(['goto', end_for[-1]])
+
+
+def p_print(p):
+    '''PrintStmt : PRINT LEFT_PARENTHESIS ExpressionList RIGHT_PARENTHESIS'''
+    p[0] = Node("Print")
+    p[0] = p[3]
+    for i in range(0, len(p[3].expr_list)):
+
+        p[0].code.append(
+            ["print_" + str(p[3].expr_type_list[i][0]), p[3].expr_list[i]])
+
+    # print(p[3].expr_list)
+    # print(p[3].expr_type_list)
 
 
 def p_for_stmt(p):
