@@ -875,10 +875,10 @@ class CodeGen:
         code.append('pop esi')
         return code
 
-    def scan_string(self, instr, scopeInfo, funcScope):
+    def scan_string(self, instr):
         src = instr[1]
-        flag = self.setFlags(instr, scopeInfo)
-        srcOffset = self.ebpOffset(src, scopeInfo[1], funcScope)
+        flag = self.setFlags(instr)
+        srcOffset = self.ebpOffset(src)
         code = []
 
         code.append('mov edi, 100')
@@ -1027,7 +1027,7 @@ class CodeGen:
     def genCode(self, idx):
         # Check instruction type and call function accordingly
         instr = self.code[idx]
-        # print(instr, len(instr))
+        print(instr, len(instr))
 
         if instr[0] == 'return':
             return []

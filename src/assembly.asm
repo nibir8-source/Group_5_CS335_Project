@@ -12,28 +12,20 @@ section .text
 main:
     push ebp
     mov ebp, esp
-    sub esp, 12
-    mov edi, 10
+    sub esp, 104
+    mov edi, "Hello"
     mov [ebp-4], edi
-    mov edi, 10
-    mov [ebp-8], edi
+    mov edi, 100
+    call malloc
+    pop edi
+    mov [ebp-4],  eax
+    mov esi, eax
+    push esi
+    call gets
+    pop esi
     mov esi, [ebp-4]
     push esi
-    push print_int
-    call printf
-    pop esi
-    pop esi
-    mov esi, [ebp-8]
-    push esi
-    push print_int
-    call printf
-    pop esi
-    pop esi
-    mov esi, 111
-    push esi
-    push print_int
-    call printf
-    pop esi
+    call puts
     pop esi
     mov esp, ebp
     pop ebp

@@ -1,0 +1,5 @@
+ main :
+ var_temp_no_0 = "Hello"
+ scan_string var_temp_no_0
+ print_string var_temp_no_0
+ return

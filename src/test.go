@@ -2,11 +2,11 @@ package main
 import "fmt"
 
 func main() {
-	var a *int
-	var b *int
-	*a = 5
-	*b = 6
-	*a = *b
+	// var a *int
+	// var b *int
+	// *a = 5
+	// *b = 6
+	// *a = *b
 	// *a = 5
 	// *b = 6
 	// c := *a + *b
@@ -16,4 +16,7 @@ func main() {
 	// var c *int 
 	// *c = *a
 	// *c ++
+	c:="Hello"
+	scan(c)
+	print(c)
 }
