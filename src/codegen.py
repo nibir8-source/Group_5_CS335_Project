@@ -45,8 +45,9 @@ class CodeGen:
     def ebpOffset(self, ident):
         scope = self.get_scope(ident)
         # offset = self.scopetab[scope].table[ident]["offset"]
+        print(ident)
         name = self.scopetab[scope].table[ident]["type"]
-        print(name)
+        # print(name)
         if(name == "temp"):
             offset = self.scopetab[scope].table[ident]["offset"]
         else:
@@ -78,7 +79,7 @@ class CodeGen:
             # if (len(curr) == 1 and curr[0][-2:] == '::'):
             #     break
             code_ = self.genCode(self.codeIndex)
-            print(code_)
+            #print(code_)
             if len(code_) == 0:
                 # then it should be a return statement
                 if len(self.code[self.codeIndex]) != 1:
@@ -1018,7 +1019,7 @@ class CodeGen:
     def genCode(self, idx):
         # Check instruction type and call function accordingly
         instr = self.code[idx]
-        print(instr)
+        # print(instr)
 
         if instr[0] == 'return':
             return []
