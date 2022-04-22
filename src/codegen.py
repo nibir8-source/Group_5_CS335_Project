@@ -818,57 +818,60 @@ class CodeGen:
             code.append('mov [ebp' + str(dstOffset) + '], eax')
         return code
 
-    # def print_int(self, instr):
-    #     src = instr[1]
-    #     srcOffset = self.ebpOffset(src)
-    #     flag = self.setFlags(instr)
-    #     code = []
-    #     code.append('mov esi, [ebp' + srcOffset + ']')
-    #     if flag[1] == 1:
-    #         code.append('mov esi, [esi]')
-    #     code.append('push esi')
-    #     code.append('push print_int')
-    #     code.append('call printf')
-    #     code.append('pop esi')
-    #     code.append('pop esi')
-    #     return code
+    def print_int(self, instr):
+        src = instr[1]
+        srcOffset = self.ebpOffset(src)
+        flag = self.setFlags(instr)
+        code = []
+        if(srcOffset == -1):
+            code.append('mov esi, ' + src)
+        else:
+            code.append('mov esi, [ebp' + srcOffset + ']')
+        if flag[1] == 1:
+            code.append('mov esi, [esi]')
+        code.append('push esi')
+        code.append('push print_int')
+        code.append('call printf')
+        code.append('pop esi')
+        code.append('pop esi')
+        return code
 
-    # def print_float(self, instr, scopeInfo, funcScope):
-    #     src = instr[1]
-    #     srcOffset = self.ebpOffset(src, scopeInfo[1], funcScope)
-    #     flag = self.setFlags(instr, scopeInfo)
-    #     code = []
-    #     # code.append('mov esi, [ebp' + srcOffset + ']')
-    #     # if flag[1] == 1:
-    #     #     code.append('mov esi, [esi]')
-    #     # code.append('push esi')
-    #     # code.append('push farray_print')
-    #     # code.append('call printf')
-    #     # code.append('pop esi')
-    #     # code.append('pop esi')
+    def print_float(self, instr, scopeInfo, funcScope):
+        src = instr[1]
+        srcOffset = self.ebpOffset(src, scopeInfo[1], funcScope)
+        flag = self.setFlags(instr, scopeInfo)
+        code = []
+        # code.append('mov esi, [ebp' + srcOffset + ']')
+        # if flag[1] == 1:
+        #     code.append('mov esi, [esi]')
+        # code.append('push esi')
+        # code.append('push farray_print')
+        # code.append('call printf')
+        # code.append('pop esi')
+        # code.append('pop esi')
 
-    #     code.append('fld dword [ebp' + srcOffset + ']')
-    #     code.append('fstp qword [temp]')
-    #     code.append('push dword [temp+4]')
-    #     code.append('push dword [temp+4]')
-    #     code.append('push dword farray_print')
-    #     code.append('call printf')
-    #     code.append('add esp, 12')
+        code.append('fld dword [ebp' + srcOffset + ']')
+        code.append('fstp qword [temp]')
+        code.append('push dword [temp+4]')
+        code.append('push dword [temp+4]')
+        code.append('push dword farray_print')
+        code.append('call printf')
+        code.append('add esp, 12')
 
-    #     return code
+        return code
 
-    # def print_string(self, instr, scopeInfo, funcScope):
-    #     src = instr[1]
-    #     flag = self.setFlags(instr, scopeInfo)
-    #     srcOffset = self.ebpOffset(src, scopeInfo[1], funcScope)
-    #     code = []
+    def print_string(self, instr, scopeInfo, funcScope):
+        src = instr[1]
+        flag = self.setFlags(instr, scopeInfo)
+        srcOffset = self.ebpOffset(src, scopeInfo[1], funcScope)
+        code = []
 
-    #     code.append('mov esi, [ebp' + srcOffset + ']')
+        code.append('mov esi, [ebp' + srcOffset + ']')
 
-    #     code.append('push esi')
-    #     code.append('call puts')
-    #     code.append('pop esi')
-    #     return code
+        code.append('push esi')
+        code.append('call puts')
+        code.append('pop esi')
+        return code
 
     # def scan_int(self, instr, scopeInfo, funcScope):
     #     src = instr[1]
@@ -1103,16 +1106,16 @@ class CodeGen:
         # elif instr[0] in ['--', '++']:
         #     return self.inc_dec(instr, scopeInfo, funcScope)
 
-        # if instr[0] == 'print_int':
-        #     return self.print_int(instr, scopeInfo, funcScope)
-        # if instr[0] == 'print_float':
-        #     return self.print_float(instr, scopeInfo, funcScope)
-        # if instr[0] == 'print_string':
-        #     return self.print_string(instr, scopeInfo, funcScope)
-        # elif instr[0] == 'scan_int':
-        #     return self.scan_int(instr, scopeInfo, funcScope)
-        # elif instr[0] == 'scan_string':
-        #     return self.scan_string(instr, scopeInfo, funcScope)
+        elif instr[0] == 'print_int':
+            return self.print_int(instr)
+        elif instr[0] == 'print_float':
+            return self.print_float(instr)
+        elif instr[0] == 'print_string':
+            return self.print_string(instr)
+        elif instr[0] == 'scan_int':
+            return self.scan_int(instr)
+        elif instr[0] == 'scan_string':
+            return self.scan_string(instr)
         elif len(instr) == 2 and instr[0] == 'param':
             return self.param(instr)
         elif len(instr) == 2 and instr[0] == 'call':
