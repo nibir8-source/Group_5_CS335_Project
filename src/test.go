@@ -7,8 +7,13 @@ func main() {
 	*a = 5
 	*b = 6
 	*a = *b
+	// *a = 5
+	// *b = 6
+	// c := *a + *b
+	// print(c)
+	// *a = *b
 
-	var c *int 
-	*c = *a
-	*c ++
+	// var c *int 
+	// *c = *a
+	// *c ++
 }
