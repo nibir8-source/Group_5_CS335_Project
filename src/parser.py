@@ -1172,12 +1172,16 @@ def p_expression(p):
         # print(p[1].code)
         if p[1].data.get("deref") is not None:
             var1 = create_temp()
+            scope_table[curr_scope].table[var1]["offset"] = offset_list[curr_func_scope]
+            offset_list[curr_func_scope] += 4
             # print('A')
             p[0].code.append([var1, "=", "*", p[1].expr_list[0]])
         else:
             var1 = p[1].expr_list[0]
         if p[3].data.get("deref") is not None:
             var2 = create_temp()
+            scope_table[curr_scope].table[var2]["offset"] = offset_list[curr_func_scope]
+            offset_list[curr_func_scope] += 4
             # print('B')
             p[0].code.append([var2, "=", "*", p[3].expr_list[0]])
         else:
@@ -1186,6 +1190,8 @@ def p_expression(p):
             p[1].expr_type_list[0], [p[2]], p[3].expr_type_list[0]))
         p[0].data["memory"] = 0
         var3 = create_temp()
+        scope_table[curr_scope].table[var3]["offset"] = offset_list[curr_func_scope]
+        offset_list[curr_func_scope] += 4
         # print('C')
         p[0].expr_list = [var3]
         p[0].code.append(
@@ -1223,6 +1229,8 @@ def p_unary_expr(p):
                     errors.add_error(
                         'Address Error', line_number.get()+1, "Can't get address")
                 var1 = create_temp()
+                scope_table[curr_scope].table[var1]["offset"] = offset_list[curr_func_scope]
+                offset_list[curr_func_scope] += 4
                 p[0].code.append([var1, "=", "&", p[2].expr_list[0]])
                 p[0].expr_list = [var1]
             else:
@@ -1230,6 +1238,8 @@ def p_unary_expr(p):
         else:
             p[0].data["memory"] = 0
             var1 = create_temp()
+            scope_table[curr_scope].table[var1]["offset"] = offset_list[curr_func_scope]
+            offset_list[curr_func_scope] += 4
             p[0].expr_list = [var1]
             if p[1].expr_type_list[0][0] == '+' or p[1].expr_type_list[0][0] == '-':
                 p[0].code.append([var1, "=", p[1].expr_type_list[0]
@@ -1285,6 +1295,8 @@ def p_primary_expr(p):
         if scope_table[x].table.get(temp1[0]) != None:
             if(scope_table[x].table[temp1[0]]["type"] == ["struct"]):
                 var1 = create_temp()
+                scope_table[curr_scope].table[var1]["offset"] = offset_list[curr_func_scope]
+                offset_list[curr_func_scope] += 4
                 p[0].code.append([var1, "=", "&", scope_table[checker.check_ident(scope_table, curr_scope, scope_list,
                                                                                   p[1], 'check_declaration')].table[p[1]]["tmp"]])
                 p[0].data["deref"] = 1
@@ -1306,6 +1318,8 @@ def p_primary_expr(p):
             p[0].data["memory"] = 1
             p[0].code = p[1].code
             var1 = create_temp()
+            scope_table[curr_scope].table[var1]["offset"] = offset_list[curr_func_scope]
+            offset_list[curr_func_scope] += 4
             off = scope_table[curr_scope].table[p[1].expr_type_list[0]
                                                 [0]]["offset "+p[3]]
             p[0].code.append([var1, "=", p[1].expr_list[0], '+int', off])
@@ -1329,6 +1343,8 @@ def p_primary_expr(p):
         p[0].data["memory"] = 1
         p[0].data["deref"] = 1
         var1 = create_temp()
+        scope_table[curr_scope].table[var1]["offset"] = offset_list[curr_func_scope]
+        offset_list[curr_func_scope] += 4
         p[0].code.append([var1, "=", p[2].expr_list[0]])
         for i in range(0, len(p[0].expr_type_list[0])):
             if p[0].expr_type_list[0][i][0:3] == "arr":
@@ -1360,6 +1376,8 @@ def p_primary_expr(p):
         else:
             for i in range(0, len(p[0].expr_type_list)):
                 var1 = create_temp()
+                scope_table[curr_scope].table[var1]["offset"] = offset_list[curr_func_scope]
+                offset_list[curr_func_scope] += 4
                 p[0].expr_list.append(var1)
         p[0].data["multi_return"] = 1
         p[0].data["memory"] = 0
@@ -1529,11 +1547,15 @@ def p_inc_dec_stmt(p):
     else:
         if p[2] == "++":
             var1 = create_temp()
+            scope_table[curr_scope].table[var1]["offset"] = offset_list[curr_func_scope]
+            offset_list[curr_func_scope] += 4
             p[0].code.append([var1, "=", "*", p[1].expr_list[0]])
             p[0].code.append([var1, "=", var1, '+int', 1])
             p[0].code.append(["*", p[1].expr_list[0], "=", var1])
         if(p[2] == "--"):
             var1 = create_temp()
+            scope_table[curr_scope].table[var1]["offset"] = offset_list[curr_func_scope]
+            offset_list[curr_func_scope] += 4
             p[0].code.append([var1, "=", "*", p[1].expr_list[0]])
             p[0].code.append([var1, "=", var1, '-int', 1])
             p[0].code.append(["*", p[1].expr_list[0], "=", var1])
@@ -1579,6 +1601,8 @@ def p_assignment(p):
         if p[1].data["dereflist"][i] == 1:
             if p[3].data["dereflist"][i] == 1:
                 var1 = create_temp()
+                scope_table[curr_scope].table[var1]["offset"] = offset_list[curr_func_scope]
+                offset_list[curr_func_scope] += 4
                 p[0].code.append([var1, "=", "*", p[3].expr_list[i]])
                 p[0].code.append(
                     ["*", p[1].expr_list[i], p[2].expr_type_list[0][0], var1])
@@ -1588,6 +1612,8 @@ def p_assignment(p):
         else:
             if(p[3].data["dereflist"][i] == 1):
                 var1 = create_temp()
+                scope_table[curr_scope].table[var1]["offset"] = offset_list[curr_func_scope]
+                offset_list[curr_func_scope] += 4
                 p[0].code.append([var1, "=", "*", p[3].expr_list[i]])
                 p[0].code.append(
                     [p[1].expr_list[i], p[2].expr_type_list[0][0], var1])
@@ -1773,6 +1799,8 @@ def p_expr_case_clause(p):
             errors.add_error('Type Error', line_number.get(
             )+1, "The type of expression in case does not match type of expression in switch")
         var = create_temp()
+        scope_table[curr_scope].table[var]["offset"] = offset_list[curr_func_scope]
+        offset_list[curr_func_scope] += 4
         label = create_label()
         p[0].code = p[3].code
         p[0].code.append([var, '=', switch_expr, '==', p[3].expr_list[0]])
@@ -1886,6 +1914,8 @@ def p_returnstmt(p):
         for i in range(0, len(p[2].expr_list)):
             if(p[2].data["dereflist"][i] == 1):
                 var1 = create_temp()
+                scope_table[curr_scope].table[var1]["offset"] = offset_list[curr_func_scope]
+                offset_list[curr_func_scope] += 4
                 p[0].code.append([var1, "=", "*", p[2].expr_list[i]])
                 p[0].code.append(["return", var1])
             else:
@@ -1986,14 +2016,14 @@ pkl.dump(Sf_node, open('Sf_node.p', 'wb'))
 # for i in range(scope_table.keys()):
 #     print(i)
 # print(scope_table.keys())
-print(offset_list)
-for i in range(1, len(scope_table.keys())):
-    # print(scope_table[i].table.keys())
-    for key in scope_table[i].table:
-        if "temp_no" in key and key[0] == "t":
-            scope_table[i].table[key]["offset"] = offset_list[i]
-            offset_list[i] += 4
-    scope_table[i].table["total_size"]["type"] = offset_list[i]
+# print(offset_list)
+# for i in range(1, len(scope_table.keys())):
+#     # print(scope_table[i].table.keys())
+#     for key in scope_table[i].table:
+#         if "temp_no" in key and key[0] == "t":
+#             scope_table[i].table[key]["offset"] = offset_list[i]
+#             offset_list[i] += 4
+#     scope_table[i].table["total_size"]["type"] = offset_list[i]
 
 for i in range(1, len(scope_table.keys())):
     print(scope_table[i].table)

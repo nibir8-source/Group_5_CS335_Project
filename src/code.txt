@@ -1,0 +1,11 @@
+ main :
+ var_temp_no_0 = 5
+ var_temp_no_1 = 6
+ temp_no_2 = var_temp_no_0 +int var_temp_no_1
+ var_temp_no_3 = temp_no_2
+ temp_no_4 = 5 <int 6
+ ifnot temp_no_4 goto label_no_0
+ temp_no_5 = var_temp_no_0 *int var_temp_no_1
+ var_temp_no_6 = temp_no_5
+ label_no_0 : 
+ return
