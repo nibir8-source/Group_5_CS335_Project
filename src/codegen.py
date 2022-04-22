@@ -834,20 +834,11 @@ class CodeGen:
         code.append('pop esi')
         return code
 
-    def print_float(self, instr, scopeInfo, funcScope):
+    def print_float(self, instr):
         src = instr[1]
-        srcOffset = self.ebpOffset(src, scopeInfo[1], funcScope)
-        flag = self.setFlags(instr, scopeInfo)
+        srcOffset = self.ebpOffset(src)
+        # flag = self.setFlags(instr)
         code = []
-        # code.append('mov esi, [ebp' + srcOffset + ']')
-        # if flag[1] == 1:
-        #     code.append('mov esi, [esi]')
-        # code.append('push esi')
-        # code.append('push farray_print')
-        # code.append('call printf')
-        # code.append('pop esi')
-        # code.append('pop esi')
-
         code.append('fld dword [ebp' + srcOffset + ']')
         code.append('fstp qword [temp]')
         code.append('push dword [temp+4]')
@@ -858,50 +849,48 @@ class CodeGen:
 
         return code
 
-    def print_string(self, instr, scopeInfo, funcScope):
+    def print_string(self, instr):
         src = instr[1]
-        flag = self.setFlags(instr, scopeInfo)
-        srcOffset = self.ebpOffset(src, scopeInfo[1], funcScope)
+        # flag = self.setFlags(instr)
+        srcOffset = self.ebpOffset(src)
         code = []
-
         code.append('mov esi, [ebp' + srcOffset + ']')
-
         code.append('push esi')
         code.append('call puts')
         code.append('pop esi')
         return code
 
-    # def scan_int(self, instr, scopeInfo, funcScope):
-    #     src = instr[1]
-    #     flag = self.setFlags(instr, scopeInfo)
-    #     srcOffset = self.ebpOffset(src, scopeInfo[1], funcScope)
-    #     code = []
-    #     code.append('lea esi, [ebp' + srcOffset + ']')
-    #     if flag[1] == 1:
-    #         code.append('mov esi, [esi]')
-    #     code.append('push esi')
-    #     code.append('push scan_int')
-    #     code.append('call scanf')
-    #     code.append('pop esi')
-    #     code.append('pop esi')
-    #     return code
+    def scan_int(self, instr):
+        src = instr[1]
+        flag = self.setFlags(instr)
+        srcOffset = self.ebpOffset(src)
+        code = []
+        code.append('lea esi, [ebp' + srcOffset + ']')
+        if flag[1] == 1:
+            code.append('mov esi, [esi]')
+        code.append('push esi')
+        code.append('push scan_int')
+        code.append('call scanf')
+        code.append('pop esi')
+        code.append('pop esi')
+        return code
 
-    # def scan_string(self, instr, scopeInfo, funcScope):
-    #     src = instr[1]
-    #     flag = self.setFlags(instr, scopeInfo)
-    #     srcOffset = self.ebpOffset(src, scopeInfo[1], funcScope)
-    #     code = []
+    def scan_string(self, instr, scopeInfo, funcScope):
+        src = instr[1]
+        flag = self.setFlags(instr, scopeInfo)
+        srcOffset = self.ebpOffset(src, scopeInfo[1], funcScope)
+        code = []
 
-    #     code.append('mov edi, 100')
-    #     code.append('call malloc')
-    #     code.append('pop edi')
-    #     code.append('mov [ebp' + srcOffset + '],  eax')
-    #     code.append('mov esi, eax')
+        code.append('mov edi, 100')
+        code.append('call malloc')
+        code.append('pop edi')
+        code.append('mov [ebp' + srcOffset + '],  eax')
+        code.append('mov esi, eax')
 
-    #     code.append('push esi')
-    #     code.append('call gets')
-    #     code.append('pop esi')
-    #     return code
+        code.append('push esi')
+        code.append('call gets')
+        code.append('pop esi')
+        return code
 
     def param(self, instr):
         # data_ = helper.symbolTables[scopeInfo[1]].get(instr[1])

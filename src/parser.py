@@ -1505,7 +1505,8 @@ def p_statement(p):
     | IfStmt 
     | SwitchStmt 
     | ForStmt
-    | PrintStmt  '''
+    | PrintStmt
+    | ScanStmt  '''
     if len(p) == 2:
         p[0] = p[1]
     else:
@@ -1821,6 +1822,15 @@ def p_print(p):
         p[0].code.append(
             ["print_" + str(p[3].expr_type_list[i][0]), p[3].expr_list[i]])
 
+
+def p_scan(p):
+    '''ScanStmt : SCAN LEFT_PARENTHESIS ExpressionList RIGHT_PARENTHESIS'''
+    p[0] = Node("Scan")
+    p[0] = p[3]
+    for i in range(0, len(p[3].expr_list)):
+
+        p[0].code.append(
+            ["scan_" + str(p[3].expr_type_list[i][0]), p[3].expr_list[i]])
     # print(p[3].expr_list)
     # print(p[3].expr_type_list)
 
