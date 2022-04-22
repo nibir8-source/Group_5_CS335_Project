@@ -26,7 +26,8 @@ keywords = {
     'const':    'CONST',
     'true':    'TRUE',
     'false':    'FALSE',
-    'print':    'PRINT'
+    'print':    'PRINT',
+    'scan': 'SCAN'
 }
 
 tokens = list(keywords.values()) + [
