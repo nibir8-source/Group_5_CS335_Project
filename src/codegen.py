@@ -43,17 +43,20 @@ class CodeGen:
                         '<=float', '>=float', '>float', '<float']
 
     def ebpOffset(self, ident):
-        scope = self.get_scope(ident)
-        # offset = self.scopetab[scope].table[ident]["offset"]
-        print(ident)
-        name = self.scopetab[scope].table[ident]["type"]
-        # print(name)
-        if(name == "temp"):
-            offset = self.scopetab[scope].table[ident]["offset"]
-        else:
-            offset = self.scopetab[scope].table[name]["offset"]
-        # if offset >= 0:
-        return '-'+str(offset)
+        try:
+            scope = self.get_scope(ident)
+            # offset = self.scopetab[scope].table[ident]["offset"]
+            # print(ident)
+            name = self.scopetab[scope].table[ident]["type"]
+            # print(name)
+            if(name == "temp"):
+                offset = self.scopetab[scope].table[ident]["offset"]
+            else:
+                offset = self.scopetab[scope].table[name]["offset"]
+            # if offset >= 0:
+            return '-'+str(offset)
+        except:
+            return -1
         # return str(offset)
 
     def addFunc(self, name):
@@ -79,7 +82,7 @@ class CodeGen:
             # if (len(curr) == 1 and curr[0][-2:] == '::'):
             #     break
             code_ = self.genCode(self.codeIndex)
-            #print(code_)
+            print(code_, self.codeIndex)
             if len(code_) == 0:
                 # then it should be a return statement
                 if len(self.code[self.codeIndex]) != 1:
@@ -735,27 +738,35 @@ class CodeGen:
         dstOffset = self.ebpOffset(dst)
         src1Offset = self.ebpOffset(src1)
         src2Offset = self.ebpOffset(src2)
-
+        # print("Instr1", instr[1])
         code = []
-        code.append('mov edi, [ebp' + str(src1Offset) + ']')
+
+        if(src1Offset == -1):
+            code.append('mov edi, '+str(src1))
+        else:
+            code.append('mov edi, [ebp' + str(src1Offset) + ']')
         if flag[2] == 1:
             code.append('mov edi, [edi]')
-        code.append('mov esi, [ebp' + str(src2Offset) + ']')
-        if flag[3] == 1:
+
+        if (src2Offset == -1):
+            code.append('mov edi, '+str(src2))
+        else:
+            code.append('mov esi, [ebp' + str(src2Offset) + ']')
+        if flag[4] == 1:
             code.append('mov esi, [esi]')
         code.append('xor eax, eax')
         code.append('cmp edi, esi')
-        if instr[1] == '==int':
+        if instr[3] == '==int':
             code.append('sete al')
-        elif instr[1] == '!=int':
+        elif instr[3] == '!=int':
             code.append('setne al')
-        elif instr[1] == '<int':
+        elif instr[3] == '<int':
             code.append('setl al')
-        elif instr[1] == '>int':
+        elif instr[3] == '>int':
             code.append('setg al')
-        elif instr[1] == '<=int':
+        elif instr[3] == '<=int':
             code.append('setle al')
-        elif instr[1] == '>=int':
+        elif instr[3] == '>=int':
             code.append('setge al')
 
         if flag[0] == 1:
@@ -787,17 +798,17 @@ class CodeGen:
         # code.append('sahf')
         code.append('fstp dword [temp]')
         # code.append('mov al, c0')
-        if instr[1] == '==float':
+        if instr[3] == '==float':
             code.append('sete al')
-        elif instr[1] == '!=float':
+        elif instr[3] == '!=float':
             code.append('setne al')
-        elif instr[1] == '<float':
+        elif instr[3] == '<float':
             code.append('setl al')
-        elif instr[1] == '>float':
+        elif instr[3] == '>float':
             code.append('setg al')
-        elif instr[1] == '<=float':
+        elif instr[3] == '<=float':
             code.append('setle al')
-        elif instr[1] == '>=float':
+        elif instr[3] == '>=float':
             code.append('setge al')
 
         if flag[0] == 1:
@@ -956,16 +967,23 @@ class CodeGen:
         src2Offset = self.ebpOffset(src2)
 
         code = []
-        code.append('mov edi, [ebp' + str(src1Offset) + ']')
+        if(src1Offset == -1):
+            code.append('mov edi, '+str(src1))
+        else:
+            code.append('mov edi, [ebp' + str(src1Offset) + ']')
         if flag[2] == 1:
             code.append('mov edi, [edi]')
-        code.append('mov esi, [ebp' + str(src2Offset) + ']')
+
+        if (src2Offset == -1):
+            code.append('mov edi, '+str(src2))
+        else:
+            code.append('mov esi, [ebp' + str(src2Offset) + ']')
         if flag[4] == 1:
             code.append('mov esi, [esi]')
 
-        if instr[1] == '||':
+        if instr[3] == '||':
             code.append('or edi, esi')
-        elif instr[1] == '&&':
+        elif instr[3] == '&&':
             code.append('and edi, esi')
 
         if flag[0] == 1:
@@ -1019,21 +1037,17 @@ class CodeGen:
     def genCode(self, idx):
         # Check instruction type and call function accordingly
         instr = self.code[idx]
-        # print(instr)
+        # print(instr, len(instr))
 
         if instr[0] == 'return':
             return []
-        elif len(instr) == 1:
+        elif len(instr) == 2 and instr[1] == ": ":
+            # print("Hello")
             return [instr[0]+':']
         elif len(instr) == 5 and instr[3] == '+int':
             return self.add_op(instr)
         elif len(instr) == 5 and instr[3] == '+float':
             return self.fadd_op(instr)
-        # elif instr[3] == '-float':
-        #     if len(instr) == 4:
-        #         return self.fsub_op(instr)
-        #     else:
-        #         return self.unary_fminus(instr)
         elif len(instr) == 4 and instr[2] == '-float':
             return self.unary_fminus(instr)
         elif len(instr) == 5 and instr[3] == '-float':
@@ -1078,7 +1092,7 @@ class CodeGen:
         elif len(instr) == 5 and instr[3] in self.frelops:
             return self.relops_fcmp(instr)
 
-        elif len(instr) == 4 and instr[0] == 'if':
+        elif len(instr) == 4 and instr[0] == 'ifnot':
             return self.if_op(instr)
         elif len(instr) == 2 and instr[0] == 'goto':
             return self.goto_op(instr)
