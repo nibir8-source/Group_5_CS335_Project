@@ -479,21 +479,19 @@ class CodeGen:
         return code
 
     def pointer_assign(self, instr):
-        dst = instr[1][1:]
-        src = instr[2]
+        dst = instr[1]
+        src = instr[3]
         code = []
-        instr[1] = dst
         flag = self.setFlags(instr)
 
         dstOffset = self.ebpOffset(dst)
-        srcOffset = self.ebpOffset(src)
-
-        code.append('mov edi, [ebp' + srcOffset + ']')
-        if flag[2] == 1:
-            code.append('mov edi [edi]')
+        if self.get_ident_info(src) != -1:
+            srcOffset = self.ebpOffset(src)
+            code.append('mov edi, [ebp' + srcOffset + ']')
+        else:
+            code.append('mov edi, ' + str(src))
         code.append('mov esi, [ebp' + dstOffset + ']')
-        if flag[1] == 1:
-            code.append('mov esi, [esi]')
+        code.append('mov esi, [esi]')
         code.append('mov [esi], edi')
         return code
 
