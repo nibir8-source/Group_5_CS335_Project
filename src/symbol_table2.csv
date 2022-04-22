@@ -1,34 +1,23 @@
-
-Table Number,0
-
-Parent,0,=,
-
-main,"{'type': ['func'], 'scope': 1, 'accepts': [['void']], 'total_param_size': 0, 'return_type': [['void']], 'total_return_size': 0, 'return_size_list': []}"
-
-Table Number,1
-
-Parent,1,=,0
-
-main,{'type': ['func']}
-a,"{'type': ['int'], 'tmp': 'var_temp_no_0', 'offset': 4}"
-var_temp_no_0,{'type': 'a'}
-b,"{'type': ['int'], 'tmp': 'var_temp_no_1', 'offset': 8}"
-var_temp_no_1,{'type': 'b'}
-temp_no_2,"{'type': 'temp', 'offset': 12}"
-c,"{'type': ['int'], 'tmp': 'var_temp_no_3', 'offset': 16}"
-var_temp_no_3,{'type': 'c'}
-total_size,{'type': 40}
-
-Table Number,2
-
-Parent,2,=,1
-
-main,{'type': ['func']}
-temp_no_4,"{'type': 'temp', 'offset': 20}"
-l,"{'type': ['int'], 'tmp': 'var_temp_no_5', 'offset': 24}"
-var_temp_no_5,{'type': 'l'}
-m,"{'type': ['int'], 'tmp': 'var_temp_no_6', 'offset': 28}"
-var_temp_no_6,{'type': 'm'}
-temp_no_7,"{'type': 'temp', 'offset': 32}"
-k,"{'type': ['int'], 'tmp': 'var_temp_no_8', 'offset': 36}"
-var_temp_no_8,{'type': 'k'}
+
+Table Number,0
+
+Parent,0,=,
+
+main,"{'type': ['func'], 'scope': 1, 'accepts': [['void']], 'total_param_size': 0, 'return_type': [['void']], 'total_return_size': 0, 'return_size_list': []}"
+
+Table Number,1
+
+Parent,1,=,0
+
+main,{'type': ['func']}
+a,"{'type': ['arr3', 'int'], 'tmp': 'var_temp_no_0', 'offset': 4}"
+var_temp_no_0,{'type': 'a'}
+temp_no_1,"{'type': 'temp', 'offset': 16}"
+temp_no_2,"{'type': 'temp', 'offset': 20}"
+temp_no_3,"{'type': 'temp', 'offset': 24}"
+temp_no_4,"{'type': 'temp', 'offset': 28}"
+temp_no_5,"{'type': 'temp', 'offset': 32}"
+temp_no_6,"{'type': 'temp', 'offset': 36}"
+temp_no_7,"{'type': 'temp', 'offset': 40}"
+temp_no_8,"{'type': 'temp', 'offset': 44}"
+total_size,{'type': 48}

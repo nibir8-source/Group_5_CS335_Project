@@ -1,13 +1,23 @@
  main :
- var_temp_no_0 = 10
- var_temp_no_1 = 15
- temp_no_2 = var_temp_no_0 +int var_temp_no_1
- var_temp_no_3 = temp_no_2
- temp_no_4 = 5 >int 3
- ifnot temp_no_4 goto label_no_0
- var_temp_no_5 = 10
- var_temp_no_6 = 19
- temp_no_7 = var_temp_no_5 +int var_temp_no_6
- var_temp_no_8 = temp_no_7
- label_no_0 : 
+ temp_no_1 = 0
+ temp_no_1 = temp_no_1 *int 4
+ temp_no_1 = temp_no_1 +int var_temp_no_0
+ * temp_no_1 = 2
+ temp_no_2 = 1
+ temp_no_2 = temp_no_2 *int 4
+ temp_no_2 = temp_no_2 +int var_temp_no_0
+ * temp_no_2 = 3
+ temp_no_3 = 2
+ temp_no_3 = temp_no_3 *int 4
+ temp_no_3 = temp_no_3 +int var_temp_no_0
+ temp_no_4 = 0
+ temp_no_4 = temp_no_4 *int 4
+ temp_no_4 = temp_no_4 +int var_temp_no_0
+ temp_no_5 = 1
+ temp_no_5 = temp_no_5 *int 4
+ temp_no_5 = temp_no_5 +int var_temp_no_0
+ temp_no_6 = * temp_no_4
+ temp_no_7 = * temp_no_5
+ temp_no_8 = temp_no_6 +int temp_no_7
+ * temp_no_3 = temp_no_8
  return
