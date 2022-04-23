@@ -61,7 +61,8 @@ class CodeGen:
 
     def addFunc(self, name):
         funcScope = self.scopetab[0].table[name]["scope"]
-
+        print(1)
+        print(name)
         # add function label
         self.asmCode.append(name+':')
 
@@ -320,7 +321,10 @@ class CodeGen:
             src2Offset = self.ebpOffset(src2)
 
         code = []
-        code.append('mov edi, [ebp' + str(src1Offset) + ']')
+        if instr[3] == '-int':
+            code.append('mov edi, [ebp' + str(src1Offset) + ']')
+        else:
+            code.append('lea edi, [ebp' + str(src1Offset) + ']')
         if flag[2] == 1:
             code.append('mov edi, [edi]')
 
@@ -479,20 +483,30 @@ class CodeGen:
         return code
 
     def pointer_assign(self, instr):
-        dst = instr[1]
-        src = instr[3]
-        code = []
-        flag = self.setFlags(instr)
-
-        dstOffset = self.ebpOffset(dst)
-        if self.get_ident_info(src) != -1:
+        if len(instr) == 4 and instr[2] == '*':
+            dst = instr[0]
+            src = instr[3]
+            dstOffset = self.ebpOffset(dst)
             srcOffset = self.ebpOffset(src)
-            code.append('mov edi, [ebp' + srcOffset + ']')
+            code = []
+            code.append('mov edi, [ebp' + str(srcOffset) + ']')
+            code.append('mov edi, [edi]')
+            code.append('mov [ebp' + str(dstOffset) + '], edi')
+            return code
         else:
-            code.append('mov edi, ' + str(src))
-        code.append('mov esi, [ebp' + dstOffset + ']')
-        code.append('mov esi, [esi]')
-        code.append('mov [esi], edi')
+            dst = instr[1]
+            src = instr[3]
+            code = []
+
+            dstOffset = self.ebpOffset(dst)
+            if self.get_ident_info(src) != -1:
+                srcOffset = self.ebpOffset(src)
+                code.append('mov edi, [ebp' + srcOffset + ']')
+            else:
+                code.append('mov edi, ' + str(src))
+            code.append('mov esi, [ebp' + dstOffset + ']')
+            # code.append('mov esi, [esi]')
+            code.append('mov [esi], edi')
         return code
 
     def assign_op(self, instr):
@@ -502,7 +516,7 @@ class CodeGen:
         code = []
         flag = self.setFlags(instr)
 
-        if dst[0] == '*':
+        if dst[0] == '*' or len(instr) == 4 and instr[2] == '*':
             return self.pointer_assign(instr)
 
         # s1 = self.get_scope(instr[0])
@@ -747,7 +761,7 @@ class CodeGen:
             code.append('mov edi, [edi]')
 
         if (src2Offset == -1):
-            code.append('mov edi, '+str(src2))
+            code.append('mov esi, '+str(src2))
         else:
             code.append('mov esi, [ebp' + str(src2Offset) + ']')
         if flag[4] == 1:
@@ -965,7 +979,7 @@ class CodeGen:
             code.append('mov edi, [edi]')
 
         if (src2Offset == -1):
-            code.append('mov edi, '+str(src2))
+            code.append('mov esi, '+str(src2))
         else:
             code.append('mov esi, [ebp' + str(src2Offset) + ']')
         if flag[4] == 1:
@@ -1031,7 +1045,7 @@ class CodeGen:
 
         if instr[0] == 'return':
             return []
-        elif len(instr) == 2 and instr[1] == ": ":
+        elif len(instr) == 2 and instr[1][0] == ':':
             # print("Hello")
             return [instr[0]+':']
         elif len(instr) == 5 and instr[3] == '+int':
@@ -1045,7 +1059,7 @@ class CodeGen:
 
         elif len(instr) == 4 and instr[2] == '-int':
             return self.unary_minus(instr)
-        elif len(instr) == 5 and instr[3] == '-int':
+        elif len(instr) == 5 and (instr[3] == '-int' or instr[3] == '-arr_int'):
             return self.sub_op(instr)
 
         # if instr[1] == '-int':
@@ -1062,7 +1076,7 @@ class CodeGen:
         elif len(instr) == 5 and instr[3] == '/float':
             return self.fdiv_op(instr)
 
-        elif len(instr) == 3 and instr[1] == '=':
+        elif (len(instr) == 3 and instr[1] == '=') or (len(instr) == 4 and instr[2] == '=') or (len(instr) == 4 and instr[1] == '='):
             return self.assign_op(instr)
         elif len(instr) == 3 and instr[1] == '+=':
             return self.add_assign_op(instr)

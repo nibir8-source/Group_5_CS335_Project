@@ -2,21 +2,15 @@ package main
 import "fmt"
 
 func main() {
-	// var a *int
-	// var b *int
-	// *a = 5
-	// *b = 6
-	// *a = *b
-	// *a = 5
-	// *b = 6
-	// c := *a + *b
-	// print(c)
-	// *a = *b
+	var a[4] int
+	a[0] = 1
+	a[1] = 2
+	a[2] = 3
+	a[3] = 4
 
-	// var c *int 
-	// *c = *a
-	// *c ++
-	c:="Hello"
-	scan(c)
-	print(c)
+	for i:=0 ; i<3; i++ {
+		c := a[i] + a[i + 1]
+		print(c)
+	}
+
 }

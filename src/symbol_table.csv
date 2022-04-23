@@ -10,6 +10,27 @@ Table Number,1
 Parent,1,=,0
 
 main,{'type': ['func']}
-c,"{'type': ['string'], 'tmp': 'var_temp_no_0', 'offset': 4}"
-var_temp_no_0,{'type': 'c'}
-total_size,{'type': 104}
+a,"{'type': ['arr4', 'int'], 'tmp': 'var_temp_no_0', 'offset': 4}"
+var_temp_no_0,{'type': 'a'}
+temp_no_1,"{'type': 'temp', 'offset': 20}"
+temp_no_2,"{'type': 'temp', 'offset': 24}"
+temp_no_3,"{'type': 'temp', 'offset': 28}"
+temp_no_4,"{'type': 'temp', 'offset': 32}"
+total_size,{'type': 72}
+
+Table Number,2
+
+Parent,2,=,1
+
+main,{'type': ['func']}
+i,"{'type': ['int'], 'tmp': 'var_temp_no_5', 'offset': 36}"
+var_temp_no_5,{'type': 'i'}
+temp_no_6,"{'type': 'temp', 'offset': 40}"
+temp_no_7,"{'type': 'temp', 'offset': 44}"
+temp_no_8,"{'type': 'temp', 'offset': 48}"
+temp_no_9,"{'type': 'temp', 'offset': 52}"
+temp_no_10,"{'type': 'temp', 'offset': 56}"
+temp_no_11,"{'type': 'temp', 'offset': 60}"
+temp_no_12,"{'type': 'temp', 'offset': 64}"
+c,"{'type': ['int'], 'tmp': 'var_temp_no_13', 'offset': 68}"
+var_temp_no_13,{'type': 'c'}

@@ -1357,7 +1357,7 @@ def p_primary_expr(p):
                 else:
                     width = scope_table[curr_scope].type_size_list[p[0].expr_type_list[0][i]]
                 p[0].code.append([var1, "=", var1, "*int", width])
-                p[0].code.append([var1, "=", var1, '+int', p[0].expr_list[0]])
+                p[0].code.append([var1, "=", p[0].expr_list[0], '-arr_int', var1])
                 break
         p[0].expr_list = [var1]
 
