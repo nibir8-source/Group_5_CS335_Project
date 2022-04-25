@@ -1382,7 +1382,7 @@ def p_primary_expr(p):
         p[0].data["multi_return"] = 1
         p[0].data["memory"] = 0
         p[0].code = p[2].code
-        p[0].code.append(["startf", p[1].data["isID"]])
+        # p[0].code.append(["startf", p[1].data["isID"]])
         for i in range(0, len(p[2].expr_list)):
             if(p[2].data["dereflist"][i] == 1):
                 # var1 = create_temp()
@@ -1393,7 +1393,7 @@ def p_primary_expr(p):
             else:
                 p[0].code.append(["param", p[2].expr_list[i]])
         p[0].code.append(["call", p[1].data["isID"]])
-        p[0].code.append(["endf", p[1].data["isID"]])
+        # p[0].code.append(["endf", p[1].data["isID"]])
         for i in range(0, len(p[0].expr_list)):
             p[0].code.append([p[0].expr_list[i], "=", "retval_"+str(i+1)])
 
@@ -1944,7 +1944,7 @@ def p_returnstmt(p):
                 p[0].code.append(["return", var1])
             else:
                 p[0].code.append(["return", p[2].expr_list[i]])
-        p[0].code.append(["return"])
+        # p[0].code.append(["return"])
 
 
 # ---------------------------------

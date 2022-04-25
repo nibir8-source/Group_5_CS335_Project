@@ -53,8 +53,11 @@ class CodeGen:
                 offset = self.scopetab[scope].table[ident]["offset"]
             else:
                 offset = self.scopetab[scope].table[name]["offset"]
-            # if offset >= 0:
-            return '-'+str(offset)
+            if offset >= 0:
+                return '-'+str(offset)
+            else:
+                offset = -offset
+                return '+'+str(offset)
         except:
             return -1
         # return str(offset)
@@ -576,7 +579,10 @@ class CodeGen:
                     code.append('mov [ebp' + str(dstOffset) + '], edi')
             else:
                 dstOffset = self.ebpOffset(dst)
-                code.append('mov edi, ' + str(src))
+                if src[:-1] == 'retval_':
+                    code.append('mov edi, eax')
+                else:
+                    code.append('mov edi, ' + str(src))
                 if flag[1] == 1:
                     code.append('mov esi, [ebp' + str(dstOffset) + ']')
                     code.append('mov [esi], edi')
@@ -909,10 +915,12 @@ class CodeGen:
     def param(self, instr):
         # data_ = helper.symbolTables[scopeInfo[1]].get(instr[1])
         data_ = self.get_ident_info(instr[1])
+        if data_ == -1:
+            return ['push ' + str(instr[1])]
         baseType = data_['type']
         flag = self.setFlags(instr)
         offset = self.ebpOffset(instr[1])
-        if baseType[0] in ['int', 'bool', 'float', 'string']:
+        if baseType[0] in ['int', 'bool', 'float', 'string'] or baseType == 'temp':
             if flag[1] == 1:
                 return [
                     'mov edx, [ebp' + offset + ']',
@@ -1037,14 +1045,25 @@ class CodeGen:
     #     else:
     #         code.append('mov [ebp' + str(dstOffset) + '], esi')
     #     return code
+    def set_return_val(self, instr):
+        data_ = self.get_ident_info(instr[1])
+        code_ = []
+        if data_ != -1:
+            offset = self.ebpOffset(instr[1])
+            code_.append('mov eax, [ebp' + str(offset) + ']')
+        else:
+            code_.append('mov eax, ' + str(instr[1]))
+        return code_
 
     def genCode(self, idx):
         # Check instruction type and call function accordingly
         instr = self.code[idx]
         print(instr, len(instr))
 
-        if instr[0] == 'return':
+        if len(instr) == 1 and instr[0] == 'return':
             return []
+        elif len(instr) == 2 and instr[0] == 'return':
+            return self.set_return_val(instr)
         elif len(instr) == 2 and instr[1][0] == ':':
             # print("Hello")
             return [instr[0]+':']
