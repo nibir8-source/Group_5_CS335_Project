@@ -1,6 +1,28 @@
  main :
- * var_temp_no_0 = 5
- var_temp_no_1 = var_temp_no_0
- var_temp_no_2 = * var_temp_no_1
- print_int var_temp_no_2
+ var_temp_no_1 = 2
+ scan_int var_temp_no_0
+ temp_no_2 = var_temp_no_1 ==int 1
+ ifnot temp_no_2 goto label_no_3
+ print_int 1
+ goto label_no_2
+ label_no_3 : 
+ temp_no_3 = var_temp_no_1 ==int 2
+ ifnot temp_no_3 goto label_no_4
+ print_int 2
+ goto label_no_2
+ label_no_4 : 
+ temp_no_4 = var_temp_no_1 +int 1
+ temp_no_6 = var_temp_no_1 ==int temp_no_4
+ ifnot temp_no_6 goto label_no_5
+ temp_no_5 = var_temp_no_1 +int 1
+ print_int temp_no_5
+ goto label_no_2
+ label_no_5 : 
+ temp_no_7 = var_temp_no_1 ==int 4
+ ifnot temp_no_7 goto label_no_6
+ print_int 4
+ goto label_no_2
+ label_no_6 : 
+ print_int 100
+ label_no_2 : 
  return

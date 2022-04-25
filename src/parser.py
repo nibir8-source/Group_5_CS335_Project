@@ -575,7 +575,7 @@ def p_var_spec(p):
         for i in range(0, len(p[4].expr_type_list)):
             if(not (p[4].expr_type_list[i][0] in basic_types_list or p[4].expr_type_list[i][0] == "pointer")):
                 errors.add_error('Type Error', line_number.get()+1,
-                                 'Invalid Assignemnt')
+                                 'Invalid Assignment')
 
     if(isinstance(p[2], str) and p[2] != "=" and not p[2] in scope_table[curr_scope].type_list):
         errors.add_error('Type Error', line_number.get() +
@@ -668,7 +668,7 @@ def p_short_var_decl(p):
             errors.add_error('Assignment Error', line_number.get(
             )+1, "Auto assignment of complex expressions not allowed")
         if not p[3].expr_type_list[i][0] in basic_types_list:
-            errors.add_error('Assignemnt Error', line_number.get(
+            errors.add_error('Assignment Error', line_number.get(
             )+1, "Auto assignment of only basic types allowed")
         if checker.check_ident(scope_table, curr_scope, scope_list, p[1].ident_list[i], 'redeclaration') is True and p[1].ident_list[i] != "_":
             errors.add_error('Assignment Error', line_number.get(
@@ -728,7 +728,7 @@ def p_function_name(p):
     p[0].ast = [p[1]]
     global curr_func
     if checker.check_ident(scope_table, curr_scope, scope_list, p[1], 'redeclaration') == True:
-        errors.add_error("Redecleration", line_number.get() +
+        errors.add_error("Redecleration error", line_number.get() +
                          1, p[1]+" is redeclared")
     scope_table[0].insert(p[1], ["func"])
     scope_table[0].update(p[1], "scope", curr_func_scope)
@@ -963,9 +963,9 @@ def p_TypeList(p):
     | IDENT
     | Type"""
     if(isinstance(p[1], str) and not p[1] in scope_table[curr_scope].type_list):
-        errors.add_error(line_number.get()+1, "Invalid return type")
+        errors.add_error("Return Error",line_number.get()+1, "Invalid return type")
     if len(p) == 4 and isinstance(p[3], str) and not p[3] in scope_table[curr_scope].type_list:
-        errors.add_error(line_number.get()+1, "Invalid return type")
+        errors.add_error("Return Error",line_number.get()+1, "Invalid return type")
     p[0] = Node('TypeList')
     if(len(p) == 2):
         if(isinstance(p[1], str)):
@@ -1038,7 +1038,7 @@ def p_ParameterDecl(p):
     | IDENT IDENT
     | IDENT Type"""
     if isinstance(p[2], str) and not p[2] in scope_table[curr_scope].type_list:
-        errors.add_error(line_number.get()+1,
+        errors.add_error("Type Error", line_number.get()+1,
                          "Invalid type of identifier "+p[2])
 
     p[0] = Node('ParameterDecl')
@@ -1047,8 +1047,7 @@ def p_ParameterDecl(p):
         p[0].ident_list = p[1].ident_list
         for x in p[1].ident_list:
             if checker.check_ident(scope_table, curr_scope, scope_list, x, 'redeclaration') == True and x != "_":
-                errors.add_error(line_number.get()+1,
-                                 "Redeclaration of identifier "+x)
+                errors.add_error("Redeclaration Error", line_number.get()+1,"Redeclaration of identifier "+x)
             else:
                 if(isinstance(p[2], str)):
                     p[0].ast = ["ParameterDecl", p[1].ast, [p[2]]]
@@ -1069,7 +1068,7 @@ def p_ParameterDecl(p):
                     p[0].expr_list.append(p[2].data["typesize"])
     else:
         if checker.check_ident(scope_table, curr_scope, scope_list, p[1], 'redeclaration') == True and p[1] != "_":
-            errors.add_error(line_number.get()+1,
+            errors.add_error("Redeclaration Error", line_number.get()+1,
                              "Redeclaration of identifier "+p[1])
         else:
             p[0].ident_list = [p[1]]
@@ -1394,6 +1393,8 @@ def p_primary_expr(p):
                 p[0].code.append(["param", p[2].expr_list[i]])
         p[0].code.append(["call", p[1].data["isID"]])
         # p[0].code.append(["endf", p[1].data["isID"]])
+        for i in range(0, len(p[2].expr_list)):
+            p[0].code.append(["pop"])
         for i in range(0, len(p[0].expr_list)):
             p[0].code.append([p[0].expr_list[i], "=", "retval_"+str(i+1)])
 
@@ -1534,10 +1535,10 @@ def p_inc_dec_stmt(p):
     else:
         p[0].ast = ["--", p[1].ast]
     if p[0].expr_type_list != [["int"]]:
-        errors.add_error(
+        errors.add_error("Type Error",
             line_number.get()+1, "Type Mismatch: Cannot increment/decrement non-integer value")
     if p[1].data["memory"] == 0:
-        errors.add_error(
+        errors.add_error("Error",
             line_number.get()+1, "Cannot increment/decrement non-addressable value")
     if p[1].data.get("deref") == None:
         if p[2] == "++":
@@ -1718,17 +1719,21 @@ def p_expr_switch_stmt(p):
     | SWITCH SimpleStmt SEMICOLON ExpressionName LEFT_BRACE OpenSwitch ExprCaseClauseStar CloseSwitch RIGHT_BRACE
     | SWITCH ExpressionName LEFT_BRACE OpenSwitch ExprCaseClauseStar CloseSwitch RIGHT_BRACE'''
     p[0] = Node('ExprSwitchStmt')
-    label = create_label(2)
     global curr_switch_type, end_for
+    old_label = end_for[-1]
+    label = create_label(2)
+    print(end_for)
     if len(p) == 7:
         p[0].ast = ["SWITCH", p[4].ast]
         p[0].code += p[4].code
+        p[0].code.append([old_label, ': '])
         if(p[4].data.get("hasReturnStmt") != None):
             p[0].data["hasRStmt"] = 1
     elif len(p) == 8:
         p[0].ast = ["SWITCH", p[2].ast, p[5].ast]
         p[0].code += p[2].code
         p[0].code += p[5].code
+        p[0].code.append([old_label, ': '])
         if(p[5].data.get("hasReturnStmt") != None):
             p[0].data["hasRStmt"] = 1
 
@@ -1737,13 +1742,14 @@ def p_expr_switch_stmt(p):
         p[0].code += p[2].code
         p[0].code += p[4].code
         p[0].code += p[7].code
+        p[0].code.append([old_label, ': '])
         if(p[7].data.get("hasReturnStmt") != None):
             p[0].data["hasRStmt"] = 1
     else:
         p[0].code += p[2].code
         p[0].code += p[6].code
         p[0].ast = ["SWITCH", p[2].ast, p[6].ast]
-        p[0].code.append([end_for[-1], ': '])
+        p[0].code.append([old_label, ': '])
         if(p[6].data.get("hasReturnStmt") != None):
             p[0].data["hasRStmt"] = 1
     end_for = end_for[0: -1]
@@ -1805,12 +1811,15 @@ def p_expr_case_clause(p):
         offset_list[curr_func_scope] += 4
         label = create_label()
         p[0].code = p[3].code
-        p[0].code.append([var, '=', switch_expr, '==', p[3].expr_list[0]])
+        typ = 'big'
+        for _, value in scope_table[curr_scope].table.items():
+            if 'tmp' in value.keys() and value['tmp'] == switch_expr:
+                typ = value['type'][0]
+        p[0].code.append([var, '=', switch_expr, '=='+str(typ), p[3].expr_list[0]])
         p[0].code.append(['ifnot', var, 'goto', label])
         p[0].code += p[5].code
         p[0].code.append(['goto', end_for[-1]])
         p[0].code.append([label, ': '])
-        p[0].code.append(['goto', end_for[-1]])
 
 
 def p_print(p):
@@ -1818,7 +1827,7 @@ def p_print(p):
     p[0] = Node("Print")
     p[0] = p[3]
     for i in range(0, len(p[3].expr_list)):
-
+        print(p[3].expr_list[i])
         p[0].code.append(
             ["print_" + str(p[3].expr_type_list[i][0]), p[3].expr_list[i]])
 
@@ -1991,7 +2000,7 @@ def preprocessing(f):
     All_imports = []
     processed_file = open("our_new_file.go", "w")
 
-    print(len(lines))
+    # print(len(lines))
     count_import_line = 0
     for line in lines:
 
@@ -2049,8 +2058,8 @@ pkl.dump(Sf_node, open('Sf_node.p', 'wb'))
 #             offset_list[i] += 4
 #     scope_table[i].table["total_size"]["type"] = offset_list[i]
 
-for i in range(1, len(scope_table.keys())):
-    print(scope_table[i].table)
+# for i in range(1, len(scope_table.keys())):
+#     print(scope_table[i].table)
 
 with open('scopeTabDump', 'wb') as handle:
     pickle.dump(scope_table, handle, protocol=pickle.HIGHEST_PROTOCOL)

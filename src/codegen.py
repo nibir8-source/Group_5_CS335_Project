@@ -25,6 +25,9 @@ class CodeGen:
         self.asmCode.append('global main')
         self.asmCode.append('extern printf')
         self.asmCode.append('extern scanf')
+        self.asmCode.append('extern gets')
+        self.asmCode.append('extern puts')
+        self.asmCode.append('extern farray_print')
         self.asmCode.append('extern malloc')
         self.asmCode.append('section .data')
         self.asmCode.append('temp dq 0')
@@ -106,7 +109,7 @@ class CodeGen:
                     retValOffset = self.ebpOffset(ident, ident_scope)
                     self.asmCode.append(
                         'lea eax, [ebp'+str(retValOffset) + ']')
-                self.add_epilogue()
+                # self.add_epilogue()
                 self.codeIndex += 1
                 break
             else:
@@ -154,20 +157,28 @@ class CodeGen:
         return flag
 
     def unary_minus(self, instr):
-        dst = instr[1]
-        src1 = instr[2]
+        if instr[0] != '*':
+            dst = instr[0]
+            src = instr[3]
+        else:
+            dst = instr[1]
+            src = instr[4]
         flag = self.setFlags(instr)
 
         dstOffset = self.ebpOffset(dst)
-        src1Offset = self.ebpOffset(src1)
+        if self.get_ident_info(src) != -1:
+            src1Offset = self.ebpOffset(src)
 
         code = []
-        code.append('mov edi, [ebp' + str(src1Offset) + ']')
-        if flag[2] == 1:
-            code.append('mov edi, [edi]')
+        if self.get_ident_info(src) != -1:
+            code.append('mov edi, [ebp' + str(src1Offset) + ']')
+            if (instr[0] == '*' and flag[4] == 1) or (instr[0] != '*' and flag[3] == 1):
+                code.append('mov edi, [edi]')
+        else:
+            code.append('mov edi, ' + str(src))
         code.append('mov esi, 0')
         code.append('sub esi, edi')
-        if flag[1] == 1:
+        if instr[0] == '*':
             code.append('mov esi, [ebp' + str(dstOffset) + ']')
             code.append('mov [esi], edi')
         else:
@@ -175,31 +186,47 @@ class CodeGen:
         return code
 
     def unary_fminus(self, instr):
-        dst = instr[1]
-        src1 = instr[2]
+        if instr[0] != '*':
+            dst = instr[0]
+            src = instr[3]
+        else:
+            dst = instr[1]
+            src = instr[4]
         flag = self.setFlags(instr)
 
         dstOffset = self.ebpOffset(dst)
-        src1Offset = self.ebpOffset(src1)
+        if self.get_ident_info(src) != -1:
+            src1Offset = self.ebpOffset(src)
 
         binaryCode = binary(float(0.0))
 
         code = []
         code.append('mov edi, 0b' + str(binaryCode))
         code.append('mov [ebp' + str(dstOffset) + '], edi')
-
         code.append('fld dword [ebp' + str(dstOffset) + ']')
-        # if flag[2] == 1:
-        #     code.append('mov edi, [edi]')
-        # code.append('mov esi, 0')
-        # code.append('sub esi, edi')
-        code.append('fsub dword [ebp+' + str(src1Offset) + ']')
-        # if flag[1] == 1:
-        #     code.append('mov esi, [ebp'+ str(dstOffset) + ']')
-        #     code.append('mov [esi], edi')
-        # else:
-        #     code.append('mov [ebp' + str(dstOffset) + '], esi')
-        code.append('fstp dword [ebp' + str(dstOffset) + ']')
+
+        if self.get_ident_info(src) != -1:
+            if (instr[0] == '*' and flag[4] != 1) or (instr[0] != '*' and flag[3] != 1):
+                code.append('fsub dword [ebp+' + str(src1Offset) + ']')
+            else:
+                code.append('mov edi [ebp' + str(src1Offset) + ']')
+                code.append('mov edi, [edi]')
+                code.append('mov esi, [ebp-4]')
+                code.append('mov [ebp-4], edi')
+                code.append('fsub dword [ebp-4]')
+                code.append('mov [ebp-4], esi')
+        else:
+            bin_code = binary(float(src))
+            code.append('mov edi, 0b' + str(bin_code))
+            code.append('mov esi, [ebp-4]')
+            code.append('mov [ebp-4], edi')
+            code.append('fsub dword [ebp-4]')
+            code.append('mov [ebp-4], esi')
+        if flag[1] == 1:
+            code.append('mov esi, [ebp'+ str(dstOffset) + ']')
+            code.append('fstp dword [esi]')
+        else:
+            code.append('fstp dword [ebp' + str(dstOffset) + ']')
         return code
 
     def add_op(self, instr):
@@ -568,7 +595,7 @@ class CodeGen:
         code = []
         flag = self.setFlags(instr)
 
-        if dst[0] == '*' or len(instr) == 4 and instr[2] == '*':
+        if dst[0] == '*' or (len(instr) == 4 and instr[2] == '*'):
             return self.pointer_assign(instr)
 
         # s1 = self.get_scope(instr[0])
@@ -908,7 +935,15 @@ class CodeGen:
         srcOffset = self.ebpOffset(src)
         # flag = self.setFlags(instr)
         code = []
-        code.append('fld dword [ebp' + srcOffset + ']')
+        if srcOffset != -1:
+            code.append('fld dword [ebp' + srcOffset + ']')
+        else:
+            binaryCode = binary(float(src))
+            code.append('mov edi, 0b' + str(binaryCode))
+            code.append('mov esi, [ebp-4]')
+            code.append('mov [ebp-4], edi')
+            code.append('fld dword [ebp-4]')
+            code.append('mov [ebp-4], esi')
         code.append('fstp qword [temp]')
         code.append('push dword [temp+4]')
         code.append('push dword [temp+4]')
@@ -1102,7 +1137,82 @@ class CodeGen:
             code_.append('mov eax, [ebp' + str(offset) + ']')
         else:
             code_.append('mov eax, ' + str(instr[1]))
+        code_.append('mov esp, ebp')
+        code_.append('pop ebp')
+        code_.append('ret')
         return code_
+
+    def bit_shift_right(self, instr):
+        dst = instr[0]
+        src1 = instr[2]
+        src2 = instr[4]
+        flag = self.setFlags(instr)
+
+        dstOffset = self.ebpOffset(dst)
+        if self.get_ident_info(src1) != -1:
+            src1Offset = self.ebpOffset(src1)
+        if self.get_ident_info(src2) != -1:
+            src2Offset = self.ebpOffset(src2)
+
+        code = []
+        if self.get_ident_info(src1) != -1:
+            code.append('mov edx, [ebp' + str(src1Offset) + ']')
+            if flag[2] == 1:
+                code.append('mov edx, [edi]')
+        else:
+            code.append('mov edx, ' + str(src1))
+
+        if self.get_ident_info(src2) != -1:
+            code.append('mov eax, [ebp' + str(src2Offset) + ']')
+            if flag[3] == 1:
+                code.append('mov eax, [eax]')
+        else:
+            code.append('mov eax, ' + str(src2))
+        code.append('mov ecx, eax')
+        code.append('sar edx, cl')
+
+        if flag[1] == 1:
+            code.append('mov esi, [ebp' + str(dstOffset) + ']')
+            code.append('mov [esi], edx')
+        else:
+            code.append('mov [ebp' + str(dstOffset) + '], edx')
+        return code
+
+    def bit_shift_left(self, instr):
+        dst = instr[0]
+        src1 = instr[2]
+        src2 = instr[4]
+        flag = self.setFlags(instr)
+
+        dstOffset = self.ebpOffset(dst)
+        if self.get_ident_info(src1) != -1:
+            src1Offset = self.ebpOffset(src1)
+        if self.get_ident_info(src2) != -1:
+            src2Offset = self.ebpOffset(src2)
+
+        code = []
+        if self.get_ident_info(src1) != -1:
+            code.append('mov edx, [ebp' + str(src1Offset) + ']')
+            if flag[2] == 1:
+                code.append('mov edx, [edx]')
+        else:
+            code.append('mov edx, ' + str(src1))
+
+        if self.get_ident_info(src2) != -1:
+            code.append('mov eax, [ebp' + str(src2Offset) + ']')
+            if flag[3] == 1:
+                code.append('mov eax, [eax]')
+        else:
+            code.append('mov eax, ' + str(src2))
+        code.append('mov ecx, eax')
+        code.append('sal edx, cl')
+
+        if flag[1] == 1:
+            code.append('mov esi, [ebp' + str(dstOffset) + ']')
+            code.append('mov [esi], edx')
+        else:
+            code.append('mov [ebp' + str(dstOffset) + '], edx')
+        return code
 
     def genCode(self, idx):
         # Check instruction type and call function accordingly
@@ -1110,7 +1220,10 @@ class CodeGen:
         print(instr, len(instr))
 
         if len(instr) == 1 and instr[0] == 'return':
+            self.add_epilogue()
             return []
+        elif len(instr) == 1 and instr[0] == 'pop':
+            return ['pop edi']
         elif len(instr) == 2 and instr[0] == 'return':
             return self.set_return_val(instr)
         elif len(instr) == 2 and instr[1][0] == ':':
@@ -1120,12 +1233,12 @@ class CodeGen:
             return self.add_op(instr)
         elif len(instr) == 5 and instr[3] == '+float':
             return self.fadd_op(instr)
-        elif len(instr) == 4 and instr[2] == '-float':
+        elif (len(instr) == 4 and instr[2] == '-float') or (instr[0] == '*' and instr[3] == '-float'):
             return self.unary_fminus(instr)
         elif len(instr) == 5 and instr[3] == '-float':
             return self.fsub_op(instr)
 
-        elif len(instr) == 4 and instr[2] == '-int':
+        elif (len(instr) == 4 and instr[2] == '-int') or (instr[0] == '*' and instr[3] == '-int'):
             return self.unary_minus(instr)
         elif len(instr) == 5 and (instr[3] == '-int' or instr[3] == '-arr_int'):
             return self.sub_op(instr)
@@ -1143,6 +1256,10 @@ class CodeGen:
             return self.div_op(instr)
         elif len(instr) == 5 and instr[3] == '/float':
             return self.fdiv_op(instr)
+        elif len(instr) == 5 and instr[3] == '<<int':
+            return self.bit_shift_left(instr)
+        elif len(instr) == 5 and instr[3] == '>>int':
+            return self.bit_shift_right(instr)
 
         elif (len(instr) == 3 and instr[1] == '=') or (len(instr) == 4 and instr[2] == '=') or (len(instr) == 4 and instr[1] == '='):
             return self.assign_op(instr)
