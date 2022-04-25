@@ -67,8 +67,6 @@ class CodeGen:
 
     def addFunc(self, name):
         funcScope = self.scopetab[0].table[name]["scope"]
-        print(1)
-        print(name)
         # add function label
         self.asmCode.append(name+':')
 
@@ -89,7 +87,6 @@ class CodeGen:
             # if (len(curr) == 1 and curr[0][-2:] == '::'):
             #     break
             code_ = self.genCode(self.codeIndex)
-            print(code_, self.codeIndex)
             if len(code_) == 0:
                 # then it should be a return statement
                 if len(self.code[self.codeIndex]) != 1:
@@ -1216,7 +1213,6 @@ class CodeGen:
     def genCode(self, idx):
         # Check instruction type and call function accordingly
         instr = self.code[idx]
-        print(instr, len(instr))
 
         if len(instr) == 1 and instr[0] == 'return':
             self.add_epilogue()
