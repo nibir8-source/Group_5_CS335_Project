@@ -508,7 +508,7 @@ class CodeGen:
 
         code = []
         code.append('xor edx, edx')
-        if self.get_ident_info(src1):
+        if self.get_ident_info(src1) != -1:
             code.append('mov eax, [ebp' + str(src1Offset) + ']')
         else:
             code.append('mov eax, ' + str(src1))

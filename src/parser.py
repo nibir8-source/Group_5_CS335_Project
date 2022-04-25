@@ -1818,7 +1818,7 @@ def p_expr_case_clause(p):
         p[0].code.append([var, '=', switch_expr, '=='+str(typ), p[3].expr_list[0]])
         p[0].code.append(['ifnot', var, 'goto', label])
         p[0].code += p[5].code
-        p[0].code.append(['goto', end_for[-1]])
+        # p[0].code.append(['goto', end_for[-1]])
         p[0].code.append([label, ': '])
 
 
