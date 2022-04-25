@@ -223,7 +223,7 @@ class CodeGen:
             code.append('fsub dword [ebp-4]')
             code.append('mov [ebp-4], esi')
         if flag[1] == 1:
-            code.append('mov esi, [ebp'+ str(dstOffset) + ']')
+            code.append('mov esi, [ebp' + str(dstOffset) + ']')
             code.append('fstp dword [esi]')
         else:
             code.append('fstp dword [ebp' + str(dstOffset) + ']')
@@ -409,7 +409,6 @@ class CodeGen:
 
             code.append('fld dword [ebp' + str(dstOffset) + ']')
 
-        
         if self.get_ident_info(src2) != -1:
             code.append('fsub dword [ebp' + str(src2Offset) + ']')
         else:
