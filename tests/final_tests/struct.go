@@ -1,19 +1,19 @@
 package main
 import "math"
-type marksheet struct{
-	var assignment int;
-	var quiz int;
-	var project float;
-}
-func main(){
-	var a[10] marksheet;
-	for i:=0; i<10;i++{
-		a[i].assignment=i+10
-		a[i].quiz=30
-		a[i].project=12.2
+type def struct{
+	a,b int;
+};
 
-		print(a[i].assignment)
+func main(){
+	var arr[10] def;
+	for i:=0; i<10;i++{
+		arr[i].a = i+10
+		arr[i].b = 30
+		c := arr[i].a + arr[i].b
+		print(c)
 	}
-	
-}
+};
+
+
+
 

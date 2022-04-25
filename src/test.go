@@ -1,15 +1,19 @@
 package main
-import "fmt";
+import "math"
+type def struct{
+	a,b int;
+};
+
 func main(){
-	var a *int;
-	var b *int;
-	*a = 10
-	*b = 20
-	var c int = *a
-	var d int = *b
-	print(c,d)
-	a = b
-	c = *a
-	d = *b
-	print(c,d)
-}
+	var arr[10] def;
+	for i:=0; i<10;i++{
+		arr[i].a = i+10
+		arr[i].b = 30
+		c := arr[i].a + arr[i].b
+		print(c)
+	}
+};
+
+
+
+
