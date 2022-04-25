@@ -1,15 +1,11 @@
-package main
-import "fmt"
+package main;
 
-func fact (x int) (int) {
-	if x == 1 {
-		return x
-	}else {
-		return x * fact(x - 1)
-	}	
-}
+// Output: 27 331
 
-func main() {
-	a := fact(7)
-	print(a)
-}
+func main(){
+    var a *int
+	*a = 5
+	var b *int = &a
+	c := *b
+	print(c)
+};

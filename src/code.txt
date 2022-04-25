@@ -1,21 +1,6 @@
- fact :
- temp_no_1 = var_temp_no_0 ==int 1
- ifnot temp_no_1 goto label_no_0
- return var_temp_no_0
- goto label_no_1
- label_no_0 : 
- temp_no_2 = var_temp_no_0 -int 1
- param temp_no_2
- call fact
- temp_no_3 = retval_1
- temp_no_4 = var_temp_no_0 *int temp_no_3
- return temp_no_4
- label_no_1 : 
- return
  main :
- param 7
- call fact
- temp_no_5 = retval_1
- var_temp_no_6 = temp_no_5
- print_int var_temp_no_6
+ * var_temp_no_0 = 5
+ var_temp_no_1 = var_temp_no_0
+ var_temp_no_2 = * var_temp_no_1
+ print_int var_temp_no_2
  return
