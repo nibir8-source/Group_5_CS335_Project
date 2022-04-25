@@ -1230,6 +1230,7 @@ def p_unary_expr(p):
                 var1 = create_temp()
                 scope_table[curr_scope].table[var1]["offset"] = offset_list[curr_func_scope]
                 offset_list[curr_func_scope] += 4
+                print(var1)
                 p[0].code.append([var1, "=", "&", p[2].expr_list[0]])
                 p[0].expr_list = [var1]
             else:
@@ -1610,6 +1611,7 @@ def p_assignment(p):
                 p[0].code.append(
                     ["*", p[1].expr_list[i], p[2].expr_type_list[0][0], var1])
             else:
+                print("nibir")
                 p[0].code.append(["*", p[1].expr_list[i],
                                  p[2].expr_type_list[0][0], p[3].expr_list[i]])
         else:

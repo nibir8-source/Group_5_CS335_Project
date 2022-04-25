@@ -1,13 +1,16 @@
- f :
- temp_no_1 = var_temp_no_0 *float 3.0
- return temp_no_1
- return
  main :
- scan_float var_temp_no_2
- param var_temp_no_2
- call f
- pop
- temp_no_3 = retval_1
- var_temp_no_4 = temp_no_3
- print_float var_temp_no_4
+ * var_temp_no_0 = 10
+ * var_temp_no_1 = 20
+ var_temp_no_2 = * var_temp_no_0
+ var_temp_no_3 = * var_temp_no_1
+ print_int var_temp_no_2
+ print_int var_temp_no_3
+ temp_no_4 = * var_temp_no_1
+ * var_temp_no_0 = temp_no_4
+ temp_no_5 = * var_temp_no_0
+ var_temp_no_2 = temp_no_5
+ temp_no_6 = * var_temp_no_1
+ var_temp_no_3 = temp_no_6
+ print_int var_temp_no_2
+ print_int var_temp_no_3
  return

@@ -3,28 +3,22 @@ Table Number,0
 
 Parent,0,=,
 
-f,"{'type': ['func'], 'scope': 1, 'accepts': [['float']], 'total_param_size': 4, 'param_size_list': [4], 'return_type': [['float']], 'total_return_size': 4, 'return_size_list': [-12]}"
-main,"{'type': ['func'], 'scope': 2, 'accepts': [['void']], 'total_param_size': 0, 'return_type': [['void']], 'total_return_size': 0, 'return_size_list': []}"
+main,"{'type': ['func'], 'scope': 1, 'accepts': [['void']], 'total_param_size': 0, 'return_type': [['void']], 'total_return_size': 0, 'return_size_list': []}"
 
 Table Number,1
 
 Parent,1,=,0
 
-f,{'type': ['func']}
-a,"{'type': ['float'], 'tmp': 'var_temp_no_0', 'offset': -8}"
-var_temp_no_0,{'type': 'a'}
-temp_no_1,"{'type': 'temp', 'offset': 4}"
-total_size,{'type': 8}
-
-Table Number,2
-
-Parent,2,=,0
-
-f,{'type': ['func']}
 main,{'type': ['func']}
-c,"{'type': ['float'], 'tmp': 'var_temp_no_2', 'offset': 4}"
+a,"{'type': ['pointer', 'int'], 'tmp': 'var_temp_no_0', 'offset': 4}"
+var_temp_no_0,{'type': 'a'}
+b,"{'type': ['pointer', 'int'], 'tmp': 'var_temp_no_1', 'offset': 8}"
+var_temp_no_1,{'type': 'b'}
+c,"{'type': ['int'], 'tmp': 'var_temp_no_2', 'offset': 12}"
 var_temp_no_2,{'type': 'c'}
-temp_no_3,"{'type': 'temp', 'offset': 8}"
-a,"{'type': ['float'], 'tmp': 'var_temp_no_4', 'offset': 12}"
-var_temp_no_4,{'type': 'a'}
-total_size,{'type': 16}
+d,"{'type': ['int'], 'tmp': 'var_temp_no_3', 'offset': 16}"
+var_temp_no_3,{'type': 'd'}
+temp_no_4,"{'type': 'temp', 'offset': 20}"
+temp_no_5,"{'type': 'temp', 'offset': 24}"
+temp_no_6,"{'type': 'temp', 'offset': 28}"
+total_size,{'type': 32}

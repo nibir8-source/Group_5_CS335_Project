@@ -1,18 +1,15 @@
-package main 
-type arr struct{
-	// a[10] float
-    a, b int
-}
+package main
+import "fmt";
 func main(){
-    // var temp arr
-    // var index float=1.0
-    // for i:=0;i<10;i++ {
-    //     (temp.a)[i]=3.31*index 
-    //     index+=1.0
-    //     print((temp.a)[i],index)
-    // }
-	var xyz temp
-	xyz.a = 1
-	xyz.b = 2
-	print(xyz.a + xyz.b)
+	var a *int;
+	var b *int;
+	*a = 10
+	*b = 20
+	var c int = *a
+	var d int = *b
+	print(c,d)
+	a = b
+	c = *a
+	d = *b
+	print(c,d)
 }
