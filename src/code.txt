@@ -1,35 +1,12 @@
  main :
- var_temp_no_1 = 0
- label_no_0 :
- label_no_2 :
- temp_no_2 = var_temp_no_1 <int 10
- ifnot temp_no_2 goto label_no_3
- temp_no_3 = var_temp_no_1
- temp_no_3 = temp_no_3 *int 8
- temp_no_3 = var_temp_no_0 -arr_int temp_no_3
- temp_no_4 = temp_no_3 +int 0
- temp_no_5 = var_temp_no_1 +int 10
- * temp_no_4 = temp_no_5
- temp_no_6 = var_temp_no_1
- temp_no_6 = temp_no_6 *int 8
- temp_no_6 = var_temp_no_0 -arr_int temp_no_6
- temp_no_7 = temp_no_6 +int 4
- * temp_no_7 = 30
- temp_no_8 = var_temp_no_1
- temp_no_8 = temp_no_8 *int 8
- temp_no_8 = var_temp_no_0 -arr_int temp_no_8
- temp_no_9 = temp_no_8 +int 0
- temp_no_10 = var_temp_no_1
- temp_no_10 = temp_no_10 *int 8
- temp_no_10 = var_temp_no_0 -arr_int temp_no_10
- temp_no_11 = temp_no_10 +int 4
- temp_no_12 = * temp_no_9
- temp_no_13 = * temp_no_11
- temp_no_14 = temp_no_12 +int temp_no_13
- var_temp_no_15 = temp_no_14
- print_int var_temp_no_15
- var_temp_no_1 = var_temp_no_1 +int 1
- goto label_no_2
- label_no_3 :
- label_no_1 :
+ var_temp_no_0 = 23
+ var_temp_no_1 = 45
+ temp_no_2 = var_temp_no_0 +int var_temp_no_1
+ temp_no_3 = var_temp_no_0 <<int 2
+ temp_no_4 = var_temp_no_1 >>int 2
+ print_int var_temp_no_0
+ print_int var_temp_no_1
+ print_int temp_no_2
+ print_int temp_no_3
+ print_int temp_no_4
  return

@@ -3,7 +3,10 @@ Table Number,0
 
 Parent,0,=,
 
-def,"{'type': ['struct'], 'a': ['int'], 'offset a': 0, 'b': ['int'], 'offset b': 4}"
+a,"{'type': ['int'], 'tmp': 'var_temp_no_0', 'offset': 0}"
+var_temp_no_0,{'type': 'a'}
+b,"{'type': ['int'], 'tmp': 'var_temp_no_1', 'offset': 4}"
+var_temp_no_1,{'type': 'b'}
 main,"{'type': ['func'], 'scope': 1, 'accepts': [['void']], 'total_param_size': 0, 'return_type': [['void']], 'total_return_size': 0, 'return_size_list': []}"
 
 Table Number,1
@@ -11,31 +14,7 @@ Table Number,1
 Parent,1,=,0
 
 main,{'type': ['func']}
-def,"{'type': ['struct'], 'a': ['int'], 'offset a': 0, 'b': ['int'], 'offset b': 4}"
-arr,"{'type': ['arr10', 'def'], 'tmp': 'var_temp_no_0', 'offset': 4}"
-var_temp_no_0,{'type': 'arr'}
-total_size,{'type': 144}
-
-Table Number,2
-
-Parent,2,=,1
-
-main,{'type': ['func']}
-def,"{'type': ['struct'], 'a': ['int'], 'offset a': 0, 'b': ['int'], 'offset b': 4}"
-i,"{'type': ['int'], 'tmp': 'var_temp_no_1', 'offset': 84}"
-var_temp_no_1,{'type': 'i'}
-temp_no_2,"{'type': 'temp', 'offset': 88}"
-temp_no_3,"{'type': 'temp', 'offset': 92}"
-temp_no_4,"{'type': 'temp', 'offset': 96}"
-temp_no_5,"{'type': 'temp', 'offset': 100}"
-temp_no_6,"{'type': 'temp', 'offset': 104}"
-temp_no_7,"{'type': 'temp', 'offset': 108}"
-temp_no_8,"{'type': 'temp', 'offset': 112}"
-temp_no_9,"{'type': 'temp', 'offset': 116}"
-temp_no_10,"{'type': 'temp', 'offset': 120}"
-temp_no_11,"{'type': 'temp', 'offset': 124}"
-temp_no_12,"{'type': 'temp', 'offset': 128}"
-temp_no_13,"{'type': 'temp', 'offset': 132}"
-temp_no_14,"{'type': 'temp', 'offset': 136}"
-c,"{'type': ['int'], 'tmp': 'var_temp_no_15', 'offset': 140}"
-var_temp_no_15,{'type': 'c'}
+temp_no_2,"{'type': 'temp', 'offset': 4}"
+temp_no_3,"{'type': 'temp', 'offset': 8}"
+temp_no_4,"{'type': 'temp', 'offset': 12}"
+total_size,{'type': 16}
