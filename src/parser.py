@@ -1,3 +1,5 @@
+import pickle as pkl
+import pickle
 import pprint
 import sys
 import ply.yacc as yacc
@@ -44,6 +46,7 @@ curr_scope = 0
 scope_number = 0
 scope_list = [0]
 scope_table = {}
+
 scope_table[0] = SymTable()
 open_for = 0
 open_switch = 0
@@ -68,6 +71,8 @@ file1 = open("tree.txt", "w")  # write mode
 file1.write("digraph graphname {")
 file1.write("\n")
 counter = 0
+
+Sf_node = Node("Sf_node")
 
 
 def writeGraph(Ast_list):
@@ -123,7 +128,7 @@ def close_scope():
 
 def create_label(p=None):
     global label_count
-    label = "label_no:" + str(label_count)
+    label = "label_no_" + str(label_count)
     label_count += 1
     if ((not p is None) and (p == 1)):
         start_for.append(label)
@@ -135,11 +140,11 @@ def create_label(p=None):
 def create_temp(p=None):
     global temp_count
     if p is None:
-        temp = "temp_no:" + str(temp_count)
+        temp = "temp_no_" + str(temp_count)
         temp_count += 1
         scope_table[curr_scope].insert(temp, "temp")
     else:
-        temp = "var_temp_no:" + str(temp_count)
+        temp = "var_temp_no_" + str(temp_count)
         temp_count += 1
     return temp
 
@@ -148,6 +153,7 @@ def create_temp(p=None):
 
 def p_source_file(p):
     '''SourceFile  : PackageClause SEMICOLON ImportDeclStar TopLevelDeclStar'''
+    global Sf_node
     p[0] = Node('SourceFile')
     p[0].code += p[1].code + p[3].code + p[4].code
     p[0].ast = ["SourceFile", p[1].ast, p[3].ast, p[4].ast]
@@ -174,6 +180,7 @@ def p_source_file(p):
     writeGraph(p[0].ast)
     file1.write("}")
     file1.close()
+    Sf_node = p[0]
 
 
 def p_open_scope(p):
@@ -568,7 +575,7 @@ def p_var_spec(p):
         for i in range(0, len(p[4].expr_type_list)):
             if(not (p[4].expr_type_list[i][0] in basic_types_list or p[4].expr_type_list[i][0] == "pointer")):
                 errors.add_error('Type Error', line_number.get()+1,
-                                 'Invalid Assignemnt')
+                                 'Invalid Assignment')
 
     if(isinstance(p[2], str) and p[2] != "=" and not p[2] in scope_table[curr_scope].type_list):
         errors.add_error('Type Error', line_number.get() +
@@ -661,7 +668,7 @@ def p_short_var_decl(p):
             errors.add_error('Assignment Error', line_number.get(
             )+1, "Auto assignment of complex expressions not allowed")
         if not p[3].expr_type_list[i][0] in basic_types_list:
-            errors.add_error('Assignemnt Error', line_number.get(
+            errors.add_error('Assignment Error', line_number.get(
             )+1, "Auto assignment of only basic types allowed")
         if checker.check_ident(scope_table, curr_scope, scope_list, p[1].ident_list[i], 'redeclaration') is True and p[1].ident_list[i] != "_":
             errors.add_error('Assignment Error', line_number.get(
@@ -721,7 +728,7 @@ def p_function_name(p):
     p[0].ast = [p[1]]
     global curr_func
     if checker.check_ident(scope_table, curr_scope, scope_list, p[1], 'redeclaration') == True:
-        errors.add_error("Redecleration", line_number.get() +
+        errors.add_error("Redecleration error", line_number.get() +
                          1, p[1]+" is redeclared")
     scope_table[0].insert(p[1], ["func"])
     scope_table[0].update(p[1], "scope", curr_func_scope)
@@ -956,9 +963,9 @@ def p_TypeList(p):
     | IDENT
     | Type"""
     if(isinstance(p[1], str) and not p[1] in scope_table[curr_scope].type_list):
-        errors.add_error(line_number.get()+1, "Invalid return type")
+        errors.add_error("Return Error",line_number.get()+1, "Invalid return type")
     if len(p) == 4 and isinstance(p[3], str) and not p[3] in scope_table[curr_scope].type_list:
-        errors.add_error(line_number.get()+1, "Invalid return type")
+        errors.add_error("Return Error",line_number.get()+1, "Invalid return type")
     p[0] = Node('TypeList')
     if(len(p) == 2):
         if(isinstance(p[1], str)):
@@ -1031,7 +1038,7 @@ def p_ParameterDecl(p):
     | IDENT IDENT
     | IDENT Type"""
     if isinstance(p[2], str) and not p[2] in scope_table[curr_scope].type_list:
-        errors.add_error(line_number.get()+1,
+        errors.add_error("Type Error", line_number.get()+1,
                          "Invalid type of identifier "+p[2])
 
     p[0] = Node('ParameterDecl')
@@ -1040,8 +1047,7 @@ def p_ParameterDecl(p):
         p[0].ident_list = p[1].ident_list
         for x in p[1].ident_list:
             if checker.check_ident(scope_table, curr_scope, scope_list, x, 'redeclaration') == True and x != "_":
-                errors.add_error(line_number.get()+1,
-                                 "Redeclaration of identifier "+x)
+                errors.add_error("Redeclaration Error", line_number.get()+1,"Redeclaration of identifier "+x)
             else:
                 if(isinstance(p[2], str)):
                     p[0].ast = ["ParameterDecl", p[1].ast, [p[2]]]
@@ -1062,7 +1068,7 @@ def p_ParameterDecl(p):
                     p[0].expr_list.append(p[2].data["typesize"])
     else:
         if checker.check_ident(scope_table, curr_scope, scope_list, p[1], 'redeclaration') == True and p[1] != "_":
-            errors.add_error(line_number.get()+1,
+            errors.add_error("Redeclaration Error", line_number.get()+1,
                              "Redeclaration of identifier "+p[1])
         else:
             p[0].ident_list = [p[1]]
@@ -1165,12 +1171,16 @@ def p_expression(p):
         # print(p[1].code)
         if p[1].data.get("deref") is not None:
             var1 = create_temp()
+            scope_table[curr_scope].table[var1]["offset"] = offset_list[curr_func_scope]
+            offset_list[curr_func_scope] += 4
             # print('A')
             p[0].code.append([var1, "=", "*", p[1].expr_list[0]])
         else:
             var1 = p[1].expr_list[0]
         if p[3].data.get("deref") is not None:
             var2 = create_temp()
+            scope_table[curr_scope].table[var2]["offset"] = offset_list[curr_func_scope]
+            offset_list[curr_func_scope] += 4
             # print('B')
             p[0].code.append([var2, "=", "*", p[3].expr_list[0]])
         else:
@@ -1179,6 +1189,8 @@ def p_expression(p):
             p[1].expr_type_list[0], [p[2]], p[3].expr_type_list[0]))
         p[0].data["memory"] = 0
         var3 = create_temp()
+        scope_table[curr_scope].table[var3]["offset"] = offset_list[curr_func_scope]
+        offset_list[curr_func_scope] += 4
         # print('C')
         p[0].expr_list = [var3]
         p[0].code.append(
@@ -1216,6 +1228,9 @@ def p_unary_expr(p):
                     errors.add_error(
                         'Address Error', line_number.get()+1, "Can't get address")
                 var1 = create_temp()
+                scope_table[curr_scope].table[var1]["offset"] = offset_list[curr_func_scope]
+                offset_list[curr_func_scope] += 4
+                print(var1)
                 p[0].code.append([var1, "=", "&", p[2].expr_list[0]])
                 p[0].expr_list = [var1]
             else:
@@ -1223,6 +1238,8 @@ def p_unary_expr(p):
         else:
             p[0].data["memory"] = 0
             var1 = create_temp()
+            scope_table[curr_scope].table[var1]["offset"] = offset_list[curr_func_scope]
+            offset_list[curr_func_scope] += 4
             p[0].expr_list = [var1]
             if p[1].expr_type_list[0][0] == '+' or p[1].expr_type_list[0][0] == '-':
                 p[0].code.append([var1, "=", p[1].expr_type_list[0]
@@ -1278,6 +1295,8 @@ def p_primary_expr(p):
         if scope_table[x].table.get(temp1[0]) != None:
             if(scope_table[x].table[temp1[0]]["type"] == ["struct"]):
                 var1 = create_temp()
+                scope_table[curr_scope].table[var1]["offset"] = offset_list[curr_func_scope]
+                offset_list[curr_func_scope] += 4
                 p[0].code.append([var1, "=", "&", scope_table[checker.check_ident(scope_table, curr_scope, scope_list,
                                                                                   p[1], 'check_declaration')].table[p[1]]["tmp"]])
                 p[0].data["deref"] = 1
@@ -1299,6 +1318,8 @@ def p_primary_expr(p):
             p[0].data["memory"] = 1
             p[0].code = p[1].code
             var1 = create_temp()
+            scope_table[curr_scope].table[var1]["offset"] = offset_list[curr_func_scope]
+            offset_list[curr_func_scope] += 4
             off = scope_table[curr_scope].table[p[1].expr_type_list[0]
                                                 [0]]["offset "+p[3]]
             p[0].code.append([var1, "=", p[1].expr_list[0], '+int', off])
@@ -1322,6 +1343,8 @@ def p_primary_expr(p):
         p[0].data["memory"] = 1
         p[0].data["deref"] = 1
         var1 = create_temp()
+        scope_table[curr_scope].table[var1]["offset"] = offset_list[curr_func_scope]
+        offset_list[curr_func_scope] += 4
         p[0].code.append([var1, "=", p[2].expr_list[0]])
         for i in range(0, len(p[0].expr_type_list[0])):
             if p[0].expr_type_list[0][i][0:3] == "arr":
@@ -1334,7 +1357,7 @@ def p_primary_expr(p):
                 else:
                     width = scope_table[curr_scope].type_size_list[p[0].expr_type_list[0][i]]
                 p[0].code.append([var1, "=", var1, "*int", width])
-                p[0].code.append([var1, "=", var1, '+int', p[0].expr_list[0]])
+                p[0].code.append([var1, "=", p[0].expr_list[0], '-arr_int', var1])
                 break
         p[0].expr_list = [var1]
 
@@ -1353,11 +1376,13 @@ def p_primary_expr(p):
         else:
             for i in range(0, len(p[0].expr_type_list)):
                 var1 = create_temp()
+                scope_table[curr_scope].table[var1]["offset"] = offset_list[curr_func_scope]
+                offset_list[curr_func_scope] += 4
                 p[0].expr_list.append(var1)
         p[0].data["multi_return"] = 1
         p[0].data["memory"] = 0
         p[0].code = p[2].code
-        p[0].code.append(["startf", p[1].data["isID"]])
+        # p[0].code.append(["startf", p[1].data["isID"]])
         for i in range(0, len(p[2].expr_list)):
             if(p[2].data["dereflist"][i] == 1):
                 # var1 = create_temp()
@@ -1368,7 +1393,9 @@ def p_primary_expr(p):
             else:
                 p[0].code.append(["param", p[2].expr_list[i]])
         p[0].code.append(["call", p[1].data["isID"]])
-        p[0].code.append(["endf", p[1].data["isID"]])
+        # p[0].code.append(["endf", p[1].data["isID"]])
+        for i in range(0, len(p[2].expr_list)):
+            p[0].code.append(["pop"])
         for i in range(0, len(p[0].expr_list)):
             p[0].code.append([p[0].expr_list[i], "=", "retval_"+str(i+1)])
 
@@ -1479,7 +1506,9 @@ def p_statement(p):
     | OpenScope Block CloseScope 
     | IfStmt 
     | SwitchStmt 
-    | ForStmt  '''
+    | ForStmt
+    | PrintStmt
+    | ScanStmt  '''
     if len(p) == 2:
         p[0] = p[1]
     else:
@@ -1507,10 +1536,10 @@ def p_inc_dec_stmt(p):
     else:
         p[0].ast = ["--", p[1].ast]
     if p[0].expr_type_list != [["int"]]:
-        errors.add_error(
+        errors.add_error("Type Error",
             line_number.get()+1, "Type Mismatch: Cannot increment/decrement non-integer value")
     if p[1].data["memory"] == 0:
-        errors.add_error(
+        errors.add_error("Error",
             line_number.get()+1, "Cannot increment/decrement non-addressable value")
     if p[1].data.get("deref") == None:
         if p[2] == "++":
@@ -1522,11 +1551,15 @@ def p_inc_dec_stmt(p):
     else:
         if p[2] == "++":
             var1 = create_temp()
+            scope_table[curr_scope].table[var1]["offset"] = offset_list[curr_func_scope]
+            offset_list[curr_func_scope] += 4
             p[0].code.append([var1, "=", "*", p[1].expr_list[0]])
             p[0].code.append([var1, "=", var1, '+int', 1])
             p[0].code.append(["*", p[1].expr_list[0], "=", var1])
         if(p[2] == "--"):
             var1 = create_temp()
+            scope_table[curr_scope].table[var1]["offset"] = offset_list[curr_func_scope]
+            offset_list[curr_func_scope] += 4
             p[0].code.append([var1, "=", "*", p[1].expr_list[0]])
             p[0].code.append([var1, "=", var1, '-int', 1])
             p[0].code.append(["*", p[1].expr_list[0], "=", var1])
@@ -1572,15 +1605,20 @@ def p_assignment(p):
         if p[1].data["dereflist"][i] == 1:
             if p[3].data["dereflist"][i] == 1:
                 var1 = create_temp()
+                scope_table[curr_scope].table[var1]["offset"] = offset_list[curr_func_scope]
+                offset_list[curr_func_scope] += 4
                 p[0].code.append([var1, "=", "*", p[3].expr_list[i]])
                 p[0].code.append(
                     ["*", p[1].expr_list[i], p[2].expr_type_list[0][0], var1])
             else:
+                print("nibir")
                 p[0].code.append(["*", p[1].expr_list[i],
                                  p[2].expr_type_list[0][0], p[3].expr_list[i]])
         else:
             if(p[3].data["dereflist"][i] == 1):
                 var1 = create_temp()
+                scope_table[curr_scope].table[var1]["offset"] = offset_list[curr_func_scope]
+                offset_list[curr_func_scope] += 4
                 p[0].code.append([var1, "=", "*", p[3].expr_list[i]])
                 p[0].code.append(
                     [p[1].expr_list[i], p[2].expr_type_list[0][0], var1])
@@ -1683,17 +1721,21 @@ def p_expr_switch_stmt(p):
     | SWITCH SimpleStmt SEMICOLON ExpressionName LEFT_BRACE OpenSwitch ExprCaseClauseStar CloseSwitch RIGHT_BRACE
     | SWITCH ExpressionName LEFT_BRACE OpenSwitch ExprCaseClauseStar CloseSwitch RIGHT_BRACE'''
     p[0] = Node('ExprSwitchStmt')
-    label = create_label(2)
     global curr_switch_type, end_for
+    old_label = end_for[-1]
+    label = create_label(2)
+    print(end_for)
     if len(p) == 7:
         p[0].ast = ["SWITCH", p[4].ast]
         p[0].code += p[4].code
+        p[0].code.append([old_label, ': '])
         if(p[4].data.get("hasReturnStmt") != None):
             p[0].data["hasRStmt"] = 1
     elif len(p) == 8:
         p[0].ast = ["SWITCH", p[2].ast, p[5].ast]
         p[0].code += p[2].code
         p[0].code += p[5].code
+        p[0].code.append([old_label, ': '])
         if(p[5].data.get("hasReturnStmt") != None):
             p[0].data["hasRStmt"] = 1
 
@@ -1702,13 +1744,14 @@ def p_expr_switch_stmt(p):
         p[0].code += p[2].code
         p[0].code += p[4].code
         p[0].code += p[7].code
+        p[0].code.append([old_label, ': '])
         if(p[7].data.get("hasReturnStmt") != None):
             p[0].data["hasRStmt"] = 1
     else:
         p[0].code += p[2].code
         p[0].code += p[6].code
         p[0].ast = ["SWITCH", p[2].ast, p[6].ast]
-        p[0].code.append([end_for[-1], ': '])
+        p[0].code.append([old_label, ': '])
         if(p[6].data.get("hasReturnStmt") != None):
             p[0].data["hasRStmt"] = 1
     end_for = end_for[0: -1]
@@ -1766,14 +1809,41 @@ def p_expr_case_clause(p):
             errors.add_error('Type Error', line_number.get(
             )+1, "The type of expression in case does not match type of expression in switch")
         var = create_temp()
+        scope_table[curr_scope].table[var]["offset"] = offset_list[curr_func_scope]
+        offset_list[curr_func_scope] += 4
         label = create_label()
         p[0].code = p[3].code
-        p[0].code.append([var, '=', switch_expr, '==', p[3].expr_list[0]])
+        typ = 'big'
+        for _, value in scope_table[curr_scope].table.items():
+            if 'tmp' in value.keys() and value['tmp'] == switch_expr:
+                typ = value['type'][0]
+        p[0].code.append([var, '=', switch_expr, '=='+str(typ), p[3].expr_list[0]])
         p[0].code.append(['ifnot', var, 'goto', label])
         p[0].code += p[5].code
-        p[0].code.append(['goto', end_for[-1]])
+        # p[0].code.append(['goto', end_for[-1]])
         p[0].code.append([label, ': '])
-        p[0].code.append(['goto', end_for[-1]])
+
+
+def p_print(p):
+    '''PrintStmt : PRINT LEFT_PARENTHESIS ExpressionList RIGHT_PARENTHESIS'''
+    p[0] = Node("Print")
+    p[0] = p[3]
+    for i in range(0, len(p[3].expr_list)):
+        print(p[3].expr_list[i])
+        p[0].code.append(
+            ["print_" + str(p[3].expr_type_list[i][0]), p[3].expr_list[i]])
+
+
+def p_scan(p):
+    '''ScanStmt : SCAN LEFT_PARENTHESIS ExpressionList RIGHT_PARENTHESIS'''
+    p[0] = Node("Scan")
+    p[0] = p[3]
+    for i in range(0, len(p[3].expr_list)):
+
+        p[0].code.append(
+            ["scan_" + str(p[3].expr_type_list[i][0]), p[3].expr_list[i]])
+    # print(p[3].expr_list)
+    # print(p[3].expr_type_list)
 
 
 def p_for_stmt(p):
@@ -1879,11 +1949,13 @@ def p_returnstmt(p):
         for i in range(0, len(p[2].expr_list)):
             if(p[2].data["dereflist"][i] == 1):
                 var1 = create_temp()
+                scope_table[curr_scope].table[var1]["offset"] = offset_list[curr_func_scope]
+                offset_list[curr_func_scope] += 4
                 p[0].code.append([var1, "=", "*", p[2].expr_list[i]])
                 p[0].code.append(["return", var1])
             else:
                 p[0].code.append(["return", p[2].expr_list[i]])
-        p[0].code.append(["return"])
+        # p[0].code.append(["return"])
 
 
 # ---------------------------------
@@ -1930,7 +2002,7 @@ def preprocessing(f):
     All_imports = []
     processed_file = open("our_new_file.go", "w")
 
-    print(len(lines))
+    # print(len(lines))
     count_import_line = 0
     for line in lines:
 
@@ -1967,3 +2039,42 @@ data = file.read()
 parser = yacc.yacc(debug=True)
 res = parser.parse(data, lexer=lexer)
 # pprint.pprint(res)
+# with open('scopeTabDump', 'wb') as handle:
+#     pickle.dump(scope_table, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+pkl.dump(Sf_node, open('Sf_node.p', 'wb'))
+# print((scope_table[0].table))
+# print(Sf_node.code)
+# print(temp_count)
+# l = []
+
+# for i in range(scope_table.keys()):
+#     print(i)
+# print(scope_table.keys())
+# print(offset_list)
+# for i in range(1, len(scope_table.keys())):
+#     # print(scope_table[i].table.keys())
+#     for key in scope_table[i].table:
+#         if "temp_no" in key and key[0] == "t":
+#             scope_table[i].table[key]["offset"] = offset_list[i]
+#             offset_list[i] += 4
+#     scope_table[i].table["total_size"]["type"] = offset_list[i]
+
+# for i in range(1, len(scope_table.keys())):
+#     print(scope_table[i].table)
+
+with open('scopeTabDump', 'wb') as handle:
+    pickle.dump(scope_table, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+csv_file = "symbol_table2.csv"
+with open(csv_file, 'w+') as csvfile:
+    for x in range(0, scope_number+1):
+        #           print("Table number",x)
+        writer = csv.writer(csvfile)
+        writer.writerow([])
+        writer.writerow(["Table Number", x])
+        writer.writerow([])
+        writer.writerow(["Parent", x, "=", scope_table[x].parent])
+        writer.writerow([])
+        for key, value in scope_table[x].table.items():
+            writer.writerow([key, value])
